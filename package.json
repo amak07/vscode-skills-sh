@@ -1,0 +1,371 @@
+{
+  "name": "skills-sh",
+  "displayName": "Skills.sh — Agent Skills Manager",
+  "description": "Browse, install, and manage Agent Skills from skills.sh for Claude Code, Cursor, Copilot, and more",
+  "version": "0.1.0",
+  "license": "MIT",
+  "publisher": "skills-sh",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "agent skills",
+    "claude",
+    "cursor",
+    "copilot",
+    "skills.sh",
+    "ai",
+    "mcp"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skills-sh/vscode-extension"
+  },
+  "icon": "media/icon.png",
+  "activationEvents": [
+    "onView:skills-sh.installedSkills"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "skills-sh",
+          "title": "Skills.sh",
+          "icon": "media/sidebar-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "skills-sh": [
+        {
+          "id": "skills-sh.installedSkills",
+          "name": "Installed Skills"
+        },
+        {
+          "id": "skills-sh.marketplace",
+          "name": "Marketplace",
+          "type": "webview"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "skills-sh.refreshInstalled",
+        "title": "Refresh Installed Skills",
+        "category": "Skills.sh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "skills-sh.openSkillFile",
+        "title": "Open SKILL.md",
+        "category": "Skills.sh",
+        "icon": "$(go-to-file)"
+      },
+      {
+        "command": "skills-sh.installSkill",
+        "title": "Install Skill",
+        "category": "Skills.sh",
+        "icon": "$(cloud-download)"
+      },
+      {
+        "command": "skills-sh.uninstallSkill",
+        "title": "Uninstall Skill",
+        "category": "Skills.sh",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "skills-sh.checkUpdates",
+        "title": "Check for Updates",
+        "category": "Skills.sh",
+        "icon": "$(sync)"
+      },
+      {
+        "command": "skills-sh.openMarketplace",
+        "title": "Open Marketplace",
+        "category": "Skills.sh",
+        "icon": "$(extensions)"
+      },
+      {
+        "command": "skills-sh.copySkillPath",
+        "title": "Copy Path",
+        "category": "Skills.sh"
+      },
+      {
+        "command": "skills-sh.addCustomSource",
+        "title": "Add Custom Source",
+        "category": "Skills.sh",
+        "icon": "$(add)"
+      },
+      {
+        "command": "skills-sh.removeCustomSource",
+        "title": "Remove Custom Source",
+        "category": "Skills.sh",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "skills-sh.browseCustomSource",
+        "title": "Browse Skills in Source",
+        "category": "Skills.sh"
+      },
+      {
+        "command": "skills-sh.openMarketplaceTab",
+        "title": "Open in Editor",
+        "category": "Skills.sh",
+        "icon": "$(link-external)"
+      },
+      {
+        "command": "skills-sh.openSettings",
+        "title": "Open Settings",
+        "category": "Skills.sh",
+        "icon": "$(gear)"
+      },
+      {
+        "command": "skills-sh.installFromSource",
+        "title": "Install from Source",
+        "category": "Skills.sh",
+        "icon": "$(cloud-download)"
+      },
+      {
+        "command": "skills-sh.previewSkillFile",
+        "title": "Preview SKILL.md",
+        "category": "Skills.sh",
+        "icon": "$(eye)"
+      },
+      {
+        "command": "skills-sh.launchClaudeWithSkill",
+        "title": "Launch Claude with Skill",
+        "category": "Skills.sh",
+        "icon": "$(play)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "skills-sh.refreshInstalled",
+          "when": "view == skills-sh.installedSkills",
+          "group": "navigation"
+        },
+        {
+          "command": "skills-sh.checkUpdates",
+          "when": "view == skills-sh.installedSkills",
+          "group": "navigation"
+        },
+        {
+          "command": "skills-sh.addCustomSource",
+          "when": "view == skills-sh.installedSkills",
+          "group": "navigation"
+        },
+        {
+          "command": "skills-sh.openSettings",
+          "when": "view == skills-sh.installedSkills",
+          "group": "2_settings"
+        },
+        {
+          "command": "skills-sh.openMarketplaceTab",
+          "when": "view == skills-sh.marketplace",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "skills-sh.previewSkillFile",
+          "when": "view == skills-sh.installedSkills && viewItem == skill",
+          "group": "inline"
+        },
+        {
+          "command": "skills-sh.launchClaudeWithSkill",
+          "when": "view == skills-sh.installedSkills && viewItem == skill",
+          "group": "inline"
+        },
+        {
+          "command": "skills-sh.openSkillFile",
+          "when": "view == skills-sh.installedSkills && viewItem == skill",
+          "group": "1_actions"
+        },
+        {
+          "command": "skills-sh.launchClaudeWithSkill",
+          "when": "view == skills-sh.installedSkills && viewItem == skill",
+          "group": "1_actions"
+        },
+        {
+          "command": "skills-sh.uninstallSkill",
+          "when": "view == skills-sh.installedSkills && viewItem == skill",
+          "group": "2_actions"
+        },
+        {
+          "command": "skills-sh.copySkillPath",
+          "when": "view == skills-sh.installedSkills && viewItem == skill",
+          "group": "3_info"
+        },
+        {
+          "command": "skills-sh.removeCustomSource",
+          "when": "view == skills-sh.installedSkills && viewItem == customSource",
+          "group": "inline"
+        },
+        {
+          "command": "skills-sh.browseCustomSource",
+          "when": "view == skills-sh.installedSkills && viewItem == customSource",
+          "group": "1_actions"
+        },
+        {
+          "command": "skills-sh.installFromSource",
+          "when": "view == skills-sh.installedSkills && viewItem == remoteSkill",
+          "group": "inline"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "skills-sh.installedSkills",
+        "contents": "No agent skills detected.\n\nSkills are scanned from:\n\u2002\u2002~/.claude/skills/\n\u2002\u2002~/.cursor/skills/\n\u2002\u2002~/.codeium/windsurf/skills/\n\u2002\u2002~/.codex/skills/\n\nEach skill must be a folder containing a SKILL.md file.\n\n[Browse Marketplace](command:skills-sh.openMarketplace)\n[Open Settings](command:skills-sh.openSettings)",
+        "when": "skills-sh.noSkillsFound"
+      }
+    ],
+    "configuration": {
+      "title": "Skills.sh",
+      "properties": {
+        "skills-sh.customSources": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "markdownDescription": "Additional GitHub repos to search for skills (e.g. `my-org/my-skills`). These are searched alongside skills.sh."
+        },
+        "skills-sh.enableSkillsShSearch": {
+          "type": "boolean",
+          "default": true,
+          "description": "Include skills.sh registry in search results"
+        },
+        "skills-sh.defaultAgent": {
+          "type": "string",
+          "default": "claude-code",
+          "markdownDescription": "Default agent for `npx skills add -a`. Supports 39+ agents: claude-code, cursor, windsurf, github-copilot, codex, gemini-cli, cline, roo, amp, goose, etc."
+        },
+        "skills-sh.installScope": {
+          "type": "string",
+          "enum": [
+            "project",
+            "global"
+          ],
+          "default": "project",
+          "description": "Default install scope: project-local or global"
+        },
+        "skills-sh.globalSkillsDir": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Override global skills directory. Leave empty for default (`~/.claude/skills/` or `$CLAUDE_CONFIG_DIR/skills/`)"
+        },
+        "skills-sh.agentPaths": {
+          "type": "object",
+          "default": {},
+          "markdownDescription": "Override skill install paths per agent. Keys are agent IDs, values are relative paths.\n\nExample:\n```json\n{ \"cursor\": \".cursor/skills\", \"github-copilot\": \".github/skills\" }\n```\nLeave empty to use the CLI defaults.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "skills-sh.scanAgents": {
+          "type": "array",
+          "default": [
+            "claude",
+            "cursor",
+            "windsurf",
+            "codex"
+          ],
+          "items": {
+            "type": "string",
+            "enum": [
+              "claude",
+              "cursor",
+              "windsurf",
+              "codex"
+            ]
+          },
+          "markdownDescription": "Which AI agents to scan for installed skills. Each agent has its own skill directory (e.g. `~/.claude/skills/`, `~/.cursor/skills/`)."
+        },
+        "skills-sh.searchResultsLimit": {
+          "type": "number",
+          "default": 20,
+          "minimum": 5,
+          "maximum": 50,
+          "description": "Maximum number of search results to display"
+        },
+        "skills-sh.searchCacheTTL": {
+          "type": "number",
+          "default": 3600,
+          "minimum": 0,
+          "description": "Search results cache duration in seconds (0 to disable caching)"
+        },
+        "skills-sh.autoRefreshOnFocus": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically refresh installed skills when the sidebar gains focus"
+        },
+        "skills-sh.claudeLaunchTarget": {
+          "type": "string",
+          "enum": ["terminal", "extension"],
+          "default": "terminal",
+          "enumDescriptions": [
+            "Open Claude in VS Code terminal (works without Claude Code extension)",
+            "Open Claude in Claude Code editor panel (requires anthropic.claude-code extension)"
+          ],
+          "markdownDescription": "Where to launch Claude sessions when using 'Launch Claude with Skill'."
+        },
+        "skills-sh.checkUpdatesOnStartup": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically check for skill updates when the extension activates"
+        },
+        "skills-sh.showInstallCountInTree": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show install counts next to skill names in the installed skills tree"
+        },
+        "skills-sh.categories": {
+          "type": "array",
+          "default": [
+            "react",
+            "next",
+            "supabase",
+            "testing",
+            "ai",
+            "database",
+            "auth",
+            "css"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "description": "Curated category chips shown in the marketplace panel. Customize to match your interests."
+        },
+        "skills-sh.confirmBeforeInstall": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show a confirmation dialog before installing or uninstalling skills"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "node esbuild.config.mjs --production",
+    "build": "node esbuild.config.mjs",
+    "watch": "node esbuild.config.mjs --watch",
+    "lint": "eslint src/",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.85.0",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.3",
+    "marked": "^15.0.0"
+  }
+}
