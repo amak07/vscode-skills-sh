@@ -81,6 +81,7 @@ export const KNOWN_AGENTS: AgentConfig[] = [
 
 export interface InstalledSkill {
   name: string;
+  folderName: string;
   description: string;
   path: string;
   scope: SkillScope;
@@ -117,11 +118,13 @@ export type WebviewCommand =
   | 'leaderboard'
   | 'detail'
   | 'install'
+  | 'update'
   | 'back'
   | 'changeTab'
   | 'categoryClick'
   | 'loadMore'
-  | 'openExternal';
+  | 'openExternal'
+  | 'openCategorySettings';
 
 export interface WebviewMessage {
   command: WebviewCommand;

@@ -8,6 +8,15 @@ export function getLastUpdateResult(): UpdateCheckResponse | null {
   return lastUpdateResult;
 }
 
+/** Remove a skill from the cached update result (e.g. after it was updated) */
+export function clearUpdateForSkill(skillName: string): void {
+  if (!lastUpdateResult) { return; }
+  lastUpdateResult = {
+    ...lastUpdateResult,
+    updates: lastUpdateResult.updates.filter(u => u.name !== skillName),
+  };
+}
+
 export async function checkUpdates(
   skills: UpdateCheckRequest['skills'],
   forceRefresh: boolean = false

@@ -4,7 +4,8 @@ import { LeaderboardView, WebviewMessage } from '../../types';
 import { searchSkills, getLeaderboard } from '../../api/search';
 import { fetchSkillDetail } from '../../api/detail-scraper';
 import { fetchSkillMd } from '../../api/github';
-import { installSkill } from '../../install/installer';
+import { installSkill, updateSkills } from '../../install/installer';
+import { getLastUpdateResult } from '../../api/updates';
 import { getStyles } from './styles';
 import {
   backIcon,
@@ -24,6 +25,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'skills-sh.marketplace';
   private _view?: vscode.WebviewView;
   private installedNames = new Set<string>();
+  private updatableNames = new Set<string>();
   private fontsUri = '';
   private panels: vscode.WebviewPanel[] = [];
   private tabWebviews = new WeakSet<vscode.Webview>();
@@ -32,6 +34,23 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
 
   setInstalledNames(names: Set<string>): void {
     this.installedNames = names;
+    this.pushButtonStates();
+  }
+
+  setUpdatableNames(names: Set<string>): void {
+    this.updatableNames = names;
+    this.pushButtonStates();
+  }
+
+  private pushButtonStates(): void {
+    const payload = {
+      installedNames: [...this.installedNames],
+      updatableNames: [...this.updatableNames],
+    };
+    this._view?.webview.postMessage({ command: 'updateButtonStates', payload });
+    for (const panel of this.panels) {
+      panel.webview.postMessage({ command: 'updateButtonStates', payload });
+    }
   }
 
   resolveWebviewView(
@@ -106,7 +125,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
           const data = await getLeaderboard(view, page);
           targetWebview.postMessage({
             command: 'leaderboardResult',
-            payload: { ...data, installedNames: [...this.installedNames] },
+            payload: { ...data, installedNames: [...this.installedNames], updatableNames: [...this.updatableNames] },
           });
         } catch (e: unknown) {
           const msg = e instanceof Error ? e.message : 'Unknown error';
@@ -121,7 +140,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
           const data = await searchSkills(query);
           targetWebview.postMessage({
             command: 'searchResult',
-            payload: { ...data, installedNames: [...this.installedNames] },
+            payload: { ...data, installedNames: [...this.installedNames], updatableNames: [...this.updatableNames] },
           });
         } catch (e: unknown) {
           const msg = e instanceof Error ? e.message : 'Unknown error';
@@ -167,7 +186,19 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
 
       case 'install': {
         const { source, skillName } = message.payload as { source: string; skillName: string };
-        await installSkill(`https://github.com/${source}`, { skill: skillName });
+        const started = await installSkill(`https://github.com/${source}`, { skill: skillName });
+        if (!started) {
+          // User dismissed the confirmation dialog — reset button states
+          this.pushButtonStates();
+        }
+        break;
+      }
+
+      case 'update': {
+        const updateResult = getLastUpdateResult();
+        if (updateResult?.updates?.length) {
+          await updateSkills(updateResult.updates);
+        }
         break;
       }
 
@@ -388,10 +419,14 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
       const row = e.target.closest('.grid-row');
       if (!row) return;
 
-      // Don't navigate if clicking install button
+      // Don't navigate if clicking install/update button
       if (e.target.closest('.btn-install')) {
         const btn = e.target.closest('.btn-install');
-        if (!btn.classList.contains('btn-installed')) {
+        if (btn.classList.contains('btn-updatable')) {
+          vscode.postMessage({ command: 'update' });
+          btn.textContent = 'Updating...';
+          btn.disabled = true;
+        } else if (!btn.classList.contains('btn-installed')) {
           const source = btn.dataset.install;
           const skillName = btn.dataset.skillName;
           vscode.postMessage({ command: 'install', payload: { source, skillName } });
@@ -418,8 +453,9 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
 
       switch (msg.command) {
         case 'leaderboardResult': {
-          const { skills, total, hasMore, page, installedNames } = msg.payload;
+          const { skills, total, hasMore, page, installedNames, updatableNames } = msg.payload;
           const installed = new Set(installedNames || []);
+          const updatable = new Set(updatableNames || []);
 
           if (page === 0) {
             updateTabCount(total);
@@ -428,7 +464,8 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
           let html = '';
           skills.forEach((s, i) => {
             const rank = page * skills.length + i + 1;
-            html += renderRow(s, rank, installed.has(s.skillId || s.name));
+            const sid = s.skillId || s.name;
+            html += renderRow(s, rank, installed.has(sid), updatable.has(sid));
           });
 
           if (page === 0) {
@@ -444,15 +481,17 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
         }
 
         case 'searchResult': {
-          const { skills, count, installedNames } = msg.payload;
+          const { skills, count, installedNames, updatableNames } = msg.payload;
           const installed = new Set(installedNames || []);
+          const updatable = new Set(updatableNames || []);
 
           if (skills.length === 0) {
             resultsEl.innerHTML = '<div class="empty-state">No skills found</div>';
           } else {
             let html = '';
             skills.forEach((s, i) => {
-              html += renderRow(s, i + 1, installed.has(s.skillId || s.name));
+              const sid = s.skillId || s.name;
+              html += renderRow(s, i + 1, installed.has(sid), updatable.has(sid));
             });
             resultsEl.innerHTML = html;
           }
@@ -469,6 +508,29 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
         case 'error': {
           resultsEl.innerHTML =
             '<div class="empty-state">Error: ' + msg.payload + '</div>';
+          break;
+        }
+
+        case 'updateButtonStates': {
+          const installed = new Set(msg.payload.installedNames || []);
+          const updatable = new Set(msg.payload.updatableNames || []);
+          document.querySelectorAll('.btn-install').forEach(function(btn) {
+            const skillName = btn.dataset.skillName;
+            if (!skillName) return;
+            if (updatable.has(skillName)) {
+              btn.className = 'btn-install btn-updatable';
+              btn.textContent = 'Update';
+              btn.disabled = false;
+            } else if (installed.has(skillName)) {
+              btn.className = 'btn-install btn-installed';
+              btn.textContent = '✓ Installed';
+              btn.disabled = false;
+            } else {
+              btn.className = 'btn-install';
+              btn.textContent = 'Install';
+              btn.disabled = false;
+            }
+          });
           break;
         }
       }
@@ -509,7 +571,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
       }
     }
 
-    function renderRow(skill, rank, isInstalled) {
+    function renderRow(skill, rank, isInstalled, isUpdatable) {
       const source = skill.source;
       const name = skill.name || skill.skillId;
       const skillId = skill.skillId || skill.name;
@@ -523,6 +585,16 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
           + (change > 0 ? '+' : '') + change + '</span>';
       }
 
+      let btnClass = 'btn-install';
+      let btnLabel = 'Install';
+      if (isUpdatable) {
+        btnClass = 'btn-install btn-updatable';
+        btnLabel = 'Update';
+      } else if (isInstalled) {
+        btnClass = 'btn-install btn-installed';
+        btnLabel = '✓ Installed';
+      }
+
       return '<div class="grid-row" data-source="' + source + '" data-skill="' + skillId + '">'
         + '<span class="row-rank">' + rank + '</span>'
         + '<div class="row-info">'
@@ -532,10 +604,10 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
         + '<div class="row-right">'
         + '<span class="row-installs">' + formatInstalls(installs) + '</span>'
         + changeHtml
-        + '<button class="btn-install ' + (isInstalled ? 'btn-installed' : '') + '"'
+        + '<button class="' + btnClass + '"'
         + ' data-install="' + source + '" data-skill-name="' + skillId + '"'
         + ' onclick="event.stopPropagation()">'
-        + (isInstalled ? '✓ Installed' : 'Install')
+        + btnLabel
         + '</button>'
         + '</div></div>';
     }

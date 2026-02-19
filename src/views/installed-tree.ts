@@ -11,16 +11,24 @@ const GROUP_ICONS: Record<string, string> = {
   untracked: 'question',
   project: 'folder-library',
   'custom-sources': 'repo',
+  updates: 'cloud-upload',
 };
 
 class GroupItem extends vscode.TreeItem {
   constructor(
     public readonly label: string,
-    public readonly groupType: 'source' | 'untracked' | 'project' | 'custom-sources',
+    public readonly groupType: 'source' | 'untracked' | 'project' | 'custom-sources' | 'updates',
     public readonly children: TreeItem[],
+    collapsibleState = vscode.TreeItemCollapsibleState.Collapsed,
   ) {
-    super(label, vscode.TreeItemCollapsibleState.Expanded);
-    this.contextValue = groupType === 'source' ? 'sourceGroup' : 'group';
+    super(label, collapsibleState);
+    if (groupType === 'updates') {
+      this.contextValue = 'updatesGroup';
+    } else if (groupType === 'source') {
+      this.contextValue = 'sourceGroup';
+    } else {
+      this.contextValue = 'group';
+    }
     this.iconPath = new vscode.ThemeIcon(GROUP_ICONS[groupType] ?? 'extensions');
   }
 }
@@ -53,7 +61,7 @@ class SkillItem extends vscode.TreeItem {
     if (!skill.source) { tooltipLines.push('\nUntracked: re-install via Marketplace to enable updates'); }
     this.tooltip = tooltipLines.join('\n');
 
-    this.contextValue = 'skill';
+    this.contextValue = hasUpdate ? 'skill_updatable' : 'skill';
     this.command = {
       command: 'skills-sh.previewSkillFile',
       title: 'Preview SKILL.md',
@@ -127,6 +135,7 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
     const names = new Set<string>();
     for (const skill of [...this.globalSkills, ...this.projectSkills]) {
       names.add(skill.name);
+      names.add(skill.folderName);
     }
     return names;
   }
@@ -147,6 +156,21 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
       );
 
       const groups: TreeItem[] = [];
+
+      // --- Updates available group (pinned at top, expanded) ---
+      if (updatableNames.size > 0) {
+        const allSkills = [...this.globalSkills, ...this.projectSkills];
+        const updatableSkills = allSkills.filter(s => updatableNames.has(s.name));
+        if (updatableSkills.length > 0) {
+          const children = updatableSkills.map(s => new SkillItem(s, true));
+          groups.push(new GroupItem(
+            `Updates Available (${updatableSkills.length})`,
+            'updates',
+            children,
+            vscode.TreeItemCollapsibleState.Expanded,
+          ));
+        }
+      }
 
       // --- Source-based groups for global skills ---
       const bySource = new Map<string, InstalledSkill[]>();

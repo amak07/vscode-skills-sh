@@ -4,6 +4,7 @@ import * as os from 'os';
 import * as vscode from 'vscode';
 import { AgentConfig, InstalledSkill, KNOWN_AGENTS, SkillScope, SkillLockFile, ScanResult } from '../types';
 import { parseSkillMd } from './parser';
+import { getLog } from '../logger';
 
 export interface AgentDiagnostic {
   agentId: string;
@@ -145,6 +146,7 @@ export class SkillScanner {
   }
 
   private async scanDirectory(dir: string, scope: SkillScope): Promise<InstalledSkill[]> {
+    const log = getLog();
     const skills: InstalledSkill[] = [];
 
     if (!fs.existsSync(dir)) {
@@ -158,6 +160,8 @@ export class SkillScanner {
       return skills;
     }
 
+    log.info(`[scanner] Scanning ${dir} (${scope}): ${entries.length} entries`);
+
     for (const entry of entries) {
       if (!this.isDirectoryEntry(dir, entry)) {
         continue;
@@ -169,10 +173,12 @@ export class SkillScanner {
         continue;
       }
 
-      const lockEntry = this.findLockEntry(parsed.name);
+      const lockEntry = this.findLockEntry(entry.name);
+      log.info(`[scanner]   ${entry.name}: name="${parsed.name}" lock=${lockEntry ? `found (source=${lockEntry.source})` : 'NOT FOUND'}`);
 
       skills.push({
         name: parsed.name,
+        folderName: entry.name,
         description: parsed.description,
         path: path.join(dir, entry.name),
         scope,
@@ -249,11 +255,15 @@ export class SkillScanner {
   }
 
   private loadLockFile(): void {
+    const log = getLog();
     const lockPath = path.join(os.homedir(), '.agents', '.skill-lock.json');
     try {
       const content = fs.readFileSync(lockPath, 'utf-8');
       this.lockFileData = JSON.parse(content) as SkillLockFile;
+      const keys = Object.keys(this.lockFileData?.skills ?? {});
+      log.info(`[scanner] Lock file loaded: ${keys.length} skills — [${keys.join(', ')}]`);
     } catch {
+      log.warn('[scanner] Lock file not found or unreadable');
       this.lockFileData = null;
     }
   }

@@ -3,10 +3,21 @@ import { SkillScanner } from './local/scanner';
 import { SkillWatcher } from './local/watcher';
 import { InstalledSkillsTreeProvider } from './views/installed-tree';
 import { MarketplaceViewProvider } from './views/marketplace/provider';
-import { installSkill, uninstallSkill, disposeTerminal } from './install/installer';
-import { checkUpdates } from './api/updates';
+import { installSkill, updateSkills, uninstallSkill, disposeTerminal, notifyInstallDetected, onOperationCompleted } from './install/installer';
+import { checkUpdates, getLastUpdateResult, clearUpdateForSkill } from './api/updates';
 import { searchSkills } from './api/search';
 import { InstalledSkill } from './types';
+import { getLog } from './logger';
+
+// Extract InstalledSkill from either a direct InstalledSkill or a SkillItem tree item
+function resolveSkill(arg: any): InstalledSkill | undefined {
+  if (!arg) { return undefined; }
+  // If it's a tree item with a .skill property (SkillItem)
+  if (arg.skill && arg.skill.path) { return arg.skill; }
+  // If it's a direct InstalledSkill (from command arguments)
+  if (arg.path) { return arg; }
+  return undefined;
+}
 
 export function activate(context: vscode.ExtensionContext) {
   const scanner = new SkillScanner();
@@ -20,6 +31,15 @@ export function activate(context: vscode.ExtensionContext) {
   });
   context.subscriptions.push(treeView);
 
+  // Helper: update the tree view badge with the current update count
+  function updateBadge(): void {
+    const updateResult = getLastUpdateResult();
+    const count = updateResult?.updates?.length ?? 0;
+    treeView.badge = count > 0
+      ? { value: count, tooltip: `${count} update(s) available` }
+      : undefined;
+  }
+
   // Register Webview
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(
@@ -32,31 +52,68 @@ export function activate(context: vscode.ExtensionContext) {
   const watcher = new SkillWatcher(scanner);
   watcher.start();
 
-  let previousSkillCount = 0;
+  let previousSkillNames = new Set<string>();
   watcher.onDidChange(async () => {
-    const oldCount = previousSkillCount;
+    const log = getLog();
+    log.info('[watcher] Change detected, rescanning...');
+    const oldNames = previousSkillNames;
     await treeProvider.rescan();
-    const newCount = treeProvider.getInstalledSkillNames().size;
-    marketplaceProvider.setInstalledNames(treeProvider.getInstalledSkillNames());
+    const newNames = treeProvider.getInstalledSkillNames();
+    log.info(`[watcher] Old names (${oldNames.size}): ${[...oldNames].join(', ')}`);
+    log.info(`[watcher] New names (${newNames.size}): ${[...newNames].join(', ')}`);
+    marketplaceProvider.setInstalledNames(newNames);
+    // Clear updatable names — skills just changed, stale update info no longer valid
+    marketplaceProvider.setUpdatableNames(new Set());
 
-    if (oldCount > 0 && newCount > oldCount) {
+    // Notify installer progress listeners for new installs AND updates.
+    // The watcher only fires on actual file changes, so any skill present
+    // after a change is either newly installed or was just updated.
+    // Fire for all current names — the listener only resolves if it's waiting.
+    for (const name of newNames) {
+      log.info(`[watcher] notifyInstallDetected("${name}")`);
+      notifyInstallDetected(name);
+      // Optimistically clear from the "updates available" cache
+      clearUpdateForSkill(name);
+    }
+
+    updateBadge();
+
+    const added = newNames.size - oldNames.size;
+    if (oldNames.size > 0 && added > 0) {
       vscode.window.showInformationMessage(
-        `Skills.sh: ${newCount - oldCount} new skill(s) installed.`,
+        `Skills.sh: ${added} new skill(s) installed.`,
         'View Installed',
       ).then(action => {
         if (action === 'View Installed') {
           vscode.commands.executeCommand('skills-sh.installedSkills.focus');
         }
       });
-    } else if (oldCount > 0 && newCount < oldCount) {
+    } else if (oldNames.size > 0 && newNames.size < oldNames.size) {
       vscode.window.showInformationMessage(
-        `Skills.sh: ${oldCount - newCount} skill(s) removed.`,
+        `Skills.sh: ${oldNames.size - newNames.size} skill(s) removed.`,
       );
     }
 
-    previousSkillCount = newCount;
+    previousSkillNames = newNames;
   });
   context.subscriptions.push(watcher);
+
+  // When a terminal install/uninstall command completes (via shell integration),
+  // trigger a rescan so the tree view and marketplace update even if the
+  // filesystem watcher didn't fire (common on Windows with symlinks).
+  onOperationCompleted(async () => {
+    const log = getLog();
+    log.info('[operation] Terminal command completed, rescanning...');
+    const oldNames = previousSkillNames;
+    await treeProvider.rescan();
+    const newNames = treeProvider.getInstalledSkillNames();
+    log.info(`[operation] Old names (${oldNames.size}): ${[...oldNames].join(', ')}`);
+    log.info(`[operation] New names (${newNames.size}): ${[...newNames].join(', ')}`);
+    marketplaceProvider.setInstalledNames(newNames);
+    marketplaceProvider.setUpdatableNames(new Set());
+    updateBadge();
+    previousSkillNames = newNames;
+  });
 
   // === Commands ===
 
@@ -64,18 +121,23 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('skills-sh.refreshInstalled', async () => {
       await treeProvider.rescan();
       marketplaceProvider.setInstalledNames(treeProvider.getInstalledSkillNames());
+      updateBadge();
     })
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('skills-sh.openSkillFile', (skill: InstalledSkill) => {
+    vscode.commands.registerCommand('skills-sh.openSkillFile', (arg: any) => {
+      const skill = resolveSkill(arg);
+      if (!skill) { return; }
       const uri = vscode.Uri.file(`${skill.path}/SKILL.md`);
       vscode.window.showTextDocument(uri);
     })
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('skills-sh.previewSkillFile', (skill: InstalledSkill) => {
+    vscode.commands.registerCommand('skills-sh.previewSkillFile', (arg: any) => {
+      const skill = resolveSkill(arg);
+      if (!skill) { return; }
       const uri = vscode.Uri.file(`${skill.path}/SKILL.md`);
       vscode.commands.executeCommand('markdown.showPreview', uri);
     })
@@ -83,7 +145,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand('skills-sh.launchClaudeWithSkill', async (arg: any) => {
-      const skillData = arg?.skill ?? arg;
+      const skillData = resolveSkill(arg);
       const name = skillData?.name;
       if (!name) { return; }
       const prompt = `Run the "${name}" skill to `;
@@ -150,7 +212,8 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('skills-sh.uninstallSkill', async (skill: InstalledSkill) => {
+    vscode.commands.registerCommand('skills-sh.uninstallSkill', async (arg: any) => {
+      const skill = resolveSkill(arg);
       if (!skill) { return; }
       await uninstallSkill(skill.name, {
         global: skill.scope === 'global',
@@ -184,12 +247,15 @@ export function activate(context: vscode.ExtensionContext) {
           vscode.window.showInformationMessage('No installed skills have update tracking data.');
         }
         await treeProvider.rescan();
+        updateBadge();
         return;
       }
 
       try {
-        const result = await checkUpdates(skillsWithHashes);
+        const result = await checkUpdates(skillsWithHashes, true);
         await treeProvider.rescan();
+        updateBadge();
+        marketplaceProvider.setUpdatableNames(new Set(result.updates.map(u => u.name)));
 
         if (result.updates.length === 0) {
           let msg = 'All tracked skills are up to date.';
@@ -202,41 +268,39 @@ export function activate(context: vscode.ExtensionContext) {
           const action = await vscode.window.showInformationMessage(
             `Updates available for: ${names}`,
             'Update All',
-            'Select Updates',
           );
 
           if (action === 'Update All') {
-            for (const update of result.updates) {
-              await installSkill(`https://github.com/${update.source}`, {
-                skill: update.name,
-              });
-            }
-          } else if (action === 'Select Updates') {
-            const items = result.updates.map(u => ({
-              label: u.name,
-              description: u.source,
-              picked: true,
-            }));
-            const selected = await vscode.window.showQuickPick(items, {
-              canPickMany: true,
-              placeHolder: 'Select skills to update',
-            });
-            if (selected) {
-              for (const item of selected) {
-                const update = result.updates.find(u => u.name === item.label);
-                if (update) {
-                  await installSkill(`https://github.com/${update.source}`, {
-                    skill: update.name,
-                  });
-                }
-              }
-            }
+            await updateSkills(result.updates);
           }
         }
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : 'Unknown error';
         vscode.window.showErrorMessage(`Update check failed: ${msg}`);
       }
+    })
+  );
+
+  // Update single skill (from inline button on updatable skills)
+  context.subscriptions.push(
+    vscode.commands.registerCommand('skills-sh.updateSingleSkill', async (item: any) => {
+      const skill = item?.skill;
+      if (!skill?.name) { return; }
+      const result = getLastUpdateResult();
+      const update = result?.updates.find(u => u.name === skill.name);
+      if (update) { await updateSkills([update]); }
+    })
+  );
+
+  // Update all skills (from inline button on "Updates Available" group)
+  context.subscriptions.push(
+    vscode.commands.registerCommand('skills-sh.updateAllSkills', async () => {
+      const result = getLastUpdateResult();
+      if (!result?.updates?.length) {
+        vscode.window.showInformationMessage('No updates available.');
+        return;
+      }
+      await updateSkills(result.updates);
     })
   );
 
@@ -247,7 +311,8 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('skills-sh.copySkillPath', (skill: InstalledSkill) => {
+    vscode.commands.registerCommand('skills-sh.copySkillPath', (arg: any) => {
+      const skill = resolveSkill(arg);
       if (!skill) { return; }
       vscode.env.clipboard.writeText(skill.path);
       vscode.window.showInformationMessage(`Copied: ${skill.path}`);
@@ -338,7 +403,8 @@ export function activate(context: vscode.ExtensionContext) {
         if (state.focused) {
           await treeProvider.rescan();
           marketplaceProvider.setInstalledNames(treeProvider.getInstalledSkillNames());
-          previousSkillCount = treeProvider.getInstalledSkillNames().size;
+          previousSkillNames = treeProvider.getInstalledSkillNames();
+          updateBadge();
         }
       })
     );
@@ -351,7 +417,8 @@ export function activate(context: vscode.ExtensionContext) {
         watcher.restart();
         await treeProvider.rescan();
         marketplaceProvider.setInstalledNames(treeProvider.getInstalledSkillNames());
-        previousSkillCount = treeProvider.getInstalledSkillNames().size;
+        previousSkillNames = treeProvider.getInstalledSkillNames();
+        updateBadge();
       }
     })
   );
@@ -360,7 +427,8 @@ export function activate(context: vscode.ExtensionContext) {
   treeProvider.rescan().then(() => {
     const installedNames = treeProvider.getInstalledSkillNames();
     marketplaceProvider.setInstalledNames(installedNames);
-    previousSkillCount = installedNames.size;
+    previousSkillNames = installedNames;
+    updateBadge();
 
     // Show diagnostic notification if no skills found
     if (installedNames.size === 0) {
@@ -381,9 +449,22 @@ export function activate(context: vscode.ExtensionContext) {
     }
   });
 
-  // Check for updates on startup if configured
-  if (vscode.workspace.getConfiguration('skills-sh').get<boolean>('checkUpdatesOnStartup', false)) {
-    vscode.commands.executeCommand('skills-sh.checkUpdates');
+  // Silent background update check on startup — populate tree + badge only, no toast
+  if (vscode.workspace.getConfiguration('skills-sh').get<boolean>('checkUpdatesOnStartup', true)) {
+    scanner.scan().then(async ({ globalSkills, projectSkills }) => {
+      const allSkills = [...globalSkills, ...projectSkills];
+      const skillsWithHashes = allSkills
+        .filter(s => s.source && s.hash)
+        .map(s => ({ name: s.name, source: s.source!, skillFolderHash: s.hash! }));
+      if (skillsWithHashes.length === 0) { return; }
+      try {
+        const result = await checkUpdates(skillsWithHashes, true);
+        await treeProvider.rescan();
+        updateBadge();
+        const updatableNames = new Set(result.updates.map(u => u.name));
+        marketplaceProvider.setUpdatableNames(updatableNames);
+      } catch { /* startup check is best-effort */ }
+    });
   }
 }
 

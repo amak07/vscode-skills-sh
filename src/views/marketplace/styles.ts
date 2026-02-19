@@ -302,6 +302,15 @@ export function getStyles(fontUri: string): string {
       background: transparent;
       color: var(--green-700);
     }
+    .btn-updatable {
+      color: var(--amber-700, #b45309);
+      border-color: var(--amber-700, #b45309);
+      font-weight: 600;
+    }
+    .btn-updatable:hover {
+      background: var(--amber-700, #b45309);
+      color: var(--bg-200, #fff);
+    }
 
     /* === Detail View === */
     .detail-view { padding: 0; }

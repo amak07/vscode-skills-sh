@@ -1,3 +1,5 @@
+import * as os from 'os';
+import * as path from 'path';
 import * as vscode from 'vscode';
 import { SkillScanner } from './scanner';
 
@@ -18,6 +20,19 @@ export class SkillWatcher implements vscode.Disposable {
     for (const dir of this.scanner.getAllProjectDirs()) {
       this.watchDirectory(dir);
     }
+
+    this.watchLockFile();
+  }
+
+  /** Watch ~/.agents/.skill-lock.json — a regular file that npx skills always updates */
+  private watchLockFile(): void {
+    const lockDir = path.join(os.homedir(), '.agents');
+    const pattern = new vscode.RelativePattern(
+      vscode.Uri.file(lockDir),
+      '.skill-lock.json',
+    );
+    const watcher = vscode.workspace.createFileSystemWatcher(pattern);
+    this.addWatcher(watcher);
   }
 
   restart(): void {

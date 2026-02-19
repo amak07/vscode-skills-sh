@@ -6,7 +6,7 @@
   "license": "MIT",
   "publisher": "skills-sh",
   "engines": {
-    "vscode": "^1.85.0"
+    "vscode": "^1.93.0"
   },
   "categories": [
     "Other"
@@ -140,6 +140,18 @@
         "title": "Launch Claude with Skill",
         "category": "Skills.sh",
         "icon": "$(play)"
+      },
+      {
+        "command": "skills-sh.updateSingleSkill",
+        "title": "Update Skill",
+        "category": "Skills.sh",
+        "icon": "$(cloud-download)"
+      },
+      {
+        "command": "skills-sh.updateAllSkills",
+        "title": "Update All Skills",
+        "category": "Skills.sh",
+        "icon": "$(cloud-download)"
       }
     ],
     "menus": {
@@ -173,32 +185,37 @@
       "view/item/context": [
         {
           "command": "skills-sh.previewSkillFile",
-          "when": "view == skills-sh.installedSkills && viewItem == skill",
+          "when": "view == skills-sh.installedSkills && viewItem =~ /^skill/",
           "group": "inline"
         },
         {
           "command": "skills-sh.launchClaudeWithSkill",
-          "when": "view == skills-sh.installedSkills && viewItem == skill",
+          "when": "view == skills-sh.installedSkills && viewItem =~ /^skill/",
           "group": "inline"
         },
         {
           "command": "skills-sh.openSkillFile",
-          "when": "view == skills-sh.installedSkills && viewItem == skill",
+          "when": "view == skills-sh.installedSkills && viewItem =~ /^skill/",
           "group": "1_actions"
         },
         {
           "command": "skills-sh.launchClaudeWithSkill",
-          "when": "view == skills-sh.installedSkills && viewItem == skill",
+          "when": "view == skills-sh.installedSkills && viewItem =~ /^skill/",
           "group": "1_actions"
         },
         {
           "command": "skills-sh.uninstallSkill",
-          "when": "view == skills-sh.installedSkills && viewItem == skill",
+          "when": "view == skills-sh.installedSkills && viewItem =~ /^skill/",
+          "group": "inline"
+        },
+        {
+          "command": "skills-sh.uninstallSkill",
+          "when": "view == skills-sh.installedSkills && viewItem =~ /^skill/",
           "group": "2_actions"
         },
         {
           "command": "skills-sh.copySkillPath",
-          "when": "view == skills-sh.installedSkills && viewItem == skill",
+          "when": "view == skills-sh.installedSkills && viewItem =~ /^skill/",
           "group": "3_info"
         },
         {
@@ -215,13 +232,23 @@
           "command": "skills-sh.installFromSource",
           "when": "view == skills-sh.installedSkills && viewItem == remoteSkill",
           "group": "inline"
+        },
+        {
+          "command": "skills-sh.updateSingleSkill",
+          "when": "view == skills-sh.installedSkills && viewItem == skill_updatable",
+          "group": "inline"
+        },
+        {
+          "command": "skills-sh.updateAllSkills",
+          "when": "view == skills-sh.installedSkills && viewItem == updatesGroup",
+          "group": "inline"
         }
       ]
     },
     "viewsWelcome": [
       {
         "view": "skills-sh.installedSkills",
-        "contents": "No agent skills detected.\n\nSkills are scanned from:\n\u2002\u2002~/.claude/skills/\n\u2002\u2002~/.cursor/skills/\n\u2002\u2002~/.codeium/windsurf/skills/\n\u2002\u2002~/.codex/skills/\n\nEach skill must be a folder containing a SKILL.md file.\n\n[Browse Marketplace](command:skills-sh.openMarketplace)\n[Open Settings](command:skills-sh.openSettings)",
+        "contents": "No agent skills detected.\n\nSkills are scanned from:\n  ~/.claude/skills/\n  ~/.cursor/skills/\n  ~/.codeium/windsurf/skills/\n  ~/.codex/skills/\n\nEach skill must be a folder containing a SKILL.md file.\n\n[Browse Marketplace](command:skills-sh.openMarketplace)\n[Open Settings](command:skills-sh.openSettings)",
         "when": "skills-sh.noSkillsFound"
       }
     ],
@@ -307,7 +334,10 @@
         },
         "skills-sh.claudeLaunchTarget": {
           "type": "string",
-          "enum": ["terminal", "extension"],
+          "enum": [
+            "terminal",
+            "extension"
+          ],
           "default": "terminal",
           "enumDescriptions": [
             "Open Claude in VS Code terminal (works without Claude Code extension)",
@@ -317,7 +347,7 @@
         },
         "skills-sh.checkUpdatesOnStartup": {
           "type": "boolean",
-          "default": false,
+          "default": true,
           "description": "Automatically check for skill updates when the extension activates"
         },
         "skills-sh.showInstallCountInTree": {
@@ -359,7 +389,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
-    "@types/vscode": "^1.85.0",
+    "@types/vscode": "^1.93.0",
     "esbuild": "^0.24.0",
     "typescript": "^5.5.0",
     "vitest": "^2.0.0"
