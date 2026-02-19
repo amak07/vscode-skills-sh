@@ -268,10 +268,29 @@ export class SkillScanner {
     }
   }
 
-  private findLockEntry(skillName: string) {
+  private findLockEntry(folderName: string) {
     if (!this.lockFileData?.skills) {
       return null;
     }
-    return this.lockFileData.skills[skillName] ?? null;
+
+    // Direct key match (works for single-skill repos where key == folder name)
+    if (this.lockFileData.skills[folderName]) {
+      return this.lockFileData.skills[folderName];
+    }
+
+    // Fallback: the CLI uses prefixed lock keys (e.g. "vercel-react-best-practices")
+    // but the installed folder is just the bare skill ID ("react-best-practices").
+    // Match folder name against the folder portion of skillPath.
+    for (const entry of Object.values(this.lockFileData.skills)) {
+      if (entry.skillPath) {
+        const parts = entry.skillPath.replace(/\/SKILL\.md$/i, '').split('/');
+        const skillFolder = parts[parts.length - 1];
+        if (skillFolder === folderName) {
+          return entry;
+        }
+      }
+    }
+
+    return null;
   }
 }
