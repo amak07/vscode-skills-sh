@@ -163,7 +163,12 @@
         },
         {
           "command": "skills-sh.checkUpdates",
-          "when": "view == skills-sh.installedSkills",
+          "when": "view == skills-sh.installedSkills && !skills-sh.hasUpdates",
+          "group": "navigation"
+        },
+        {
+          "command": "skills-sh.updateAllSkills",
+          "when": "view == skills-sh.installedSkills && skills-sh.hasUpdates",
           "group": "navigation"
         },
         {

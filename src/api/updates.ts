@@ -1,6 +1,5 @@
-import { UpdateCheckRequest, UpdateCheckResponse } from '../types';
-
-const CHECK_UPDATES_URL = 'https://add-skill.vercel.sh/check-updates';
+import { UpdateCheckResponse } from '../types';
+import { fetchSkillFolderHashes } from './github';
 
 let lastUpdateResult: UpdateCheckResponse | null = null;
 
@@ -17,23 +16,40 @@ export function clearUpdateForSkill(skillName: string): void {
   };
 }
 
+/**
+ * Check for skill updates using the GitHub Trees API directly.
+ * Matches the CLI's fetchSkillFolderHash() logic: tries main → master branches.
+ * This avoids the branch mismatch bug in the Vercel check-updates API.
+ */
 export async function checkUpdates(
-  skills: UpdateCheckRequest['skills'],
-  forceRefresh: boolean = false
+  skills: { name: string; source: string; skillFolderHash: string; skillPath?: string }[]
 ): Promise<UpdateCheckResponse> {
-  const body: UpdateCheckRequest = { skills, forceRefresh };
-
-  const response = await fetch(CHECK_UPDATES_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Check updates API error: ${response.status} ${response.statusText}`);
+  // Group by source repo to batch API calls
+  const bySource = new Map<string, typeof skills>();
+  for (const s of skills) {
+    const list = bySource.get(s.source) || [];
+    list.push(s);
+    bySource.set(s.source, list);
   }
 
-  const data = (await response.json()) as UpdateCheckResponse;
-  lastUpdateResult = data;
-  return data;
+  const updates: UpdateCheckResponse['updates'] = [];
+
+  for (const [source, sourceSkills] of bySource) {
+    const hashes = await fetchSkillFolderHashes(source);
+
+    for (const skill of sourceSkills) {
+      // Extract folder path from skillPath: "skills/react-email/SKILL.md" → "skills/react-email"
+      const folderPath = skill.skillPath
+        ? skill.skillPath.replace(/\/SKILL\.md$/i, '')
+        : `skills/${skill.name}`;
+
+      const latestHash = hashes.get(folderPath);
+      if (latestHash && latestHash !== skill.skillFolderHash) {
+        updates.push({ name: skill.name, source, newHash: latestHash });
+      }
+    }
+  }
+
+  lastUpdateResult = { updates, errors: [] };
+  return lastUpdateResult;
 }

@@ -174,7 +174,8 @@ export class SkillScanner {
       }
 
       const lockEntry = this.findLockEntry(entry.name);
-      log.info(`[scanner]   ${entry.name}: name="${parsed.name}" lock=${lockEntry ? `found (source=${lockEntry.source})` : 'NOT FOUND'}`);
+      const isSymlink = entry.isSymbolicLink();
+      log.info(`[scanner]   ${entry.name}: name="${parsed.name}" symlink=${isSymlink} lock=${lockEntry ? `found (source=${lockEntry.source})` : 'NOT FOUND'}`);
 
       skills.push({
         name: parsed.name,
@@ -185,7 +186,9 @@ export class SkillScanner {
         metadata: parsed.metadata,
         source: lockEntry?.source,
         hash: lockEntry?.skillFolderHash,
+        skillPath: lockEntry?.skillPath,
         agents: [],
+        isCustom: !isSymlink && !lockEntry,
       });
     }
 

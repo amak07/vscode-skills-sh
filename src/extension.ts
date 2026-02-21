@@ -38,6 +38,7 @@ export function activate(context: vscode.ExtensionContext) {
     treeView.badge = count > 0
       ? { value: count, tooltip: `${count} update(s) available` }
       : undefined;
+    vscode.commands.executeCommand('setContext', 'skills-sh.hasUpdates', count > 0);
   }
 
   // Register Webview
@@ -47,6 +48,13 @@ export function activate(context: vscode.ExtensionContext) {
       marketplaceProvider,
     )
   );
+
+  // Helper: sync marketplace updatable names from the authoritative update cache
+  function syncUpdatableNames(): void {
+    const updateResult = getLastUpdateResult();
+    const updatableNames = new Set((updateResult?.updates ?? []).map(u => u.name));
+    marketplaceProvider.setUpdatableNames(updatableNames);
+  }
 
   // Start file watcher
   const watcher = new SkillWatcher(scanner);
@@ -62,20 +70,18 @@ export function activate(context: vscode.ExtensionContext) {
     log.info(`[watcher] Old names (${oldNames.size}): ${[...oldNames].join(', ')}`);
     log.info(`[watcher] New names (${newNames.size}): ${[...newNames].join(', ')}`);
     marketplaceProvider.setInstalledNames(newNames);
-    // Clear updatable names — skills just changed, stale update info no longer valid
-    marketplaceProvider.setUpdatableNames(new Set());
 
-    // Notify installer progress listeners for new installs AND updates.
-    // The watcher only fires on actual file changes, so any skill present
-    // after a change is either newly installed or was just updated.
-    // Fire for all current names — the listener only resolves if it's waiting.
+    // Notify installer progress listeners and clear updates only for genuinely new skills.
     for (const name of newNames) {
-      log.info(`[watcher] notifyInstallDetected("${name}")`);
       notifyInstallDetected(name);
-      // Optimistically clear from the "updates available" cache
-      clearUpdateForSkill(name);
+      // Only clear update status for skills that are genuinely new installs
+      if (!oldNames.has(name)) {
+        log.info(`[watcher] New skill detected: "${name}", clearing from update cache`);
+        clearUpdateForSkill(name);
+      }
     }
 
+    syncUpdatableNames();
     updateBadge();
 
     const added = newNames.size - oldNames.size;
@@ -110,7 +116,7 @@ export function activate(context: vscode.ExtensionContext) {
     log.info(`[operation] Old names (${oldNames.size}): ${[...oldNames].join(', ')}`);
     log.info(`[operation] New names (${newNames.size}): ${[...newNames].join(', ')}`);
     marketplaceProvider.setInstalledNames(newNames);
-    marketplaceProvider.setUpdatableNames(new Set());
+    syncUpdatableNames();
     updateBadge();
     previousSkillNames = newNames;
   });
@@ -228,15 +234,16 @@ export function activate(context: vscode.ExtensionContext) {
 
       const skillsWithHashes = allSkills
         .filter(s => s.source && s.hash)
-        .map(s => ({ name: s.name, source: s.source!, skillFolderHash: s.hash! }));
+        .map(s => ({ name: s.name, source: s.source!, skillFolderHash: s.hash!, skillPath: s.skillPath }));
 
-      const untrackedSkills = allSkills.filter(s => !s.source || !s.hash);
+      // Exclude custom (user-authored) skills — they have no remote source to check
+      const untrackedSkills = allSkills.filter(s => !s.isCustom && (!s.source || !s.hash));
 
       if (skillsWithHashes.length === 0) {
         if (untrackedSkills.length > 0) {
           const names = untrackedSkills.map(s => s.name).join(', ');
           vscode.window.showInformationMessage(
-            `Found ${untrackedSkills.length} skill(s) without tracking data (${names}). Re-install via Marketplace to enable updates.`,
+            `${untrackedSkills.length} skill(s) missing tracking data (${names}). Re-install via Marketplace to enable updates.`,
             'Browse Marketplace',
           ).then(action => {
             if (action === 'Browse Marketplace') {
@@ -252,15 +259,15 @@ export function activate(context: vscode.ExtensionContext) {
       }
 
       try {
-        const result = await checkUpdates(skillsWithHashes, true);
+        const result = await checkUpdates(skillsWithHashes);
         await treeProvider.rescan();
         updateBadge();
-        marketplaceProvider.setUpdatableNames(new Set(result.updates.map(u => u.name)));
+        syncUpdatableNames();
 
         if (result.updates.length === 0) {
-          let msg = 'All tracked skills are up to date.';
+          let msg = 'All skills are up to date.';
           if (untrackedSkills.length > 0) {
-            msg += ` (${untrackedSkills.length} untracked skill(s) cannot be checked)`;
+            msg += ` ${untrackedSkills.length} skill(s) missing tracking data — re-install to enable updates.`;
           }
           vscode.window.showInformationMessage(msg);
         } else {
@@ -288,7 +295,12 @@ export function activate(context: vscode.ExtensionContext) {
       if (!skill?.name) { return; }
       const result = getLastUpdateResult();
       const update = result?.updates.find(u => u.name === skill.name);
-      if (update) { await updateSkills([update]); }
+      if (update) {
+        await updateSkills([update]);
+        await treeProvider.rescan();
+        syncUpdatableNames();
+        updateBadge();
+      }
     })
   );
 
@@ -301,6 +313,9 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
       await updateSkills(result.updates);
+      await treeProvider.rescan();
+      syncUpdatableNames();
+      updateBadge();
     })
   );
 
@@ -455,14 +470,13 @@ export function activate(context: vscode.ExtensionContext) {
       const allSkills = [...globalSkills, ...projectSkills];
       const skillsWithHashes = allSkills
         .filter(s => s.source && s.hash)
-        .map(s => ({ name: s.name, source: s.source!, skillFolderHash: s.hash! }));
+        .map(s => ({ name: s.name, source: s.source!, skillFolderHash: s.hash!, skillPath: s.skillPath }));
       if (skillsWithHashes.length === 0) { return; }
       try {
-        const result = await checkUpdates(skillsWithHashes, true);
+        await checkUpdates(skillsWithHashes);
         await treeProvider.rescan();
         updateBadge();
-        const updatableNames = new Set(result.updates.map(u => u.name));
-        marketplaceProvider.setUpdatableNames(updatableNames);
+        syncUpdatableNames();
       } catch { /* startup check is best-effort */ }
     });
   }

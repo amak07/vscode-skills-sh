@@ -8,6 +8,7 @@ type TreeItem = GroupItem | SkillItem | CustomSourceItem | RemoteSkillItem;
 
 const GROUP_ICONS: Record<string, string> = {
   source: 'repo',
+  custom: 'account',
   untracked: 'question',
   project: 'folder-library',
   'custom-sources': 'repo',
@@ -17,7 +18,7 @@ const GROUP_ICONS: Record<string, string> = {
 class GroupItem extends vscode.TreeItem {
   constructor(
     public readonly label: string,
-    public readonly groupType: 'source' | 'untracked' | 'project' | 'custom-sources' | 'updates',
+    public readonly groupType: 'source' | 'custom' | 'untracked' | 'project' | 'custom-sources' | 'updates',
     public readonly children: TreeItem[],
     collapsibleState = vscode.TreeItemCollapsibleState.Collapsed,
   ) {
@@ -43,6 +44,9 @@ class SkillItem extends vscode.TreeItem {
     if (hasUpdate) {
       this.description = `Update available${agentSuffix}`;
       this.iconPath = new vscode.ThemeIcon('arrow-up');
+    } else if (skill.isCustom) {
+      this.description = `${skill.description}${agentSuffix}`;
+      this.iconPath = new vscode.ThemeIcon('file-code');
     } else if (!skill.source || !skill.hash) {
       this.description = skill.description
         ? `${skill.description} (untracked)${agentSuffix}`
@@ -57,8 +61,13 @@ class SkillItem extends vscode.TreeItem {
     if (skill.description) { tooltipLines.push(skill.description); }
     if (skill.agents.length > 0) { tooltipLines.push(`\nAgents: ${skill.agents.join(', ')}`); }
     tooltipLines.push(`\nPath: ${skill.path}`);
-    if (skill.source) { tooltipLines.push(`Source: ${skill.source}`); }
-    if (!skill.source) { tooltipLines.push('\nUntracked: re-install via Marketplace to enable updates'); }
+    if (skill.source) {
+      tooltipLines.push(`Source: ${skill.source}`);
+    } else if (skill.isCustom) {
+      tooltipLines.push('\nCustom skill (user-created)');
+    } else {
+      tooltipLines.push('\nUntracked: re-install via Marketplace to enable updates');
+    }
     this.tooltip = tooltipLines.join('\n');
 
     this.contextValue = hasUpdate ? 'skill_updatable' : 'skill';
@@ -174,6 +183,7 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
 
       // --- Source-based groups for global skills ---
       const bySource = new Map<string, InstalledSkill[]>();
+      const custom: InstalledSkill[] = [];
       const untracked: InstalledSkill[] = [];
 
       for (const skill of this.globalSkills) {
@@ -181,9 +191,21 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
           const list = bySource.get(skill.source) || [];
           list.push(skill);
           bySource.set(skill.source, list);
+        } else if (skill.isCustom) {
+          custom.push(skill);
         } else {
           untracked.push(skill);
         }
+      }
+
+      // Custom skills — user-created, regular directories (not symlinks)
+      if (custom.length > 0) {
+        const children = custom.map(s => new SkillItem(s, false));
+        groups.push(new GroupItem(
+          `My Skills (${custom.length})`,
+          'custom',
+          children,
+        ));
       }
 
       const sortedSources = Array.from(bySource.entries())
@@ -198,6 +220,7 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
         ));
       }
 
+      // Untracked — orphaned symlinks missing lock entries
       if (untracked.length > 0) {
         const children = untracked.map(s => new SkillItem(s, false));
         groups.push(new GroupItem(

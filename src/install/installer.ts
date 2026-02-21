@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { exec } from 'child_process';
 import { getLog } from '../logger';
+import { clearUpdateForSkill } from '../api/updates';
 
 let sharedTerminal: vscode.Terminal | undefined;
 
@@ -141,47 +141,83 @@ export async function updateSkills(
   if (action !== 'Update') { return; }
 
   const agent = getDefaultAgent();
-  const npx = process.platform === 'win32' ? 'npx.cmd' : 'npx';
+  const log = getLog();
+  const terminal = getTerminal();
+  terminal.show();
 
-  await vscode.window.withProgress(
-    { location: vscode.ProgressLocation.Notification, title: 'Updating skills...', cancellable: false },
-    async (progress) => {
-      let succeeded = 0;
-      const failed: string[] = [];
+  // Send remove+add commands individually (cross-shell compatible — no && or ;)
+  for (const u of updates) {
+    const removeCmd = `npx skills remove ${u.name} -a ${agent} -g -y`;
+    const addCmd = `npx skills add https://github.com/${u.source} -s ${u.name} -a ${agent} -g -y`;
+    terminal.sendText(removeCmd);
+    terminal.sendText(addCmd);
+    log.info(`[installer] update: sent commands for "${u.name}": ${removeCmd} ; ${addCmd}`);
+  }
 
-      for (const update of updates) {
-        progress.report({ message: `(${succeeded + failed.length + 1}/${updates.length}) ${update.name}` });
+  // Optimistically clear the requested skills from the update cache
+  for (const u of updates) {
+    clearUpdateForSkill(u.name);
+  }
 
-        const removeCmd = `${npx} skills remove ${update.name} -a ${agent} -g -y`;
-        const addCmd = `${npx} skills add https://github.com/${update.source} -s ${update.name} -a ${agent} -g -y`;
+  // Show progress notification until terminal completes or timeout
+  vscode.window.withProgress(
+    { location: vscode.ProgressLocation.Notification, title: `Updating ${updates.length} skill(s)...`, cancellable: false },
+    () => {
+      const minDelay = new Promise<void>(r => setTimeout(r, 2000));
+      const detection = new Promise<void>((resolve) => {
+        const disposables: vscode.Disposable[] = [];
+        let timeoutId: ReturnType<typeof setTimeout>;
+        let resolved = false;
 
-        try {
-          await execCommand(removeCmd);
-          await execCommand(addCmd);
-          succeeded++;
-        } catch {
-          failed.push(update.name);
-        }
-      }
+        const cleanup = (source: string) => {
+          if (resolved) { return; }
+          resolved = true;
+          log.info(`[installer] update: detected completion via ${source} for "${names}"`);
+          clearTimeout(timeoutId);
+          disposables.forEach(d => d.dispose());
+          _onOperationCompleted.fire();
+          resolve();
+        };
 
-      if (failed.length > 0) {
-        vscode.window.showWarningMessage(
-          `Updated ${succeeded}, failed ${failed.length}: ${failed.join(', ')}`
+        // Detection 1: Terminal shell integration — wait for all commands to finish
+        // Each skill sends 2 commands (remove + add), so we expect 2N completions.
+        const expectedCmds = updates.length * 2;
+        let completedCmds = 0;
+        disposables.push(
+          vscode.window.onDidEndTerminalShellExecution((e) => {
+            if (e.terminal === terminal) {
+              completedCmds++;
+              log.info(`[installer] update: shell execution ${completedCmds}/${expectedCmds} (exit: ${e.exitCode})`);
+              if (e.exitCode !== undefined && e.exitCode !== 0) {
+                vscode.window.showWarningMessage(
+                  `Some skill updates may have failed (exit code ${e.exitCode}). Check the terminal.`,
+                );
+              }
+              if (completedCmds >= expectedCmds) {
+                cleanup('shell-integration');
+              }
+            }
+          })
         );
-      } else {
-        vscode.window.showInformationMessage(`Updated ${succeeded} skill(s) successfully.`);
-      }
+
+        // Detection 2: Watcher-based (filesystem change)
+        disposables.push(
+          onInstallDetected(() => {
+            cleanup('watcher');
+          })
+        );
+
+        // Detection 3: Timeout fallback
+        timeoutId = setTimeout(() => {
+          cleanup('timeout');
+          vscode.window.showWarningMessage(
+            `Skill update may still be running. Check the Skills.sh terminal.`,
+          );
+        }, 30_000);
+      });
+      return Promise.all([minDelay, detection]).then(() => {});
     },
   );
-}
-
-function execCommand(cmd: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    exec(cmd, { timeout: 30_000 }, (error, stdout, stderr) => {
-      if (error) { reject(new Error(stderr || error.message)); }
-      else { resolve(stdout); }
-    });
-  });
 }
 
 export async function uninstallSkill(

@@ -197,7 +197,13 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
       case 'update': {
         const updateResult = getLastUpdateResult();
         if (updateResult?.updates?.length) {
-          await updateSkills(updateResult.updates);
+          const targetName = (message.payload as { skillName?: string })?.skillName;
+          const updates = targetName
+            ? updateResult.updates.filter(u => u.name === targetName)
+            : updateResult.updates;
+          if (updates.length > 0) {
+            await updateSkills(updates);
+          }
         }
         break;
       }
@@ -423,7 +429,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
       if (e.target.closest('.btn-install')) {
         const btn = e.target.closest('.btn-install');
         if (btn.classList.contains('btn-updatable')) {
-          vscode.postMessage({ command: 'update' });
+          vscode.postMessage({ command: 'update', payload: { skillName: btn.dataset.skillName } });
           btn.textContent = 'Updating...';
           btn.disabled = true;
         } else if (!btn.classList.contains('btn-installed')) {

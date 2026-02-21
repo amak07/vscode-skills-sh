@@ -36,12 +36,7 @@ export interface LeaderboardResponse {
 
 export type LeaderboardView = 'all-time' | 'trending' | 'hot';
 
-// === API Types: check-updates ===
-
-export interface UpdateCheckRequest {
-  skills: { name: string; source: string; skillFolderHash: string }[];
-  forceRefresh?: boolean;
-}
+// === Update checking ===
 
 export interface UpdateCheckResponse {
   updates: { name: string; source: string; newHash: string }[];
@@ -88,7 +83,9 @@ export interface InstalledSkill {
   metadata: Record<string, unknown>;
   source?: string;
   hash?: string;
+  skillPath?: string; // e.g. "skills/react-email/SKILL.md" — from lock file
   agents: string[];
+  isCustom: boolean; // true = regular directory (user-created), false = symlink (marketplace)
 }
 
 export interface ScanResult {
