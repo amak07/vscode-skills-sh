@@ -2,8 +2,16 @@
 src/**
 node_modules/**
 .gitignore
+.claude/**
+.beads/**
+docs/**
 tsconfig.json
 esbuild.config.mjs
+vitest.config.*
+.eslintrc*
+.prettierrc*
+CLAUDE.md
 **/*.map
 **/*.ts
+**/*.vsix
 !dist/**

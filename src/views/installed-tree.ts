@@ -149,6 +149,10 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
     return names;
   }
 
+  getAllInstalledSkills(): InstalledSkill[] {
+    return [...this.globalSkills, ...this.projectSkills];
+  }
+
   getTreeItem(element: TreeItem): vscode.TreeItem {
     return element;
   }

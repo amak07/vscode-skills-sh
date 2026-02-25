@@ -5,6 +5,8 @@ const clearIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" st
 export const backIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>`;
 export const fileIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>`;
 export const copyIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+const githubIcon = `<svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>`;
+const starIcon = `<svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14"><path fill-rule="evenodd" d="m8 .43.66 1.21 1.93 3.54 3.97.75 1.35.25-.95 1-2.77 2.93.52 4 .18 1.37-1.24-.6L8 13.17l-3.65 1.73-1.24.59.18-1.37.52-4-2.77-2.93-.95-1 1.35-.25 3.97-.75 1.93-3.54zm0 3.14L6.56 6.2l-.17.32-.35.06-2.97.56 2.07 2.19.25.26-.05.35-.39 3 2.73-1.3.32-.15.32.15 2.73 1.3-.4-3-.04-.35.25-.26 2.07-2.2-2.97-.55-.35-.06-.17-.32z" clip-rule="evenodd"/></svg>`;
 
 const SKILLS_ASCII = `███████╗██╗  ██╗██╗██╗     ██╗     ███████╗
 ██╔════╝██║ ██╔╝██║██║     ██║     ██╔════╝
@@ -73,11 +75,12 @@ export function renderSearchInput(): string {
   `;
 }
 
-export function renderTabs(activeTab: string, total?: number): string {
+export function renderTabs(activeTab: string, total?: number, installedCount?: number): string {
   const tabs = [
     { id: 'all-time', label: total ? `All Time (${total.toLocaleString()})` : 'All Time' },
     { id: 'trending', label: 'Trending (24h)' },
     { id: 'hot', label: 'Hot' },
+    { id: 'installed', label: installedCount !== undefined ? `Installed (${installedCount})` : 'Installed' },
   ];
 
   return `
@@ -185,15 +188,15 @@ export function renderDetailView(detail: SkillDetail): string {
 
       <div class="detail-breadcrumb">
         <a data-nav="home">skills</a> <span>/</span>
-        <span>${owner}</span> <span>/</span>
-        <span>${repo}</span> <span>/</span>
+        <a data-nav="external" data-url="https://skills.sh/${owner}">${owner}</a> <span>/</span>
+        <a data-nav="external" data-url="https://skills.sh/${owner}/${repo}">${repo}</a> <span>/</span>
         <span>${detail.name}</span>
       </div>
 
       <h1 class="detail-title">${detail.name}</h1>
 
       <div class="detail-cmd" id="copyCmd" title="Click to copy">
-        <code><span class="dollar">$</span> ${escapeHtml(detail.installCommand)}</code>
+        <span class="detail-cmd-text"><span class="dollar">$</span> ${escapeHtml(detail.installCommand)}</span>
         <span class="copy-icon">${copyIcon}</span>
       </div>
 
@@ -216,11 +219,23 @@ export function renderDetailView(detail: SkillDetail): string {
 
           <div class="sidebar-section">
             <div class="sidebar-label">Repository</div>
-            <a class="sidebar-link sidebar-value" href="#"
-               data-external="https://github.com/${detail.repository}">
-              ${detail.repository}
+            <a class="sidebar-link sidebar-value sidebar-link-with-icon"
+               data-nav="external"
+               data-url="https://github.com/${detail.repository}">
+              ${githubIcon}
+              <span>${detail.repository}</span>
             </a>
           </div>
+
+          ${detail.githubStars ? `
+            <div class="sidebar-section">
+              <div class="sidebar-label">GitHub Stars</div>
+              <div class="sidebar-value sidebar-stars">
+                <span class="star-icon">${starIcon}</span>
+                <span>${detail.githubStars}</span>
+              </div>
+            </div>
+          ` : ''}
 
           <div class="sidebar-section">
             <div class="sidebar-label">First Seen</div>

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { Marked } from 'marked';
-import { LeaderboardView, WebviewMessage } from '../../types';
+import { InstalledSkillCard, LeaderboardView, WebviewMessage } from '../../types';
 import { searchSkills, getLeaderboard } from '../../api/search';
 import { fetchSkillDetail } from '../../api/detail-scraper';
 import { fetchSkillMd } from '../../api/github';
@@ -26,6 +26,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
   private _view?: vscode.WebviewView;
   private installedNames = new Set<string>();
   private updatableNames = new Set<string>();
+  private installedSkills: InstalledSkillCard[] = [];
   private fontsUri = '';
   private panels: vscode.WebviewPanel[] = [];
   private tabWebviews = new WeakSet<vscode.Webview>();
@@ -40,6 +41,15 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
   setUpdatableNames(names: Set<string>): void {
     this.updatableNames = names;
     this.pushButtonStates();
+  }
+
+  setInstalledSkills(skills: InstalledSkillCard[]): void {
+    this.installedSkills = skills;
+    const payload = skills;
+    this._view?.webview.postMessage({ command: 'installedSkillsData', payload });
+    for (const panel of this.panels) {
+      panel.webview.postMessage({ command: 'installedSkillsData', payload });
+    }
   }
 
   private pushButtonStates(): void {
@@ -266,11 +276,14 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
 
   <script nonce="${nonce}">
     const vscode = acquireVsCodeApi();
+    const githubIcon = '<svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>';
+    const starIcon = '<svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14"><path fill-rule="evenodd" d="m8 .43.66 1.21 1.93 3.54 3.97.75 1.35.25-.95 1-2.77 2.93.52 4 .18 1.37-1.24-.6L8 13.17l-3.65 1.73-1.24.59.18-1.37.52-4-2.77-2.93-.95-1 1.35-.25 3.97-.75 1.93-3.54zm0 3.14L6.56 6.2l-.17.32-.35.06-2.97.56 2.07 2.19.25.26-.05.35-.39 3 2.73-1.3.32-.15.32.15 2.73 1.3-.4-3-.04-.35.25-.26 2.07-2.2-2.97-.55-.35-.06-.17-.32z" clip-rule="evenodd"/></svg>';
     let currentView = 'leaderboard';
     let currentTab = 'all-time';
     let currentPage = 0;
     let currentChip = null;
     let debounceTimer = null;
+    let installedSkills = [];
 
     const searchInput = document.getElementById('searchInput');
     const searchKbd = document.getElementById('searchKbd');
@@ -380,14 +393,22 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
       tab.addEventListener('click', () => {
         currentTab = tab.dataset.tab;
         currentPage = 0;
-        currentView = 'leaderboard';
         searchInput.value = '';
         searchKbd.style.display = '';
         searchClear.style.display = 'none';
         currentChip = null;
         updateTabs();
         updateChips();
-        loadLeaderboard(currentTab, 0);
+
+        if (currentTab === 'installed') {
+          currentView = 'installed';
+          showLeaderboardChrome(false);
+          renderInstalledView();
+        } else {
+          currentView = 'leaderboard';
+          showLeaderboardChrome(true);
+          loadLeaderboard(currentTab, 0);
+        }
       });
     });
 
@@ -539,6 +560,15 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
           });
           break;
         }
+
+        case 'installedSkillsData': {
+          installedSkills = msg.payload || [];
+          updateInstalledTabLabel();
+          if (currentView === 'installed') {
+            renderInstalledView();
+          }
+          break;
+        }
       }
     });
 
@@ -548,6 +578,65 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
       const heading = document.querySelector('.hero-leaderboard-heading');
       if (hero) hero.style.display = visible ? '' : 'none';
       if (heading) heading.style.display = visible ? '' : 'none';
+    }
+
+    function showLeaderboardChrome(visible) {
+      const search = document.querySelector('.search-container');
+      const chips = document.querySelector('.chips');
+      const gridHeader = document.querySelector('.grid-header');
+      if (search) search.style.display = visible ? '' : 'none';
+      if (chips) chips.style.display = visible ? '' : 'none';
+      if (gridHeader) gridHeader.style.display = visible ? '' : 'none';
+    }
+
+    function renderInstalledView() {
+      if (installedSkills.length === 0) {
+        resultsEl.innerHTML = '<div class="empty-state">No skills installed yet. Browse the marketplace to get started.</div>';
+        return;
+      }
+      let html = '';
+      installedSkills.forEach(function(skill) {
+        html += renderInstalledRow(skill);
+      });
+      resultsEl.innerHTML = html;
+    }
+
+    function renderInstalledRow(skill) {
+      const source = skill.source || '';
+      const scopeLabel = skill.scope === 'project' ? 'project' : 'global';
+      const desc = skill.description || '';
+
+      let btnClass = 'btn-install btn-installed';
+      let btnLabel = '✓ Installed';
+      if (skill.hasUpdate) {
+        btnClass = 'btn-install btn-updatable';
+        btnLabel = 'Update';
+      }
+
+      return '<div class="grid-row installed-row"'
+        + (source ? ' data-source="' + source + '" data-skill="' + escapeHtml(skill.folderName) + '"' : '')
+        + '>'
+        + '<div class="row-info">'
+        + '<div class="row-name">' + escapeHtml(skill.name)
+        + ' <span class="scope-badge scope-' + scopeLabel + '">' + scopeLabel + '</span>'
+        + '</div>'
+        + '<div class="row-source">' + (desc ? escapeHtml(desc) : (source ? escapeHtml(source) : 'Custom skill')) + '</div>'
+        + '</div>'
+        + '<div class="row-right">'
+        + (source ? '<span class="row-installs" style="font-size:0.75rem;color:var(--gray-600)">' + escapeHtml(source) + '</span>' : '')
+        + '<button class="' + btnClass + '"'
+        + (source ? ' data-install="' + source + '" data-skill-name="' + escapeHtml(skill.folderName) + '"' : '')
+        + ' onclick="event.stopPropagation()">'
+        + btnLabel
+        + '</button>'
+        + '</div></div>';
+    }
+
+    function updateInstalledTabLabel() {
+      const tab = document.querySelector('.tab[data-tab="installed"]');
+      if (tab) {
+        tab.textContent = 'Installed (' + installedSkills.length + ')';
+      }
     }
 
     function loadLeaderboard(view, page) {
@@ -633,6 +722,21 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
         + '</span><span class="agent-installs">' + a.installs + '</span></div>'
       ).join('');
 
+      const starsSection = detail.githubStars
+        ? '<div class="sidebar-section"><div class="sidebar-label">GitHub Stars</div>'
+          + '<div class="sidebar-value sidebar-stars">'
+          + '<span class="star-icon">' + starIcon + '</span>'
+          + '<span>' + escapeHtml(detail.githubStars) + '</span>'
+          + '</div></div>'
+        : '';
+
+      const repoSection = '<div class="sidebar-section"><div class="sidebar-label">Repository</div>'
+        + '<a class="sidebar-link sidebar-value sidebar-link-with-icon" data-nav="external"'
+        + ' data-url="https://github.com/' + escapeHtml(detail.repository || '') + '">'
+        + githubIcon
+        + '<span>' + escapeHtml(detail.repository || '') + '</span>'
+        + '</a></div>';
+
       return '<div class="detail-view">'
         + '<button class="back-btn" id="backBtn">${backIcon.replace(/'/g, "\\'")} Back to results</button>'
         + '<div class="detail-breadcrumb">'
@@ -642,7 +746,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
         + '<span>' + detail.name + '</span></div>'
         + '<h1 class="detail-title">' + detail.name + '</h1>'
         + '<div class="detail-cmd" id="copyCmd" title="Click to copy">'
-        + '<code><span class="dollar">$</span> ' + escapeHtml(detail.installCommand) + '</code>'
+        + '<span class="detail-cmd-text"><span class="dollar">$</span> ' + escapeHtml(detail.installCommand) + '</span>'
         + '<span class="copy-icon">${copyIcon.replace(/'/g, "\\'")}</span></div>'
         + '<div class="detail-grid"><div class="detail-content">'
         + '<div class="detail-skillmd-header">${fileIcon.replace(/'/g, "\\'")} <span>SKILL.md</span></div>'
@@ -650,8 +754,8 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
         + '</div><aside>'
         + '<div class="sidebar-section"><div class="sidebar-label">Weekly Installs</div>'
         + '<div class="sidebar-value-large">' + (detail.weeklyInstalls || 'N/A') + '</div></div>'
-        + '<div class="sidebar-section"><div class="sidebar-label">Repository</div>'
-        + '<div class="sidebar-value">' + (detail.repository || '') + '</div></div>'
+        + repoSection
+        + starsSection
         + '<div class="sidebar-section"><div class="sidebar-label">First Seen</div>'
         + '<div class="sidebar-value">' + (detail.firstSeen || 'N/A') + '</div></div>'
         + (agentRows ? '<div class="sidebar-section"><div class="sidebar-label">Installed On</div>'
@@ -672,8 +776,8 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
         });
       }
 
-      // Breadcrumb navigation
-      document.querySelectorAll('.detail-breadcrumb a[data-nav]').forEach(link => {
+      // Navigation links (breadcrumbs + sidebar)
+      document.querySelectorAll('[data-nav]').forEach(link => {
         link.addEventListener('click', () => {
           const nav = link.getAttribute('data-nav');
           if (nav === 'home') {
@@ -689,7 +793,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
       const copyCmd = document.getElementById('copyCmd');
       if (copyCmd) {
         copyCmd.addEventListener('click', () => {
-          const text = copyCmd.querySelector('code').textContent.replace(/^\\$ /, '');
+          const text = copyCmd.querySelector('.detail-cmd-text').textContent.replace(/^\\$ /, '');
           navigator.clipboard.writeText(text);
           showCopyFeedback(copyCmd.querySelector('.copy-icon'));
         });

@@ -54,6 +54,7 @@ export interface SkillDetail {
   installCommand: string;
   perAgent: { agent: string; installs: string }[];
   skillMdHtml: string;
+  githubStars?: string;
 }
 
 // === Local types ===
@@ -128,4 +129,16 @@ export interface WebviewMessage {
   payload?: unknown;
 }
 
-export type ViewState = 'leaderboard' | 'search-results' | 'detail';
+export type ViewState = 'leaderboard' | 'search-results' | 'detail' | 'installed';
+
+// === Installed tab (lightweight subset for webview) ===
+
+export interface InstalledSkillCard {
+  name: string;
+  folderName: string;
+  description: string;
+  source?: string;
+  scope: SkillScope;
+  hasUpdate: boolean;
+  isCustom: boolean;
+}

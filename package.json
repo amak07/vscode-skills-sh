@@ -9,6 +9,7 @@
     "vscode": "^1.93.0"
   },
   "categories": [
+    "Machine Learning",
     "Other"
   ],
   "keywords": [
@@ -389,12 +390,14 @@
     "vscode:prepublish": "node esbuild.config.mjs --production",
     "build": "node esbuild.config.mjs",
     "watch": "node esbuild.config.mjs --watch",
+    "package": "vsce package",
     "lint": "eslint src/",
     "test": "vitest run"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
     "@types/vscode": "^1.93.0",
+    "@vscode/vsce": "^3.2.0",
     "esbuild": "^0.24.0",
     "typescript": "^5.5.0",
     "vitest": "^2.0.0"

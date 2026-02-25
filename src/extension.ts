@@ -6,7 +6,7 @@ import { MarketplaceViewProvider } from './views/marketplace/provider';
 import { installSkill, updateSkills, uninstallSkill, disposeTerminal, notifyInstallDetected, onOperationCompleted } from './install/installer';
 import { checkUpdates, getLastUpdateResult, clearUpdateForSkill } from './api/updates';
 import { searchSkills } from './api/search';
-import { InstalledSkill } from './types';
+import { InstalledSkill, InstalledSkillCard } from './types';
 import { getLog } from './logger';
 
 // Extract InstalledSkill from either a direct InstalledSkill or a SkillItem tree item
@@ -56,6 +56,23 @@ export function activate(context: vscode.ExtensionContext) {
     marketplaceProvider.setUpdatableNames(updatableNames);
   }
 
+  // Helper: sync full installed skill cards to marketplace webview
+  function syncInstalledSkills(): void {
+    const updateResult = getLastUpdateResult();
+    const updatableNames = new Set((updateResult?.updates ?? []).map(u => u.name));
+    const allSkills = treeProvider.getAllInstalledSkills();
+    const cards: InstalledSkillCard[] = allSkills.map(s => ({
+      name: s.name,
+      folderName: s.folderName,
+      description: s.description,
+      source: s.source,
+      scope: s.scope,
+      hasUpdate: updatableNames.has(s.name),
+      isCustom: s.isCustom,
+    }));
+    marketplaceProvider.setInstalledSkills(cards);
+  }
+
   // Start file watcher
   const watcher = new SkillWatcher(scanner);
   watcher.start();
@@ -70,6 +87,7 @@ export function activate(context: vscode.ExtensionContext) {
     log.info(`[watcher] Old names (${oldNames.size}): ${[...oldNames].join(', ')}`);
     log.info(`[watcher] New names (${newNames.size}): ${[...newNames].join(', ')}`);
     marketplaceProvider.setInstalledNames(newNames);
+    syncInstalledSkills();
 
     // Notify installer progress listeners and clear updates only for genuinely new skills.
     for (const name of newNames) {
@@ -117,6 +135,7 @@ export function activate(context: vscode.ExtensionContext) {
     log.info(`[operation] New names (${newNames.size}): ${[...newNames].join(', ')}`);
     marketplaceProvider.setInstalledNames(newNames);
     syncUpdatableNames();
+    syncInstalledSkills();
     updateBadge();
     previousSkillNames = newNames;
   });
@@ -127,6 +146,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('skills-sh.refreshInstalled', async () => {
       await treeProvider.rescan();
       marketplaceProvider.setInstalledNames(treeProvider.getInstalledSkillNames());
+      syncInstalledSkills();
       updateBadge();
     })
   );
@@ -418,6 +438,7 @@ export function activate(context: vscode.ExtensionContext) {
         if (state.focused) {
           await treeProvider.rescan();
           marketplaceProvider.setInstalledNames(treeProvider.getInstalledSkillNames());
+          syncInstalledSkills();
           previousSkillNames = treeProvider.getInstalledSkillNames();
           updateBadge();
         }
@@ -432,6 +453,7 @@ export function activate(context: vscode.ExtensionContext) {
         watcher.restart();
         await treeProvider.rescan();
         marketplaceProvider.setInstalledNames(treeProvider.getInstalledSkillNames());
+        syncInstalledSkills();
         previousSkillNames = treeProvider.getInstalledSkillNames();
         updateBadge();
       }
@@ -442,6 +464,7 @@ export function activate(context: vscode.ExtensionContext) {
   treeProvider.rescan().then(() => {
     const installedNames = treeProvider.getInstalledSkillNames();
     marketplaceProvider.setInstalledNames(installedNames);
+    syncInstalledSkills();
     previousSkillNames = installedNames;
     updateBadge();
 
@@ -477,6 +500,7 @@ export function activate(context: vscode.ExtensionContext) {
         await treeProvider.rescan();
         updateBadge();
         syncUpdatableNames();
+        syncInstalledSkills();
       } catch { /* startup check is best-effort */ }
     });
   }

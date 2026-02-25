@@ -56,6 +56,12 @@ function parseRenderedHtml(
       /First Seen<\/span><\/div><div[^>]*>([^<]+)<\/div>/
     ) || 'N/A';
 
+    // GitHub Stars: <span>GitHub Stars</span></div><div ...><svg...>...</svg><span>6.8K</span></div>
+    const githubStars = extractPattern(
+      html,
+      /GitHub Stars<\/span><\/div><div[^>]*>[\s\S]*?<span>([\d,.]+K?)<\/span><\/div>/
+    ) || undefined;
+
     // Install command: npx skills add https://github.com/owner/repo --skill skillId
     const installCommand = extractPattern(html, /(npx skills add[^<"]+)/)
       || `npx skills add https://github.com/${owner}/${repo} --skill ${skillId}`;
@@ -75,6 +81,7 @@ function parseRenderedHtml(
       installCommand,
       perAgent,
       skillMdHtml,
+      githubStars,
     };
   } catch {
     return null;
@@ -108,16 +115,24 @@ function extractPerAgentData(html: string): { agent: string; installs: string }[
 
 function extractSkillMdContent(html: string): string {
   // The SKILL.md content is inside a div with class="prose prose-invert max-w-none ..."
-  // Extract everything from the opening prose tag to the closing </div> before </aside> or </main>
-  const proseMatch = html.match(/class="prose[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>\s*<aside/);
+  // The content column uses lg:col-span-9 and sidebar uses lg:col-span-3
+
+  // Primary: capture prose content, stopping before the sidebar column (col-span-3)
+  const proseMatch = html.match(/class="prose[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>\s*<div[^>]*col-span-3/);
   if (proseMatch) {
     return proseMatch[1];
   }
 
-  // Fallback: broader match
-  const fallbackMatch = html.match(/class="prose[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/main>/);
-  if (fallbackMatch) {
-    return fallbackMatch[1];
+  // Fallback: stop before <aside> tag (older page layouts)
+  const asideMatch = html.match(/class="prose[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>\s*<aside/);
+  if (asideMatch) {
+    return asideMatch[1];
+  }
+
+  // Last resort: stop before "Weekly Installs" sidebar section
+  const weeklyMatch = html.match(/class="prose[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>[\s\S]*?(?=Weekly Installs<\/span>)/);
+  if (weeklyMatch) {
+    return weeklyMatch[1];
   }
 
   return '';
