@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(npx.cmd skills add:*)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" api repos/vercel-labs/skills/contents/src/skill-lock.ts --jq '.content')",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" api repos/vercel-labs/skills/contents/src/local-lock.ts --jq '.content')",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" issue view 399 --repo vercel-labs/skills --json body,comments,title,state,labels)"
+    ]
+  }
+}
