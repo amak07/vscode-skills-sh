@@ -8,6 +8,7 @@ import { checkUpdates, getLastUpdateResult, clearUpdateForSkill } from './api/up
 import { searchSkills } from './api/search';
 import { InstalledSkill, InstalledSkillCard } from './types';
 import { getLog } from './logger';
+import { addSkillToManifest, removeSkillFromManifest, readManifest, writeManifest, getManifestPath, getMissingSkills, isSkillInManifest, getManifestSkillNames } from './manifest/manifest';
 
 // Extract InstalledSkill from either a direct InstalledSkill or a SkillItem tree item
 function resolveSkill(arg: any): InstalledSkill | undefined {
@@ -22,12 +23,11 @@ function resolveSkill(arg: any): InstalledSkill | undefined {
 export function activate(context: vscode.ExtensionContext) {
   const scanner = new SkillScanner();
   const treeProvider = new InstalledSkillsTreeProvider(scanner);
-  marketplaceProvider = new MarketplaceViewProvider(context.extensionUri);
+  marketplaceProvider = new MarketplaceViewProvider(context.extensionUri, () => treeProvider.refresh());
 
   // Register TreeView
   const treeView = vscode.window.createTreeView('skills-sh.installedSkills', {
     treeDataProvider: treeProvider,
-    showCollapseAll: true,
   });
   context.subscriptions.push(treeView);
 
@@ -60,6 +60,7 @@ export function activate(context: vscode.ExtensionContext) {
   function syncInstalledSkills(): void {
     const updateResult = getLastUpdateResult();
     const updatableNames = new Set((updateResult?.updates ?? []).map(u => u.name));
+    const manifestNames = getManifestSkillNames();
     const allSkills = treeProvider.getAllInstalledSkills();
     const cards: InstalledSkillCard[] = allSkills.map(s => ({
       name: s.name,
@@ -69,6 +70,7 @@ export function activate(context: vscode.ExtensionContext) {
       scope: s.scope,
       hasUpdate: updatableNames.has(s.name),
       isCustom: s.isCustom,
+      inManifest: manifestNames.has(s.folderName),
     }));
     marketplaceProvider.setInstalledSkills(cards);
   }
@@ -78,12 +80,15 @@ export function activate(context: vscode.ExtensionContext) {
   watcher.start();
 
   let previousSkillNames = new Set<string>();
+  let previousSkillsList: InstalledSkill[] = [];
   watcher.onDidChange(async () => {
     const log = getLog();
     log.info('[watcher] Change detected, rescanning...');
     const oldNames = previousSkillNames;
+    const oldSkills = previousSkillsList;
     await treeProvider.rescan();
     const newNames = treeProvider.getInstalledSkillNames();
+    const newSkills = treeProvider.getAllInstalledSkills();
     log.info(`[watcher] Old names (${oldNames.size}): ${[...oldNames].join(', ')}`);
     log.info(`[watcher] New names (${newNames.size}): ${[...newNames].join(', ')}`);
     marketplaceProvider.setInstalledNames(newNames);
@@ -112,13 +117,58 @@ export function activate(context: vscode.ExtensionContext) {
           vscode.commands.executeCommand('skills-sh.installedSkills.focus');
         }
       });
+
+      // Post-install manifest prompt (Step 5b): offer to add newly installed skills to skills.json
+      if (oldSkills.length > 0 && readManifest()) {
+        const manifestSkills = getManifestSkillNames();
+        const oldFolderNames = new Set(oldSkills.map(s => s.folderName));
+        const newlyAdded = newSkills.filter(s =>
+          !oldFolderNames.has(s.folderName) && s.source && !manifestSkills.has(s.folderName),
+        );
+        for (const skill of newlyAdded) {
+          vscode.window.showInformationMessage(
+            `You installed "${skill.name}". Add it to this project's skills.json?`,
+            'Add to skills.json',
+            'Dismiss',
+          ).then(action => {
+            if (action === 'Add to skills.json' && skill.source) {
+              addSkillToManifest(skill.source, skill.folderName);
+              treeProvider.refresh();
+              vscode.window.showInformationMessage(`Added "${skill.name}" to skills.json`);
+            }
+          });
+        }
+      }
     } else if (oldNames.size > 0 && newNames.size < oldNames.size) {
       vscode.window.showInformationMessage(
         `Skills.sh: ${oldNames.size - newNames.size} skill(s) removed.`,
       );
+
+      // Post-uninstall manifest prompt (Step 5c): offer to remove uninstalled skills from skills.json
+      if (readManifest()) {
+        const manifestSkills = getManifestSkillNames();
+        const newFolderNames = new Set(newSkills.map(s => s.folderName));
+        const removed = oldSkills.filter(s =>
+          !newFolderNames.has(s.folderName) && manifestSkills.has(s.folderName),
+        );
+        for (const skill of removed) {
+          vscode.window.showInformationMessage(
+            `You uninstalled "${skill.name}". Remove it from this project's skills.json?`,
+            'Remove from skills.json',
+            'Keep in skills.json',
+          ).then(action => {
+            if (action === 'Remove from skills.json') {
+              removeSkillFromManifest(skill.folderName);
+              treeProvider.refresh();
+              vscode.window.showInformationMessage(`Removed "${skill.name}" from skills.json`);
+            }
+          });
+        }
+      }
     }
 
     previousSkillNames = newNames;
+    previousSkillsList = newSkills;
   });
   context.subscriptions.push(watcher);
 
@@ -138,6 +188,7 @@ export function activate(context: vscode.ExtensionContext) {
     syncInstalledSkills();
     updateBadge();
     previousSkillNames = newNames;
+    previousSkillsList = treeProvider.getAllInstalledSkills();
   });
 
   // === Commands ===
@@ -249,62 +300,67 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand('skills-sh.checkUpdates', async () => {
-      const { globalSkills, projectSkills } = await scanner.scan();
-      const allSkills = [...globalSkills, ...projectSkills];
+      await vscode.window.withProgress(
+        { location: vscode.ProgressLocation.Notification, title: 'Checking for skill updates...', cancellable: false },
+        async () => {
+          const { globalSkills, projectSkills } = await scanner.scan();
+          const allSkills = [...globalSkills, ...projectSkills];
 
-      const skillsWithHashes = allSkills
-        .filter(s => s.source && s.hash)
-        .map(s => ({ name: s.name, source: s.source!, skillFolderHash: s.hash!, skillPath: s.skillPath }));
+          const skillsWithHashes = allSkills
+            .filter(s => s.source && s.hash)
+            .map(s => ({ name: s.name, source: s.source!, skillFolderHash: s.hash!, skillPath: s.skillPath }));
 
-      // Exclude custom (user-authored) skills — they have no remote source to check
-      const untrackedSkills = allSkills.filter(s => !s.isCustom && (!s.source || !s.hash));
+          // Exclude custom (user-authored) skills — they have no remote source to check
+          const untrackedSkills = allSkills.filter(s => !s.isCustom && (!s.source || !s.hash));
 
-      if (skillsWithHashes.length === 0) {
-        if (untrackedSkills.length > 0) {
-          const names = untrackedSkills.map(s => s.name).join(', ');
-          vscode.window.showInformationMessage(
-            `${untrackedSkills.length} skill(s) missing tracking data (${names}). Re-install via Marketplace to enable updates.`,
-            'Browse Marketplace',
-          ).then(action => {
-            if (action === 'Browse Marketplace') {
-              vscode.commands.executeCommand('skills-sh.openMarketplace');
+          if (skillsWithHashes.length === 0) {
+            if (untrackedSkills.length > 0) {
+              const names = untrackedSkills.map(s => s.name).join(', ');
+              vscode.window.showInformationMessage(
+                `${untrackedSkills.length} skill(s) missing tracking data (${names}). Re-install via Marketplace to enable updates.`,
+                'Browse Marketplace',
+              ).then(action => {
+                if (action === 'Browse Marketplace') {
+                  vscode.commands.executeCommand('skills-sh.openMarketplace');
+                }
+              });
+            } else {
+              vscode.window.showInformationMessage('No installed skills have update tracking data.');
             }
-          });
-        } else {
-          vscode.window.showInformationMessage('No installed skills have update tracking data.');
-        }
-        await treeProvider.rescan();
-        updateBadge();
-        return;
-      }
-
-      try {
-        const result = await checkUpdates(skillsWithHashes);
-        await treeProvider.rescan();
-        updateBadge();
-        syncUpdatableNames();
-
-        if (result.updates.length === 0) {
-          let msg = 'All skills are up to date.';
-          if (untrackedSkills.length > 0) {
-            msg += ` ${untrackedSkills.length} skill(s) missing tracking data — re-install to enable updates.`;
+            await treeProvider.rescan();
+            updateBadge();
+            return;
           }
-          vscode.window.showInformationMessage(msg);
-        } else {
-          const names = result.updates.map(u => u.name).join(', ');
-          const action = await vscode.window.showInformationMessage(
-            `Updates available for: ${names}`,
-            'Update All',
-          );
 
-          if (action === 'Update All') {
-            await updateSkills(result.updates);
+          try {
+            const result = await checkUpdates(skillsWithHashes);
+            await treeProvider.rescan();
+            updateBadge();
+            syncUpdatableNames();
+
+            if (result.updates.length === 0) {
+              let msg = 'All skills are up to date.';
+              if (untrackedSkills.length > 0) {
+                msg += ` ${untrackedSkills.length} skill(s) missing tracking data — re-install to enable updates.`;
+              }
+              vscode.window.showInformationMessage(msg);
+            } else {
+              const names = result.updates.map(u => u.name).join(', ');
+              const action = await vscode.window.showInformationMessage(
+                `Updates available for: ${names}`,
+                'Update All',
+              );
+
+              if (action === 'Update All') {
+                await updateSkills(result.updates);
+              }
+            }
+          } catch (e: unknown) {
+            const msg = e instanceof Error ? e.message : 'Unknown error';
+            vscode.window.showErrorMessage(`Update check failed: ${msg}`);
           }
-        }
-      } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : 'Unknown error';
-        vscode.window.showErrorMessage(`Update check failed: ${msg}`);
-      }
+        },
+      );
     })
   );
 
@@ -429,6 +485,127 @@ export function activate(context: vscode.ExtensionContext) {
     })
   );
 
+  // === Manifest (skills.json) commands ===
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('skills-sh.addToManifest', (arg: any) => {
+      const skill = resolveSkill(arg);
+      if (!skill) { return; }
+      if (!skill.source) {
+        vscode.window.showWarningMessage(
+          `"${skill.name}" has no known source and cannot be added to skills.json. Re-install via Marketplace to add source tracking.`,
+        );
+        return;
+      }
+      addSkillToManifest(skill.source, skill.folderName);
+      treeProvider.refresh();
+      vscode.window.showInformationMessage(`Added "${skill.name}" to skills.json`);
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('skills-sh.removeFromManifest', (arg: any) => {
+      const skill = resolveSkill(arg);
+      if (!skill) { return; }
+      removeSkillFromManifest(skill.folderName);
+      treeProvider.refresh();
+      vscode.window.showInformationMessage(`Removed "${skill.name}" from skills.json`);
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('skills-sh.editManifest', async () => {
+      const allSkills = treeProvider.getAllInstalledSkills();
+      const skillsWithSource = allSkills.filter(s => s.source);
+      if (skillsWithSource.length === 0) {
+        vscode.window.showInformationMessage('No installed skills have source tracking. Install skills from the Marketplace first.');
+        return;
+      }
+
+      const manifestNames = getManifestSkillNames();
+      const items = skillsWithSource.map(s => ({
+        label: s.name,
+        description: s.source!,
+        picked: manifestNames.has(s.folderName),
+        skill: s,
+      }));
+
+      const picked = await vscode.window.showQuickPick(items, {
+        canPickMany: true,
+        placeHolder: 'Select skills to include in skills.json',
+      });
+      if (!picked) { return; }
+
+      // Build manifest from selections
+      const bySource = new Map<string, string[]>();
+      for (const item of picked) {
+        const source = item.skill.source!;
+        const list = bySource.get(source) ?? [];
+        list.push(item.skill.folderName);
+        bySource.set(source, list);
+      }
+
+      const manifest = {
+        skills: Array.from(bySource.entries())
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([source, skills]) => ({ source, skills: skills.sort() })),
+      };
+
+      writeManifest(manifest);
+      treeProvider.refresh();
+
+      // Open the file in editor
+      const manifestPath = getManifestPath();
+      if (manifestPath) {
+        const doc = await vscode.workspace.openTextDocument(manifestPath);
+        await vscode.window.showTextDocument(doc);
+      }
+      vscode.window.showInformationMessage(`Updated skills.json with ${picked.length} skill(s)`);
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('skills-sh.installFromManifest', async () => {
+      const manifest = readManifest();
+      if (!manifest) {
+        vscode.window.showInformationMessage('No skills.json found in this workspace.');
+        return;
+      }
+
+      const allSkills = treeProvider.getAllInstalledSkills();
+      const missing = getMissingSkills(manifest, allSkills);
+
+      if (missing.length === 0) {
+        vscode.window.showInformationMessage('All skills from skills.json are already installed.');
+        return;
+      }
+
+      const items = missing.map(m => ({
+        label: m.skillName,
+        description: m.source,
+        picked: true,
+        missing: m,
+      }));
+
+      const picked = await vscode.window.showQuickPick(items, {
+        canPickMany: true,
+        placeHolder: `${missing.length} skill(s) from skills.json are not installed. Select skills to install.`,
+      });
+      if (!picked || picked.length === 0) { return; }
+
+      const agent = vscode.workspace.getConfiguration('skills-sh').get<string>('defaultAgent', 'claude-code');
+      const terminal = vscode.window.createTerminal({ name: 'Skills.sh — Install from manifest' });
+      terminal.show();
+
+      for (const item of picked) {
+        const cmd = `npx skills add https://github.com/${item.missing.source} -s ${item.missing.skillName} -a ${agent} -g -y`;
+        terminal.sendText(cmd);
+      }
+
+      vscode.window.showInformationMessage(`Installing ${picked.length} skill(s) from skills.json...`);
+    })
+  );
+
   // Auto-refresh on window focus
   const autoRefreshEnabled = vscode.workspace.getConfiguration('skills-sh')
     .get<boolean>('autoRefreshOnFocus', true);
@@ -440,6 +617,7 @@ export function activate(context: vscode.ExtensionContext) {
           marketplaceProvider.setInstalledNames(treeProvider.getInstalledSkillNames());
           syncInstalledSkills();
           previousSkillNames = treeProvider.getInstalledSkillNames();
+          previousSkillsList = treeProvider.getAllInstalledSkills();
           updateBadge();
         }
       })
@@ -455,6 +633,7 @@ export function activate(context: vscode.ExtensionContext) {
         marketplaceProvider.setInstalledNames(treeProvider.getInstalledSkillNames());
         syncInstalledSkills();
         previousSkillNames = treeProvider.getInstalledSkillNames();
+        previousSkillsList = treeProvider.getAllInstalledSkills();
         updateBadge();
       }
     })
@@ -466,6 +645,7 @@ export function activate(context: vscode.ExtensionContext) {
     marketplaceProvider.setInstalledNames(installedNames);
     syncInstalledSkills();
     previousSkillNames = installedNames;
+    previousSkillsList = treeProvider.getAllInstalledSkills();
     updateBadge();
 
     // Show diagnostic notification if no skills found
@@ -484,6 +664,39 @@ export function activate(context: vscode.ExtensionContext) {
           }
         });
       }
+    }
+
+    // Auto-detect missing skills from skills.json on activation (Step 5)
+    const manifest = readManifest();
+    if (manifest) {
+      const allSkills = treeProvider.getAllInstalledSkills();
+      const missing = getMissingSkills(manifest, allSkills);
+      if (missing.length > 0) {
+        const total = manifest.skills.reduce((n, e) => n + e.skills.length, 0);
+        vscode.window.showInformationMessage(
+          `This project recommends ${total} skill(s) — ${missing.length} not installed.`,
+          'Install Missing',
+          'Dismiss',
+        ).then(action => {
+          if (action === 'Install Missing') {
+            vscode.commands.executeCommand('skills-sh.installFromManifest');
+          }
+        });
+      }
+    } else if (
+      installedNames.size > 0
+      && vscode.workspace.getConfiguration('skills-sh').get<boolean>('promptSkillsJson', true)
+    ) {
+      // No skills.json exists but skills are installed — prompt to create one
+      vscode.window.showInformationMessage(
+        'Create a skills.json to share this project\'s skills with your team?',
+        'Create skills.json',
+        'Dismiss',
+      ).then(action => {
+        if (action === 'Create skills.json') {
+          vscode.commands.executeCommand('skills-sh.editManifest');
+        }
+      });
     }
   });
 

@@ -153,6 +153,29 @@
         "title": "Update All Skills",
         "category": "Skills.sh",
         "icon": "$(cloud-download)"
+      },
+      {
+        "command": "skills-sh.addToManifest",
+        "title": "Add to skills.json",
+        "category": "Skills.sh",
+        "icon": "$(bookmark)"
+      },
+      {
+        "command": "skills-sh.removeFromManifest",
+        "title": "Remove from skills.json",
+        "category": "Skills.sh",
+        "icon": "$(pinned)"
+      },
+      {
+        "command": "skills-sh.editManifest",
+        "title": "Edit skills.json",
+        "category": "Skills.sh"
+      },
+      {
+        "command": "skills-sh.installFromManifest",
+        "title": "Install from skills.json",
+        "category": "Skills.sh",
+        "icon": "$(cloud-download)"
       }
     ],
     "menus": {
@@ -241,13 +264,33 @@
         },
         {
           "command": "skills-sh.updateSingleSkill",
-          "when": "view == skills-sh.installedSkills && viewItem == skill_updatable",
+          "when": "view == skills-sh.installedSkills && viewItem =~ /^skill_updatable/",
           "group": "inline"
         },
         {
           "command": "skills-sh.updateAllSkills",
           "when": "view == skills-sh.installedSkills && viewItem == updatesGroup",
           "group": "inline"
+        },
+        {
+          "command": "skills-sh.addToManifest",
+          "when": "view == skills-sh.installedSkills && viewItem =~ /^skill/ && !(viewItem =~ /manifest/)",
+          "group": "inline"
+        },
+        {
+          "command": "skills-sh.addToManifest",
+          "when": "view == skills-sh.installedSkills && viewItem =~ /^skill/ && !(viewItem =~ /manifest/)",
+          "group": "2_actions"
+        },
+        {
+          "command": "skills-sh.removeFromManifest",
+          "when": "view == skills-sh.installedSkills && viewItem =~ /^skill.*_manifest$/",
+          "group": "inline"
+        },
+        {
+          "command": "skills-sh.removeFromManifest",
+          "when": "view == skills-sh.installedSkills && viewItem =~ /^skill.*_manifest$/",
+          "group": "2_actions"
         }
       ]
     },
@@ -382,6 +425,11 @@
           "type": "boolean",
           "default": true,
           "description": "Show a confirmation dialog before installing or uninstalling skills"
+        },
+        "skills-sh.promptSkillsJson": {
+          "type": "boolean",
+          "default": true,
+          "description": "Prompt to create a skills.json when a workspace has installed skills but no manifest"
         }
       }
     }

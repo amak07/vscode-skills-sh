@@ -3,6 +3,7 @@ import { InstalledSkill } from '../types';
 import { SkillScanner } from '../local/scanner';
 import { fetchRepoSkillList } from '../api/github';
 import { getLastUpdateResult } from '../api/updates';
+import { getManifestSkillNames } from '../manifest/manifest';
 
 type TreeItem = GroupItem | SkillItem | CustomSourceItem | RemoteSkillItem;
 
@@ -35,7 +36,11 @@ class GroupItem extends vscode.TreeItem {
 }
 
 class SkillItem extends vscode.TreeItem {
-  constructor(public readonly skill: InstalledSkill, hasUpdate: boolean = false) {
+  constructor(
+    public readonly skill: InstalledSkill,
+    hasUpdate: boolean = false,
+    inManifest: boolean = false,
+  ) {
     super(skill.name, vscode.TreeItemCollapsibleState.None);
 
     // Only show agent badges when installed for 2+ agents (otherwise it's noise)
@@ -68,9 +73,14 @@ class SkillItem extends vscode.TreeItem {
     } else {
       tooltipLines.push('\nUntracked: re-install via Marketplace to enable updates');
     }
+    if (inManifest) {
+      tooltipLines.push('\n📋 In skills.json');
+    }
     this.tooltip = tooltipLines.join('\n');
 
-    this.contextValue = hasUpdate ? 'skill_updatable' : 'skill';
+    // Context value scheme: skill / skill_manifest / skill_updatable / skill_updatable_manifest
+    const base = hasUpdate ? 'skill_updatable' : 'skill';
+    this.contextValue = inManifest ? `${base}_manifest` : base;
     this.command = {
       command: 'skills-sh.previewSkillFile',
       title: 'Preview SKILL.md',
@@ -127,7 +137,6 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
     const { globalSkills, projectSkills } = await this.scanner.scan();
     this.globalSkills = globalSkills;
     this.projectSkills = projectSkills;
-    await this.loadCustomSourceCounts();
     this.hasInitiallyScanned = true;
 
     const customSources = vscode.workspace.getConfiguration('skills-sh')
@@ -137,7 +146,11 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
       && customSources.length === 0;
     vscode.commands.executeCommand('setContext', 'skills-sh.noSkillsFound', noSkills);
 
+    // Refresh immediately with local data, load custom sources in background
     this.refresh();
+
+    // Fire-and-forget: load custom source counts, then refresh again when done
+    this.loadCustomSourceCounts().then(() => this.refresh());
   }
 
   getInstalledSkillNames(): Set<string> {
@@ -167,6 +180,7 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
       const updatableNames = new Set(
         (updateResult?.updates ?? []).map(u => u.name),
       );
+      const manifestNames = getManifestSkillNames();
 
       const groups: TreeItem[] = [];
 
@@ -175,7 +189,9 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
         const allSkills = [...this.globalSkills, ...this.projectSkills];
         const updatableSkills = allSkills.filter(s => updatableNames.has(s.name));
         if (updatableSkills.length > 0) {
-          const children = updatableSkills.map(s => new SkillItem(s, true));
+          const children = updatableSkills.map(s =>
+            new SkillItem(s, true, manifestNames.has(s.folderName)),
+          );
           groups.push(new GroupItem(
             `Updates Available (${updatableSkills.length})`,
             'updates',
@@ -204,7 +220,9 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
 
       // Custom skills — user-created, regular directories (not symlinks)
       if (custom.length > 0) {
-        const children = custom.map(s => new SkillItem(s, false));
+        const children = custom.map(s =>
+          new SkillItem(s, false, manifestNames.has(s.folderName)),
+        );
         groups.push(new GroupItem(
           `My Skills (${custom.length})`,
           'custom',
@@ -216,7 +234,9 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
         .sort(([a], [b]) => a.localeCompare(b));
 
       for (const [source, skills] of sortedSources) {
-        const children = skills.map(s => new SkillItem(s, updatableNames.has(s.name)));
+        const children = skills.map(s =>
+          new SkillItem(s, updatableNames.has(s.name), manifestNames.has(s.folderName)),
+        );
         groups.push(new GroupItem(
           `${source} (${skills.length})`,
           'source',
@@ -226,7 +246,9 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
 
       // Untracked — orphaned symlinks missing lock entries
       if (untracked.length > 0) {
-        const children = untracked.map(s => new SkillItem(s, false));
+        const children = untracked.map(s =>
+          new SkillItem(s, false, manifestNames.has(s.folderName)),
+        );
         groups.push(new GroupItem(
           `Untracked (${untracked.length})`,
           'untracked',
@@ -237,7 +259,7 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
       // --- Project skills ---
       if (this.projectSkills.length > 0) {
         const children = this.projectSkills.map(s =>
-          new SkillItem(s, updatableNames.has(s.name)),
+          new SkillItem(s, updatableNames.has(s.name), manifestNames.has(s.folderName)),
         );
         groups.push(new GroupItem(
           `Project Skills (${this.projectSkills.length})`,

@@ -22,6 +22,7 @@ export class SkillWatcher implements vscode.Disposable {
     }
 
     this.watchLockFile();
+    this.watchManifestFile();
   }
 
   /** Watch ~/.agents/.skill-lock.json — a regular file that npx skills always updates */
@@ -31,6 +32,15 @@ export class SkillWatcher implements vscode.Disposable {
       vscode.Uri.file(lockDir),
       '.skill-lock.json',
     );
+    const watcher = vscode.workspace.createFileSystemWatcher(pattern);
+    this.addWatcher(watcher);
+  }
+
+  /** Watch skills.json in the workspace root for manual edits */
+  private watchManifestFile(): void {
+    const ws = vscode.workspace.workspaceFolders;
+    if (!ws || ws.length === 0) { return; }
+    const pattern = new vscode.RelativePattern(ws[0].uri, 'skills.json');
     const watcher = vscode.workspace.createFileSystemWatcher(pattern);
     this.addWatcher(watcher);
   }

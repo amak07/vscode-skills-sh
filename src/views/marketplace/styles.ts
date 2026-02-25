@@ -820,6 +820,58 @@ export function getStyles(fontUri: string): string {
       border: 1px solid var(--blue-600);
     }
 
+    /* === Manifest (skills.json) toggle button === */
+    .btn-manifest {
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      padding: 0.125rem 0.375rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--gray-400);
+      background: transparent;
+      color: var(--gray-600);
+      cursor: pointer;
+      transition: all 150ms;
+      white-space: nowrap;
+    }
+    .btn-manifest:hover {
+      border-color: var(--blue-600);
+      color: var(--blue-600);
+    }
+    .btn-manifest-active {
+      color: var(--blue-600);
+      border-color: var(--blue-600);
+    }
+    .btn-manifest-active:hover {
+      color: var(--red-600, #dc2626);
+      border-color: var(--red-600, #dc2626);
+    }
+    .btn-manifest-detail {
+      width: 100%;
+      padding: 0.375rem 0.5rem;
+      font-size: 0.75rem;
+      text-align: center;
+    }
+
+    /* === Manifest "Install Missing" banner === */
+    .manifest-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.5rem 0.75rem;
+      margin-bottom: 0.5rem;
+      border: 1px solid var(--blue-600);
+      border-radius: var(--radius-md);
+      background: color-mix(in srgb, var(--blue-600) 8%, transparent);
+      font-size: 0.75rem;
+      color: var(--gray-300);
+    }
+    .manifest-banner .btn-install {
+      flex-shrink: 0;
+      font-size: 0.6875rem;
+      padding: 0.1875rem 0.625rem;
+    }
+
     /* === Copy feedback (checkmark) === */
     .copy-icon svg { transition: opacity 150ms; }
   `;

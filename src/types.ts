@@ -122,7 +122,10 @@ export type WebviewCommand =
   | 'categoryClick'
   | 'loadMore'
   | 'openExternal'
-  | 'openCategorySettings';
+  | 'openCategorySettings'
+  | 'addToManifest'
+  | 'removeFromManifest'
+  | 'installFromManifest';
 
 export interface WebviewMessage {
   command: WebviewCommand;
@@ -130,6 +133,17 @@ export interface WebviewMessage {
 }
 
 export type ViewState = 'leaderboard' | 'search-results' | 'detail' | 'installed';
+
+// === Project skills manifest (skills.json) ===
+
+export interface SkillManifestEntry {
+  source: string;      // GitHub owner/repo (e.g. "vercel-labs/agent-skills")
+  skills: string[];    // Skill folder names within that source
+}
+
+export interface SkillManifest {
+  skills: SkillManifestEntry[];
+}
 
 // === Installed tab (lightweight subset for webview) ===
 
@@ -141,4 +155,5 @@ export interface InstalledSkillCard {
   scope: SkillScope;
   hasUpdate: boolean;
   isCustom: boolean;
+  inManifest: boolean;
 }

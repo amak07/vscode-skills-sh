@@ -37,8 +37,15 @@ interface TreeItem {
   sha: string;
 }
 
-/** Fetch the full repo tree (main → master fallback). Returns null if both fail. */
+const treeCache = new Map<string, { tree: TreeItem[]; timestamp: number }>();
+
+/** Fetch the full repo tree (main → master fallback, cached 1h). Returns null if both fail. */
 async function fetchRepoTree(source: string): Promise<TreeItem[] | null> {
+  const cached = treeCache.get(source);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.tree;
+  }
+
   for (const branch of ['main', 'master']) {
     const url = `https://api.github.com/repos/${source}/git/trees/${branch}?recursive=1`;
     try {
@@ -47,6 +54,7 @@ async function fetchRepoTree(source: string): Promise<TreeItem[] | null> {
       });
       if (!response.ok) { continue; }
       const data = (await response.json()) as { tree: TreeItem[] };
+      treeCache.set(source, { tree: data.tree, timestamp: Date.now() });
       return data.tree;
     } catch {
       continue;
