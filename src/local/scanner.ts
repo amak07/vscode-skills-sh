@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import * as vscode from 'vscode';
-import { AgentConfig, InstalledSkill, KNOWN_AGENTS, SkillScope, SkillLockFile, ScanResult } from '../types';
+import { AgentConfig, InstalledSkill, KNOWN_AGENTS, SkillScope, SkillLockFile, LocalLockFile, ScanResult } from '../types';
 import { parseSkillMd } from './parser';
 import { getLog } from '../logger';
 
@@ -23,6 +23,7 @@ export interface ScanDiagnostic {
 
 export class SkillScanner {
   private lockFileData: SkillLockFile | null = null;
+  private localLockData: LocalLockFile | null = null;
 
   /** Check if a dirent is a directory, following symlinks */
   private isDirectoryEntry(dir: string, entry: fs.Dirent): boolean {
@@ -98,6 +99,7 @@ export class SkillScanner {
 
   async scan(): Promise<ScanResult> {
     this.loadLockFile();
+    this.loadLocalLockFile();
     const agents = this.getAgentConfigs();
 
     const globalResults = await Promise.all(
@@ -271,27 +273,52 @@ export class SkillScanner {
     }
   }
 
+  /** Load project-level skills-lock.json (created by npx skills add without -g) */
+  private loadLocalLockFile(): void {
+    const log = getLog();
+    const ws = vscode.workspace.workspaceFolders;
+    if (!ws || ws.length === 0) { this.localLockData = null; return; }
+    const lockPath = path.join(ws[0].uri.fsPath, 'skills-lock.json');
+    try {
+      const content = fs.readFileSync(lockPath, 'utf-8');
+      this.localLockData = JSON.parse(content) as LocalLockFile;
+      const keys = Object.keys(this.localLockData?.skills ?? {});
+      log.info(`[scanner] Local lock file loaded: ${keys.length} skills — [${keys.join(', ')}]`);
+    } catch {
+      this.localLockData = null;
+    }
+  }
+
   private findLockEntry(folderName: string) {
-    if (!this.lockFileData?.skills) {
-      return null;
-    }
+    // Check global lock (~/.agents/.skill-lock.json)
+    if (this.lockFileData?.skills) {
+      // Direct key match (works for single-skill repos where key == folder name)
+      if (this.lockFileData.skills[folderName]) {
+        return this.lockFileData.skills[folderName];
+      }
 
-    // Direct key match (works for single-skill repos where key == folder name)
-    if (this.lockFileData.skills[folderName]) {
-      return this.lockFileData.skills[folderName];
-    }
-
-    // Fallback: the CLI uses prefixed lock keys (e.g. "vercel-react-best-practices")
-    // but the installed folder is just the bare skill ID ("react-best-practices").
-    // Match folder name against the folder portion of skillPath.
-    for (const entry of Object.values(this.lockFileData.skills)) {
-      if (entry.skillPath) {
-        const parts = entry.skillPath.replace(/\/SKILL\.md$/i, '').split('/');
-        const skillFolder = parts[parts.length - 1];
-        if (skillFolder === folderName) {
-          return entry;
+      // Fallback: the CLI uses prefixed lock keys (e.g. "vercel-react-best-practices")
+      // but the installed folder is just the bare skill ID ("react-best-practices").
+      // Match folder name against the folder portion of skillPath.
+      for (const entry of Object.values(this.lockFileData.skills)) {
+        if (entry.skillPath) {
+          const parts = entry.skillPath.replace(/\/SKILL\.md$/i, '').split('/');
+          const skillFolder = parts[parts.length - 1];
+          if (skillFolder === folderName) {
+            return entry;
+          }
         }
       }
+    }
+
+    // Check local lock (<project>/skills-lock.json) for project-scope installs
+    if (this.localLockData?.skills?.[folderName]) {
+      const local = this.localLockData.skills[folderName];
+      return {
+        source: local.source,
+        sourceType: local.sourceType,
+        skillFolderHash: local.computedHash,
+      };
     }
 
     return null;

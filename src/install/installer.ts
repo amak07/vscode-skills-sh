@@ -17,7 +17,7 @@ function getDefaultAgent(): string {
 }
 
 function getInstallScope(): string {
-  return vscode.workspace.getConfiguration('skills-sh').get<string>('installScope', 'project');
+  return vscode.workspace.getConfiguration('skills-sh').get<string>('installScope', 'ask');
 }
 
 // Event emitter for install detection — watcher fires this when a new skill appears
@@ -39,15 +39,33 @@ export async function installSkill(
   options?: { agent?: string; skill?: string; global?: boolean }
 ): Promise<boolean> {
   const agent = options?.agent || getDefaultAgent();
-  const isGlobal = options?.global ?? (getInstallScope() === 'global');
   const skillName = options?.skill || source;
 
-  const answer = await vscode.window.showInformationMessage(
-    `Install "${skillName}" for ${agent}?`,
-    'Install'
-  );
-  if (answer !== 'Install') {
-    return false;
+  let isGlobal: boolean;
+
+  if (options?.global !== undefined) {
+    // Explicit scope from caller (e.g. manifest install)
+    isGlobal = options.global;
+    const scopeLabel = isGlobal ? 'globally' : 'in this project';
+    const answer = await vscode.window.showInformationMessage(
+      `Install "${skillName}" ${scopeLabel} for ${agent}?`, 'Install');
+    if (answer !== 'Install') { return false; }
+  } else {
+    const pref = getInstallScope();
+    if (pref === 'global' || pref === 'project') {
+      // Fixed scope from config
+      isGlobal = pref === 'global';
+      const scopeLabel = isGlobal ? 'globally' : 'in this project';
+      const answer = await vscode.window.showInformationMessage(
+        `Install "${skillName}" ${scopeLabel} for ${agent}?`, 'Install');
+      if (answer !== 'Install') { return false; }
+    } else {
+      // "ask" mode — two-button toast combines scope selection + confirmation
+      const answer = await vscode.window.showInformationMessage(
+        `Install "${skillName}" for ${agent}?`, 'Install Globally', 'Install in Project');
+      if (!answer) { return false; }
+      isGlobal = answer === 'Install Globally';
+    }
   }
 
   let cmd = `npx skills add ${source} -a ${agent}`;

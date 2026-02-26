@@ -22,6 +22,7 @@ export class SkillWatcher implements vscode.Disposable {
     }
 
     this.watchLockFile();
+    this.watchLocalLockFile();
     this.watchManifestFile();
   }
 
@@ -32,6 +33,15 @@ export class SkillWatcher implements vscode.Disposable {
       vscode.Uri.file(lockDir),
       '.skill-lock.json',
     );
+    const watcher = vscode.workspace.createFileSystemWatcher(pattern);
+    this.addWatcher(watcher);
+  }
+
+  /** Watch skills-lock.json in the workspace root (project-scope installs) */
+  private watchLocalLockFile(): void {
+    const ws = vscode.workspace.workspaceFolders;
+    if (!ws || ws.length === 0) { return; }
+    const pattern = new vscode.RelativePattern(ws[0].uri, 'skills-lock.json');
     const watcher = vscode.workspace.createFileSystemWatcher(pattern);
     this.addWatcher(watcher);
   }

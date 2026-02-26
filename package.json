@@ -325,11 +325,17 @@
         "skills-sh.installScope": {
           "type": "string",
           "enum": [
+            "ask",
             "project",
             "global"
           ],
-          "default": "project",
-          "description": "Default install scope: project-local or global"
+          "enumDescriptions": [
+            "Prompt for scope on each install",
+            "Always install to .claude/skills/ in the current project",
+            "Always install to ~/.claude/skills/ (available everywhere)"
+          ],
+          "default": "ask",
+          "markdownDescription": "Where to install skills. Set to `ask` to choose each time, or `project`/`global` to skip the prompt."
         },
         "skills-sh.globalSkillsDir": {
           "type": "string",

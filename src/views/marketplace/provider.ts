@@ -4,7 +4,7 @@ import { InstalledSkillCard, LeaderboardView, WebviewMessage } from '../../types
 import { searchSkills, getLeaderboard } from '../../api/search';
 import { fetchSkillDetail } from '../../api/detail-scraper';
 import { fetchSkillMd } from '../../api/github';
-import { installSkill, updateSkills } from '../../install/installer';
+import { installSkill, updateSkills, uninstallSkill } from '../../install/installer';
 import { getLastUpdateResult } from '../../api/updates';
 import { addSkillToManifest, removeSkillFromManifest, getManifestSkillNames } from '../../manifest/manifest';
 import { getStyles } from './styles';
@@ -209,7 +209,6 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
         const { source, skillName } = message.payload as { source: string; skillName: string };
         const started = await installSkill(`https://github.com/${source}`, { skill: skillName });
         if (!started) {
-          // User dismissed the confirmation dialog — reset button states
           this.pushButtonStates();
         }
         break;
@@ -259,6 +258,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
           );
           this.setInstalledSkills(this.installedSkills);
           this.onManifestChanged?.();
+          vscode.window.showInformationMessage(`Added "${mSkill}" to skills.json`);
         }
         break;
       }
@@ -273,12 +273,22 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
           );
           this.setInstalledSkills(this.installedSkills);
           this.onManifestChanged?.();
+          vscode.window.showInformationMessage(`Removed "${rmSkill}" from skills.json`);
         }
         break;
       }
 
       case 'installFromManifest': {
         vscode.commands.executeCommand('skills-sh.installFromManifest');
+        break;
+      }
+
+      case 'uninstall': {
+        const { skillName } = message.payload as { skillName: string };
+        const skill = this.installedSkills.find(s => s.folderName === skillName);
+        if (skill) {
+          await uninstallSkill(skill.name, { global: skill.scope === 'global' });
+        }
         break;
       }
 
@@ -439,11 +449,16 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
       searchInput.focus();
     });
 
-    // Keyboard shortcut: / to focus search
+    // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
       if (e.key === '/' && document.activeElement !== searchInput) {
         e.preventDefault();
         searchInput.focus();
+      }
+      // Alt+Left: navigate back (mirrors VS Code editor back button)
+      if (e.altKey && e.key === 'ArrowLeft' && navStack.length > 0) {
+        e.preventDefault();
+        goBack();
       }
     });
 
@@ -504,10 +519,49 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
 
     // === Results click (detail) ===
     resultsEl.addEventListener('click', (e) => {
+      // Handle manifest toggle via delegation (inline onclick blocked by CSP nonce policy)
+      var manifestBtn = e.target.closest('.btn-manifest, .btn-action-manifest');
+      if (manifestBtn) {
+        toggleManifest(manifestBtn);
+        return;
+      }
+
+      // Handle "Install Missing" banner button
+      if (e.target.closest('.btn-install-missing')) {
+        vscode.postMessage({ command: 'installFromManifest' });
+        return;
+      }
+
+      // Handle remove button (Installed tab — new icon style)
+      var removeBtn = e.target.closest('.btn-action-remove');
+      if (removeBtn) {
+        var rmName = removeBtn.dataset.skillName;
+        if (rmName) {
+          vscode.postMessage({ command: 'uninstall', payload: { skillName: rmName } });
+          var rmLabel = removeBtn.querySelector('span');
+          if (rmLabel) rmLabel.textContent = 'Removing...';
+          removeBtn.disabled = true;
+        }
+        return;
+      }
+
+      // Handle update button (Installed tab — new icon style)
+      var updateActionBtn = e.target.closest('.btn-action-update');
+      if (updateActionBtn) {
+        var upName = updateActionBtn.dataset.skillName;
+        if (upName) {
+          vscode.postMessage({ command: 'update', payload: { skillName: upName } });
+          var upLabel = updateActionBtn.querySelector('span');
+          if (upLabel) upLabel.textContent = 'Updating...';
+          updateActionBtn.disabled = true;
+        }
+        return;
+      }
+
       const row = e.target.closest('.grid-row');
       if (!row) return;
 
-      // Don't navigate if clicking install/update button or manifest toggle
+      // Don't navigate if clicking install/update button
       if (e.target.closest('.btn-install')) {
         const btn = e.target.closest('.btn-install');
         if (btn.classList.contains('btn-updatable')) {
@@ -523,7 +577,6 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
         }
         return;
       }
-      if (e.target.closest('.btn-manifest')) return;
 
       const source = row.dataset.source;
       const skillId = row.dataset.skill;
@@ -533,15 +586,17 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
           view: currentView, tab: currentTab,
           query: searchInput ? searchInput.value : '',
           scrollY: window.scrollY,
-          html: document.querySelector('.container').innerHTML,
+          html: resultsEl.innerHTML,
           heroVisible: document.querySelector('.hero') ? document.querySelector('.hero').style.display !== 'none' : false,
           leaderboardChrome: document.querySelector('.search-container') ? document.querySelector('.search-container').style.display !== 'none' : true
         });
         currentView = 'detail';
         setHeroVisible(false);
+        showLeaderboardChrome(false);
+        var tabsNav = document.querySelector('.tabs');
+        if (tabsNav) tabsNav.style.display = 'none';
+        resultsEl.innerHTML = '<div class="empty-state">Loading skill details...</div>';
         vscode.postMessage({ command: 'detail', payload: { source, skillId } });
-        document.querySelector('.container').innerHTML =
-          '<div class="empty-state">Loading skill details...</div>';
         saveState();
       }
     });
@@ -601,7 +656,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
 
         case 'detailResult': {
           const detail = msg.payload;
-          document.querySelector('.container').innerHTML = renderDetailHtml(detail);
+          resultsEl.innerHTML = renderDetailHtml(detail);
           attachDetailListeners();
           break;
         }
@@ -633,13 +688,27 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
               btn.disabled = false;
             }
           });
-          // Update manifest toggle buttons
+          // Update manifest toggle buttons (detail page style)
           document.querySelectorAll('.btn-manifest').forEach(function(btn) {
             const skillName = btn.dataset.skillName;
             if (!skillName) return;
             const inMf = manifestSkillNames.has(skillName);
             btn.className = 'btn-manifest' + (btn.classList.contains('btn-manifest-detail') ? ' btn-manifest-detail' : '') + (inMf ? ' btn-manifest-active' : '');
             btn.textContent = inMf ? '✓ In skills.json' : '+ skills.json';
+            btn.title = inMf ? 'Remove from skills.json' : 'Add to skills.json';
+          });
+          // Update action-style manifest buttons (installed tab)
+          document.querySelectorAll('.btn-action-manifest').forEach(function(btn) {
+            var skillName = btn.dataset.skillName;
+            if (!skillName) return;
+            var inMf = manifestSkillNames.has(skillName);
+            if (inMf) {
+              btn.classList.add('btn-action-active');
+            } else {
+              btn.classList.remove('btn-action-active');
+            }
+            var label = btn.querySelector('span');
+            if (label) label.textContent = inMf ? 'In Skills.json' : 'Add to Skills.json';
             btn.title = inMf ? 'Remove from skills.json' : 'Add to skills.json';
           });
           // Re-render Installed tab if active to sync manifest state on rows
@@ -670,9 +739,12 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
       }
       currentView = prev.view;
       currentTab = prev.tab;
-      document.querySelector('.container').innerHTML = prev.html;
+      resultsEl.innerHTML = prev.html;
       setHeroVisible(prev.heroVisible);
       showLeaderboardChrome(prev.leaderboardChrome);
+      // Show tabs again (hidden when entering detail)
+      var tabsNav = document.querySelector('.tabs');
+      if (tabsNav) tabsNav.style.display = '';
       updateTabs();
       if (searchInput) searchInput.value = prev.query || '';
       requestAnimationFrame(function() { window.scrollTo(0, prev.scrollY || 0); });
@@ -712,7 +784,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
         if (missingCount > 0) {
           html += '<div class="manifest-banner">'
             + '<span>' + missingCount + ' skill' + (missingCount > 1 ? 's' : '') + ' from skills.json ' + (missingCount > 1 ? 'are' : 'is') + ' not installed</span>'
-            + '<button class="btn-install" onclick="event.stopPropagation(); vscode.postMessage({ command: \\'installFromManifest\\' })">Install Missing</button>'
+            + '<button class="btn-install btn-install-missing">Install Missing</button>'
             + '</div>';
         }
       }
@@ -729,22 +801,34 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
       const desc = skill.description || '';
       const inMf = skill.inManifest;
 
-      let btnClass = 'btn-install btn-installed';
-      let btnLabel = '✓ Installed';
-      if (skill.hasUpdate) {
-        btnClass = 'btn-install btn-updatable';
-        btnLabel = 'Update';
-      }
+      // SVG icons (12x12)
+      var shareIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg>';
+      var trashIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
+      var updateIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>';
 
-      const manifestBtn = source
-        ? '<button class="btn-manifest' + (inMf ? ' btn-manifest-active' : '') + '"'
+      // Manifest button (add to / in skills.json)
+      var manifestBtn = source
+        ? '<button class="btn-action btn-action-manifest' + (inMf ? ' btn-action-active' : '') + '"'
           + ' data-source="' + escapeHtml(source) + '"'
           + ' data-skill-name="' + escapeHtml(skill.folderName) + '"'
-          + ' title="' + (inMf ? 'Remove from skills.json' : 'Add to skills.json') + '"'
-          + ' onclick="event.stopPropagation(); toggleManifest(this)">'
-          + (inMf ? '✓ In skills.json' : '+ skills.json')
+          + ' title="' + (inMf ? 'Remove from skills.json' : 'Add to skills.json') + '">'
+          + shareIcon + '<span>' + (inMf ? 'In Skills.json' : 'Add to Skills.json') + '</span>'
           + '</button>'
         : '';
+
+      // Action button (Update takes priority over Uninstall)
+      var actionBtn;
+      if (skill.hasUpdate) {
+        actionBtn = '<button class="btn-action btn-action-update"'
+          + ' data-install="' + escapeHtml(source) + '" data-skill-name="' + escapeHtml(skill.folderName) + '">'
+          + updateIcon + '<span>Update</span>'
+          + '</button>';
+      } else {
+        actionBtn = '<button class="btn-action btn-action-remove"'
+          + ' data-skill-name="' + escapeHtml(skill.folderName) + '">'
+          + trashIcon + '<span>Uninstall</span>'
+          + '</button>';
+      }
 
       return '<div class="grid-row installed-row"'
         + (source ? ' data-source="' + source + '" data-skill="' + escapeHtml(skill.folderName) + '"' : '')
@@ -755,13 +839,9 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
         + '</div>'
         + '<div class="row-source">' + (desc ? escapeHtml(desc) : (source ? escapeHtml(source) : 'Custom skill')) + '</div>'
         + '</div>'
-        + '<div class="row-right">'
+        + '<div class="row-actions">'
         + manifestBtn
-        + '<button class="' + btnClass + '"'
-        + (source ? ' data-install="' + source + '" data-skill-name="' + escapeHtml(skill.folderName) + '"' : '')
-        + ' onclick="event.stopPropagation()">'
-        + btnLabel
-        + '</button>'
+        + actionBtn
         + '</div></div>';
     }
 
@@ -823,17 +903,6 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
         btnLabel = '✓ Installed';
       }
 
-      const inMf = isInstalled && source && manifestSkillNames.has(skillId);
-      const manifestBtn = isInstalled && source
-        ? '<button class="btn-manifest' + (inMf ? ' btn-manifest-active' : '') + '"'
-          + ' data-source="' + escapeHtml(source) + '"'
-          + ' data-skill-name="' + escapeHtml(skillId) + '"'
-          + ' title="' + (inMf ? 'Remove from skills.json' : 'Add to skills.json') + '"'
-          + ' onclick="event.stopPropagation(); toggleManifest(this)">'
-          + (inMf ? '✓ In skills.json' : '+ skills.json')
-          + '</button>'
-        : '';
-
       return '<div class="grid-row" data-source="' + source + '" data-skill="' + skillId + '">'
         + '<span class="row-rank">' + rank + '</span>'
         + '<div class="row-info">'
@@ -843,7 +912,6 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
         + '<div class="row-right">'
         + '<span class="row-installs">' + formatInstalls(installs) + '</span>'
         + changeHtml
-        + manifestBtn
         + '<button class="' + btnClass + '"'
         + ' data-install="' + source + '" data-skill-name="' + skillId + '"'
         + ' onclick="event.stopPropagation()">'
@@ -976,16 +1044,21 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
       const source = btn.dataset.source;
       const skillName = btn.dataset.skillName;
       if (!skillName) return;
-      const isActive = btn.classList.contains('btn-manifest-active');
+      const isActionStyle = btn.classList.contains('btn-action-manifest');
+      const isActive = btn.classList.contains('btn-manifest-active') || btn.classList.contains('btn-action-active');
       if (isActive) {
         vscode.postMessage({ command: 'removeFromManifest', payload: { skillName } });
-        btn.classList.remove('btn-manifest-active');
-        btn.textContent = '+ skills.json';
+        btn.classList.remove('btn-manifest-active', 'btn-action-active');
+        var label = btn.querySelector('span');
+        if (label) { label.textContent = 'Add to Skills.json'; }
+        else { btn.textContent = '+ skills.json'; }
         btn.title = 'Add to skills.json';
       } else {
         vscode.postMessage({ command: 'addToManifest', payload: { source, skillName } });
-        btn.classList.add('btn-manifest-active');
-        btn.textContent = '✓ In skills.json';
+        btn.classList.add(isActionStyle ? 'btn-action-active' : 'btn-manifest-active');
+        var label2 = btn.querySelector('span');
+        if (label2) { label2.textContent = 'In Skills.json'; }
+        else { btn.textContent = '✓ In skills.json'; }
         btn.title = 'Remove from skills.json';
       }
     }

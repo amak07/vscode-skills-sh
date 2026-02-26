@@ -109,6 +109,19 @@ export interface SkillLockFile {
   skills: Record<string, SkillLockEntry>;
 }
 
+// === Local lock file (project-level skills-lock.json) ===
+
+export interface LocalLockEntry {
+  source: string;
+  sourceType: string;
+  computedHash: string;
+}
+
+export interface LocalLockFile {
+  version: number;
+  skills: Record<string, LocalLockEntry>;
+}
+
 // === Webview message types ===
 
 export type WebviewCommand =
@@ -125,7 +138,8 @@ export type WebviewCommand =
   | 'openCategorySettings'
   | 'addToManifest'
   | 'removeFromManifest'
-  | 'installFromManifest';
+  | 'installFromManifest'
+  | 'uninstall';
 
 export interface WebviewMessage {
   command: WebviewCommand;

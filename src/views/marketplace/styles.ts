@@ -798,7 +798,7 @@ export function getStyles(fontUri: string): string {
 
     /* === Installed Tab === */
     .installed-row {
-      grid-template-columns: 1fr auto;
+      grid-template-columns: minmax(0, 1fr) 9rem;
     }
     .scope-badge {
       font-family: var(--font-mono);
@@ -850,6 +850,66 @@ export function getStyles(fontUri: string): string {
       padding: 0.375rem 0.5rem;
       font-size: 0.75rem;
       text-align: center;
+    }
+
+    /* === Installed tab: action buttons with icons === */
+    .row-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.375rem;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      background: transparent;
+      cursor: pointer;
+      transition: all 150ms;
+      white-space: nowrap;
+      width: 100%;
+    }
+    .btn-action svg { flex-shrink: 0; }
+    /* Add to Skills.json — blue theme */
+    .btn-action-manifest {
+      color: var(--blue-600);
+      border-color: color-mix(in srgb, var(--blue-600) 40%, transparent);
+    }
+    .btn-action-manifest:hover {
+      border-color: var(--blue-600);
+      background: color-mix(in srgb, var(--blue-600) 10%, transparent);
+    }
+    .btn-action-manifest.btn-action-active {
+      color: var(--bg-200);
+      border-color: var(--blue-600);
+      background: var(--blue-600);
+    }
+    .btn-action-manifest.btn-action-active:hover {
+      background: color-mix(in srgb, var(--blue-600) 80%, transparent);
+    }
+    /* Uninstall — red theme */
+    .btn-action-remove {
+      color: var(--red-600, #dc2626);
+      border-color: color-mix(in srgb, var(--red-600, #dc2626) 40%, transparent);
+    }
+    .btn-action-remove:hover {
+      border-color: var(--red-600, #dc2626);
+      background: color-mix(in srgb, var(--red-600, #dc2626) 10%, transparent);
+    }
+    /* Update — amber theme */
+    .btn-action-update {
+      color: var(--amber-700, #b45309);
+      border-color: var(--amber-700, #b45309);
+      font-weight: 600;
+    }
+    .btn-action-update:hover {
+      background: var(--amber-700, #b45309);
+      color: var(--bg-200, #fff);
     }
 
     /* === Manifest "Install Missing" banner === */
