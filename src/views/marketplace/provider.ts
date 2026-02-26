@@ -786,7 +786,13 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
 
         case 'detailResult': {
           const detail = msg.payload;
-          resultsEl.innerHTML = renderDetailHtml(detail);
+          const detailHtml = renderDetailHtml(detail);
+          if (resultsEl.parentNode) {
+            resultsEl.innerHTML = detailHtml;
+          } else {
+            // resultsEl was detached (navigated from audits/docs view) — render into container
+            document.querySelector('.container').innerHTML = detailHtml;
+          }
           attachDetailListeners();
           break;
         }
