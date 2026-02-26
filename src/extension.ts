@@ -81,31 +81,31 @@ export function activate(context: vscode.ExtensionContext) {
 
   let previousSkillNames = new Set<string>();
   let previousSkillsList: InstalledSkill[] = [];
-  watcher.onDidChange(async () => {
+
+  async function handleSkillChanges(source: string): Promise<void> {
     const log = getLog();
-    log.info('[watcher] Change detected, rescanning...');
     const oldNames = previousSkillNames;
     const oldSkills = previousSkillsList;
+
     await treeProvider.rescan();
     const newNames = treeProvider.getInstalledSkillNames();
     const newSkills = treeProvider.getAllInstalledSkills();
-    log.info(`[watcher] Old names (${oldNames.size}): ${[...oldNames].join(', ')}`);
-    log.info(`[watcher] New names (${newNames.size}): ${[...newNames].join(', ')}`);
+    log.info(`[${source}] Old (${oldNames.size}): ${[...oldNames].join(', ')}`);
+    log.info(`[${source}] New (${newNames.size}): ${[...newNames].join(', ')}`);
+
     marketplaceProvider.setInstalledNames(newNames);
     syncInstalledSkills();
+    syncUpdatableNames();
+    updateBadge();
 
-    // Notify installer progress listeners and clear updates only for genuinely new skills.
+    // Notify install listeners + clear update cache for new skills
     for (const name of newNames) {
       notifyInstallDetected(name);
-      // Only clear update status for skills that are genuinely new installs
       if (!oldNames.has(name)) {
-        log.info(`[watcher] New skill detected: "${name}", clearing from update cache`);
+        log.info(`[${source}] New skill: "${name}", clearing update cache`);
         clearUpdateForSkill(name);
       }
     }
-
-    syncUpdatableNames();
-    updateBadge();
 
     const added = newNames.size - oldNames.size;
     if (oldNames.size > 0 && added > 0) {
@@ -118,7 +118,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
       });
 
-      // Post-install manifest prompt (Step 5b): offer to add newly installed skills to skills.json
+      // Post-install: offer to add newly installed skills to skills.json
       if (oldSkills.length > 0 && readManifest()) {
         const manifestSkills = getManifestSkillNames();
         const oldFolderNames = new Set(oldSkills.map(s => s.folderName));
@@ -144,7 +144,7 @@ export function activate(context: vscode.ExtensionContext) {
         `Skills.sh: ${oldNames.size - newNames.size} skill(s) removed.`,
       );
 
-      // Post-uninstall manifest prompt (Step 5c): offer to remove uninstalled skills from skills.json
+      // Post-uninstall: offer to remove uninstalled skills from skills.json
       if (readManifest()) {
         const manifestSkills = getManifestSkillNames();
         const newFolderNames = new Set(newSkills.map(s => s.folderName));
@@ -169,26 +169,20 @@ export function activate(context: vscode.ExtensionContext) {
 
     previousSkillNames = newNames;
     previousSkillsList = newSkills;
+  }
+
+  watcher.onDidChange(() => {
+    getLog().info('[watcher] Change detected, rescanning...');
+    handleSkillChanges('watcher');
   });
   context.subscriptions.push(watcher);
 
   // When a terminal install/uninstall command completes (via shell integration),
   // trigger a rescan so the tree view and marketplace update even if the
   // filesystem watcher didn't fire (common on Windows with symlinks).
-  onOperationCompleted(async () => {
-    const log = getLog();
-    log.info('[operation] Terminal command completed, rescanning...');
-    const oldNames = previousSkillNames;
-    await treeProvider.rescan();
-    const newNames = treeProvider.getInstalledSkillNames();
-    log.info(`[operation] Old names (${oldNames.size}): ${[...oldNames].join(', ')}`);
-    log.info(`[operation] New names (${newNames.size}): ${[...newNames].join(', ')}`);
-    marketplaceProvider.setInstalledNames(newNames);
-    syncUpdatableNames();
-    syncInstalledSkills();
-    updateBadge();
-    previousSkillNames = newNames;
-    previousSkillsList = treeProvider.getAllInstalledSkills();
+  onOperationCompleted(() => {
+    getLog().info('[operation] Terminal command completed, rescanning...');
+    handleSkillChanges('operation');
   });
 
   // === Commands ===

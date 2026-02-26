@@ -519,6 +519,15 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
 
     // === Results click (detail) ===
     resultsEl.addEventListener('click', (e) => {
+      // Handle collapsible group headers (Installed tab)
+      var groupHeader = e.target.closest('.installed-group-header');
+      if (groupHeader) {
+        var body = groupHeader.nextElementSibling;
+        if (body) body.classList.toggle('open');
+        groupHeader.classList.toggle('collapsed');
+        return;
+      }
+
       // Handle manifest toggle via delegation (inline onclick blocked by CSP nonce policy)
       var manifestBtn = e.target.closest('.btn-manifest, .btn-action-manifest');
       if (manifestBtn) {
@@ -767,17 +776,29 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
       if (gridHeader) gridHeader.style.display = visible ? '' : 'none';
     }
 
+    function renderInstalledGroup(label, skills, expanded) {
+      if (skills.length === 0) return '';
+      var headerCls = expanded ? 'installed-group-header' : 'installed-group-header collapsed';
+      var bodyCls = expanded ? 'installed-group-body open' : 'installed-group-body';
+      var rows = '';
+      skills.forEach(function(skill) { rows += renderInstalledRow(skill); });
+      return '<div class="installed-group">'
+        + '<div class="' + headerCls + '"><span class="chevron">&#x25B8;</span> '
+        + escapeHtml(label) + ' (' + skills.length + ')</div>'
+        + '<div class="' + bodyCls + '">' + rows + '</div></div>';
+    }
+
     function renderInstalledView() {
       if (installedSkills.length === 0) {
         resultsEl.innerHTML = '<div class="empty-state">No skills installed yet. Browse the marketplace to get started.</div>';
         return;
       }
-      let html = '';
+      var html = '';
 
       // Show "Install Missing" banner if manifest has skills not yet installed
       if (manifestSkillNames.size > 0) {
-        const installedFolders = new Set(installedSkills.map(function(s) { return s.folderName; }));
-        let missingCount = 0;
+        var installedFolders = new Set(installedSkills.map(function(s) { return s.folderName; }));
+        var missingCount = 0;
         manifestSkillNames.forEach(function(name) {
           if (!installedFolders.has(name)) missingCount++;
         });
@@ -789,9 +810,38 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
         }
       }
 
+      // Group skills matching TreeView order
+      var updates = [], custom = [], untracked = [], project = [];
+      var bySource = {};
+
       installedSkills.forEach(function(skill) {
-        html += renderInstalledRow(skill);
+        if (skill.hasUpdate) updates.push(skill);
+        if (skill.scope === 'project') { project.push(skill); return; }
+        if (skill.isCustom) { custom.push(skill); return; }
+        if (!skill.source) { untracked.push(skill); return; }
+        var src = skill.source;
+        if (!bySource[src]) bySource[src] = [];
+        bySource[src].push(skill);
       });
+
+      // Updates Available (expanded)
+      html += renderInstalledGroup('Updates Available', updates, true);
+
+      // My Skills (custom, user-created)
+      html += renderInstalledGroup('My Skills', custom, true);
+
+      // Source-based groups (sorted alphabetically)
+      var sources = Object.keys(bySource).sort();
+      sources.forEach(function(src) {
+        html += renderInstalledGroup(src, bySource[src], true);
+      });
+
+      // Untracked (missing lock entries)
+      html += renderInstalledGroup('Untracked', untracked, false);
+
+      // Project Skills
+      html += renderInstalledGroup('Project Skills', project, true);
+
       resultsEl.innerHTML = html;
     }
 

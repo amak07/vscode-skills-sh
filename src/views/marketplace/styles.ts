@@ -800,6 +800,31 @@ export function getStyles(fontUri: string): string {
     .installed-row {
       grid-template-columns: minmax(0, 1fr) 9rem;
     }
+
+    /* Collapsible group sections */
+    .installed-group-header {
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.5rem 0.75rem 0.25rem;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--gray-600);
+      cursor: pointer;
+      user-select: none;
+    }
+    .installed-group-header:hover { color: var(--fg); }
+    .installed-group-header .chevron {
+      display: inline-block;
+      transition: transform 150ms;
+      font-size: 0.5rem;
+    }
+    .installed-group-header:not(.collapsed) .chevron { transform: rotate(90deg); }
+    .installed-group-body { display: none; }
+    .installed-group-body.open { display: block; }
+
     .scope-badge {
       font-family: var(--font-mono);
       font-size: 0.625rem;
@@ -812,8 +837,8 @@ export function getStyles(fontUri: string): string {
       margin-left: 0.375rem;
     }
     .scope-global {
-      color: var(--gray-600);
-      border: 1px solid var(--gray-400);
+      color: var(--green-700);
+      border: 1px solid var(--green-700);
     }
     .scope-project {
       color: var(--blue-600);
