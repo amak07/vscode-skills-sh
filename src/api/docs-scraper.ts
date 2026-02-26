@@ -15,8 +15,8 @@ const DOCS_URLS: Record<DocsPage, string> = {
 };
 
 const DOCS_TITLES: Record<DocsPage, string> = {
-  overview: 'Documentation',
-  cli: 'CLI',
+  overview: 'Getting Started',
+  cli: 'CLI Reference',
   faq: 'Frequently Asked Questions',
 };
 

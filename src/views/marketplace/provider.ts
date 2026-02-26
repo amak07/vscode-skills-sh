@@ -214,7 +214,8 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
           const manifestNames = getManifestSkillNames();
           const isInstalled = this.installedNames.has(skillId);
           const inManifest = manifestNames.has(skillId);
-          targetWebview.postMessage({ command: 'detailResult', payload: { ...detail, isInstalled, inManifest } });
+          const hasUpdate = this.updatableNames.has(skillId);
+          targetWebview.postMessage({ command: 'detailResult', payload: { ...detail, isInstalled, inManifest, hasUpdate } });
         } catch (e: unknown) {
           const msg = e instanceof Error ? e.message : 'Unknown error';
           targetWebview.postMessage({ command: 'error', payload: msg });
@@ -462,7 +463,15 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
       loadLeaderboard(currentTab, 0);
     }
 
-    // === Nav bar (Audits / Docs) ===
+    // === Nav bar (Audits / Docs + brand home link) ===
+    var navBrand = document.querySelector('.nav-brand');
+    if (navBrand) {
+      navBrand.style.cursor = 'pointer';
+      navBrand.addEventListener('click', function() {
+        navigationStack = [];
+        vscode.postMessage({ command: 'back' });
+      });
+    }
     document.querySelectorAll('[data-nav-page]').forEach(function(link) {
       link.addEventListener('click', function() {
         var page = link.getAttribute('data-nav-page');
@@ -506,12 +515,20 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
 
     function navigateBack() {
       var prev = navigationStack.pop() || 'leaderboard';
-      if (prev === 'leaderboard' || prev === 'search-results' || prev === 'installed') {
-        vscode.postMessage({ command: 'back' });
-      } else if (prev === 'audits') {
-        navigateToAudits();
+      if (prev === 'audits') {
+        currentView = 'audits';
+        setHeroVisible(false);
+        updateNavLinks();
+        document.querySelector('.container').innerHTML =
+          '<div class="empty-state">Loading security audits...</div>';
+        vscode.postMessage({ command: 'audits' });
       } else if (prev === 'docs') {
-        navigateToDocs(currentDocsPage);
+        currentView = 'docs';
+        setHeroVisible(false);
+        updateNavLinks();
+        document.querySelector('.container').innerHTML =
+          '<div class="empty-state">Loading documentation...</div>';
+        vscode.postMessage({ command: 'docs', payload: { page: currentDocsPage } });
       } else {
         vscode.postMessage({ command: 'back' });
       }
@@ -1135,15 +1152,36 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
       const detailSource = detail.source || '';
       const detailIsInstalled = detail.isInstalled || false;
       const detailInManifest = detail.inManifest || false;
-      const manifestSection = detailSource
-        ? '<div class="sidebar-section">'
-          + '<button class="btn-manifest btn-manifest-detail' + (detailInManifest ? ' btn-manifest-active' : '') + '"'
+
+      // Action buttons (same components as Installed tab)
+      var dShareIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg>';
+      var dTrashIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
+      var dUpdateIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>';
+
+      var detailActionsHtml = '';
+      if (detailSource) {
+        detailActionsHtml += '<button class="btn-action btn-action-manifest'
+          + (detailInManifest ? ' btn-action-active' : '') + '"'
           + ' data-source="' + escapeHtml(detailSource) + '"'
           + ' data-skill-name="' + escapeHtml(skillId) + '"'
-          + ' title="' + (detailInManifest ? 'Remove from skills.json' : 'Add to skills.json') + '"'
-          + ' onclick="toggleManifest(this)">'
-          + (detailInManifest ? '✓ In skills.json' : '+ Add to skills.json')
-          + '</button></div>'
+          + ' title="' + (detailInManifest ? 'Remove from skills.json' : 'Add to skills.json') + '">'
+          + dShareIcon + '<span>' + (detailInManifest ? 'In Skills.json' : 'Add to Skills.json') + '</span>'
+          + '</button>';
+      }
+      if (detailIsInstalled) {
+        if (detail.hasUpdate) {
+          detailActionsHtml += '<button class="btn-action btn-action-update"'
+            + ' data-install="' + escapeHtml(detailSource) + '"'
+            + ' data-skill-name="' + escapeHtml(skillId) + '">'
+            + dUpdateIcon + '<span>Update</span></button>';
+        } else {
+          detailActionsHtml += '<button class="btn-action btn-action-remove"'
+            + ' data-skill-name="' + escapeHtml(skillId) + '">'
+            + dTrashIcon + '<span>Uninstall</span></button>';
+        }
+      }
+      var actionsSection = detailActionsHtml
+        ? '<div class="sidebar-section"><div class="row-actions">' + detailActionsHtml + '</div></div>'
         : '';
 
       const securitySection = (detail.securityAudits && detail.securityAudits.length > 0)
@@ -1160,7 +1198,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
         : '';
 
       return '<div class="detail-view">'
-        + '<button class="back-btn" id="backBtn">${backIcon.replace(/'/g, "\\'")} Back to results</button>'
+        + '<button class="back-btn" id="backBtn">${backIcon.replace(/'/g, "\\'")} Back</button>'
         + '<div class="detail-breadcrumb">'
         + '<a data-nav="home">skills</a> <span>/</span> '
         + '<a data-nav="external" data-url="https://skills.sh/' + owner + '">' + owner + '</a> <span>/</span> '
@@ -1174,7 +1212,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
         + '<div class="detail-skillmd-header">${fileIcon.replace(/'/g, "\\'")} <span>SKILL.md</span></div>'
         + '<div class="prose">' + (detail.skillMdHtml || '') + '</div>'
         + '</div><aside>'
-        + manifestSection
+        + actionsSection
         + '<div class="sidebar-section"><div class="sidebar-label">Weekly Installs</div>'
         + '<div class="sidebar-value-large">' + (detail.weeklyInstalls || 'N/A') + '</div></div>'
         + repoSection
@@ -1188,9 +1226,9 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
     }
 
     function getAuditBadgeClass(status) {
-      var s = (status || '').toLowerCase();
-      if (s === 'pass' || s === 'safe') return 'audit-badge-pass';
-      if (s === 'fail' || s === 'high' || s === 'critical') return 'audit-badge-fail';
+      var s = (status || '').toLowerCase().trim();
+      if (s === 'pass' || s === 'safe' || s === '0 alerts' || s === 'low risk') return 'audit-badge-pass';
+      if (s === 'fail' || s === 'critical' || s === 'high risk') return 'audit-badge-fail';
       return 'audit-badge-warn';
     }
 
@@ -1203,7 +1241,11 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
       const backBtn = document.getElementById('backBtn');
       if (backBtn) {
         backBtn.addEventListener('click', () => {
-          goBack();
+          if (navigationStack.length > 0) {
+            navigateBack();
+          } else {
+            goBack();
+          }
         });
       }
 
@@ -1306,7 +1348,9 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
         + '<div class="docs-sidebar-title">Documentation</div>'
         + sidebarLinks
         + '</nav>'
-        + '<div class="docs-content prose">' + (data.html || '') + '</div>'
+        + '<div class="docs-content">'
+        + '<h1 class="detail-title">' + escapeHtml(data.title) + '</h1>'
+        + '<div class="prose">' + (data.html || '') + '</div></div>'
         + '</div></div>';
     }
 
