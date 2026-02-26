@@ -176,6 +176,18 @@
         "title": "Install from skills.json",
         "category": "Skills.sh",
         "icon": "$(cloud-download)"
+      },
+      {
+        "command": "skills-sh.openAudits",
+        "title": "Browse Security Audits",
+        "category": "Skills.sh",
+        "icon": "$(shield)"
+      },
+      {
+        "command": "skills-sh.openDocs",
+        "title": "Read Documentation",
+        "category": "Skills.sh",
+        "icon": "$(book)"
       }
     ],
     "menus": {

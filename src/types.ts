@@ -45,6 +45,12 @@ export interface UpdateCheckResponse {
 
 // === Detail page (scraped from RSC) ===
 
+export interface SkillSecurityAudit {
+  partner: string;   // "Gen Agent Trust Hub", "Socket", "Snyk"
+  status: string;    // "Pass", "Warn", "Fail"
+  url: string;       // full URL to security detail page on skills.sh
+}
+
 export interface SkillDetail {
   name: string;
   source: string;
@@ -55,6 +61,37 @@ export interface SkillDetail {
   perAgent: { agent: string; installs: string }[];
   skillMdHtml: string;
   githubStars?: string;
+  securityAudits?: SkillSecurityAudit[];
+}
+
+// === Audits listing (scraped from /audits) ===
+
+export interface SkillAuditResult {
+  partner: string;   // "Gen Agent Trust Hub" | "Socket" | "Snyk"
+  status: string;    // "Pass", "Warn", "Fail", "Safe", "Low", "Med", "High", "Critical"
+  alertCount?: string;
+}
+
+export interface AuditListingSkill {
+  name: string;
+  source: string;
+  skillId: string;
+  audits: SkillAuditResult[];
+}
+
+export interface AuditListingResponse {
+  skills: AuditListingSkill[];
+  total: number;
+}
+
+// === Docs (scraped from /docs, /docs/cli, /docs/faq) ===
+
+export type DocsPage = 'overview' | 'cli' | 'faq';
+
+export interface DocsContent {
+  page: DocsPage;
+  title: string;
+  html: string;
 }
 
 // === Local types ===
@@ -139,14 +176,16 @@ export type WebviewCommand =
   | 'addToManifest'
   | 'removeFromManifest'
   | 'installFromManifest'
-  | 'uninstall';
+  | 'uninstall'
+  | 'audits'
+  | 'docs';
 
 export interface WebviewMessage {
   command: WebviewCommand;
   payload?: unknown;
 }
 
-export type ViewState = 'leaderboard' | 'search-results' | 'detail' | 'installed';
+export type ViewState = 'leaderboard' | 'search-results' | 'detail' | 'installed' | 'audits' | 'docs';
 
 // === Project skills manifest (skills.json) ===
 

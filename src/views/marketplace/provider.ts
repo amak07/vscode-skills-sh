@@ -1,9 +1,11 @@
 import * as vscode from 'vscode';
 import { Marked } from 'marked';
-import { InstalledSkillCard, LeaderboardView, WebviewMessage } from '../../types';
+import { DocsPage, InstalledSkillCard, LeaderboardView, WebviewMessage } from '../../types';
 import { searchSkills, getLeaderboard } from '../../api/search';
 import { fetchSkillDetail } from '../../api/detail-scraper';
 import { fetchSkillMd } from '../../api/github';
+import { fetchDocsPage } from '../../api/docs-scraper';
+import { fetchAuditListing } from '../../api/audits-scraper';
 import { installSkill, updateSkills, uninstallSkill } from '../../install/installer';
 import { getLastUpdateResult } from '../../api/updates';
 import { addSkillToManifest, removeSkillFromManifest, getManifestSkillNames } from '../../manifest/manifest';
@@ -18,6 +20,7 @@ import {
   renderGridHeader,
   renderSkeletonRows,
   renderHero,
+  renderNavBar,
 } from './templates';
 
 const marked = new Marked();
@@ -126,6 +129,20 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
     });
 
     this.panels.push(panel);
+  }
+
+  navigateTo(view: 'audits' | 'docs'): void {
+    const payload = view === 'audits'
+      ? { view: 'audits' }
+      : { view: 'docs', page: 'overview' };
+
+    this._view?.webview.postMessage({ command: 'navigateTo', payload });
+    for (const panel of this.panels) {
+      panel.webview.postMessage({ command: 'navigateTo', payload });
+    }
+
+    // Focus the marketplace sidebar
+    vscode.commands.executeCommand('skills-sh.marketplace.focus');
   }
 
   dispose(): void {
@@ -263,6 +280,17 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
         break;
       }
 
+      case 'audits': {
+        try {
+          const data = await fetchAuditListing();
+          targetWebview.postMessage({ command: 'auditsResult', payload: data });
+        } catch (e: unknown) {
+          const msg = e instanceof Error ? e.message : 'Unknown error';
+          targetWebview.postMessage({ command: 'error', payload: msg });
+        }
+        break;
+      }
+
       case 'removeFromManifest': {
         const { skillName: rmSkill } = message.payload as { skillName: string };
         if (rmSkill) {
@@ -297,6 +325,18 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
         break;
       }
 
+      case 'docs': {
+        const { page } = message.payload as { page: DocsPage };
+        try {
+          const data = await fetchDocsPage(page);
+          targetWebview.postMessage({ command: 'docsResult', payload: data });
+        } catch (e: unknown) {
+          const msg = e instanceof Error ? e.message : 'Unknown error';
+          targetWebview.postMessage({ command: 'error', payload: msg });
+        }
+        break;
+      }
+
       case 'changeTab':
       case 'categoryClick':
       case 'loadMore':
@@ -325,6 +365,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
   <style nonce="${nonce}">${getStyles(fontUri)}</style>
 </head>
 <body${isTab ? ' class="tab-view"' : ''}>
+  ${renderNavBar()}
   ${isTab ? renderHero() : ''}
   <div class="container">
     ${renderSearchInput()}
@@ -347,6 +388,8 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
     let installedSkills = [];
     let manifestSkillNames = new Set();
     let navStack = [];
+    let navigationStack = [];
+    let currentDocsPage = 'overview';
 
     function saveState() {
       vscode.setState({ currentView, currentTab, currentChip });
@@ -417,6 +460,61 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
       renderInstalledView();
     } else {
       loadLeaderboard(currentTab, 0);
+    }
+
+    // === Nav bar (Audits / Docs) ===
+    document.querySelectorAll('[data-nav-page]').forEach(function(link) {
+      link.addEventListener('click', function() {
+        var page = link.getAttribute('data-nav-page');
+        if (page === 'audits') {
+          navigateToAudits();
+        } else if (page === 'docs') {
+          navigateToDocs('overview');
+        }
+      });
+    });
+
+    function navigateToAudits() {
+      navigationStack.push(currentView);
+      currentView = 'audits';
+      setHeroVisible(false);
+      updateNavLinks();
+      document.querySelector('.container').innerHTML =
+        '<div class="empty-state">Loading security audits...</div>';
+      vscode.postMessage({ command: 'audits' });
+    }
+
+    function navigateToDocs(page) {
+      if (currentView !== 'docs') {
+        navigationStack.push(currentView);
+      }
+      currentView = 'docs';
+      currentDocsPage = page || 'overview';
+      setHeroVisible(false);
+      updateNavLinks();
+      document.querySelector('.container').innerHTML =
+        '<div class="empty-state">Loading documentation...</div>';
+      vscode.postMessage({ command: 'docs', payload: { page: currentDocsPage } });
+    }
+
+    function updateNavLinks() {
+      document.querySelectorAll('[data-nav-page]').forEach(function(link) {
+        var page = link.getAttribute('data-nav-page');
+        link.classList.toggle('active', page === currentView);
+      });
+    }
+
+    function navigateBack() {
+      var prev = navigationStack.pop() || 'leaderboard';
+      if (prev === 'leaderboard' || prev === 'search-results' || prev === 'installed') {
+        vscode.postMessage({ command: 'back' });
+      } else if (prev === 'audits') {
+        navigateToAudits();
+      } else if (prev === 'docs') {
+        navigateToDocs(currentDocsPage);
+      } else {
+        vscode.postMessage({ command: 'back' });
+      }
     }
 
     // === Search ===
@@ -604,6 +702,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
           heroVisible: document.querySelector('.hero') ? document.querySelector('.hero').style.display !== 'none' : false,
           leaderboardChrome: document.querySelector('.search-container') ? document.querySelector('.search-container').style.display !== 'none' : true
         });
+        navigationStack.push(currentView);
         currentView = 'detail';
         setHeroVisible(false);
         showLeaderboardChrome(false);
@@ -737,6 +836,33 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
           updateInstalledTabLabel();
           if (currentView === 'installed') {
             renderInstalledView();
+          }
+          break;
+        }
+
+        case 'auditsResult': {
+          var data = msg.payload;
+          document.querySelector('.container').innerHTML = renderAuditsView(data);
+          attachAuditsListeners();
+          break;
+        }
+
+        case 'docsResult': {
+          var docsData = msg.payload;
+          if (docsData) {
+            currentDocsPage = docsData.page;
+            document.querySelector('.container').innerHTML = renderDocsView(docsData);
+            attachDocsListeners();
+          }
+          break;
+        }
+
+        case 'navigateTo': {
+          var nav = msg.payload;
+          if (nav.view === 'audits') {
+            navigateToAudits();
+          } else if (nav.view === 'docs') {
+            navigateToDocs(nav.page || 'overview');
           }
           break;
         }
@@ -1020,6 +1146,19 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
           + '</button></div>'
         : '';
 
+      const securitySection = (detail.securityAudits && detail.securityAudits.length > 0)
+        ? '<div class="sidebar-section"><div class="sidebar-label">Security Audits</div>'
+          + '<div class="security-audits">'
+          + detail.securityAudits.map(function(a) {
+            var cls = getAuditBadgeClass(a.status);
+            return '<a class="security-audit-row" data-nav="external" data-url="' + escapeHtml(a.url) + '">'
+              + '<span class="security-audit-partner">' + escapeHtml(a.partner) + '</span>'
+              + '<span class="audit-badge ' + cls + '">' + escapeHtml(a.status) + '</span>'
+              + '</a>';
+          }).join('')
+          + '</div></div>'
+        : '';
+
       return '<div class="detail-view">'
         + '<button class="back-btn" id="backBtn">${backIcon.replace(/'/g, "\\'")} Back to results</button>'
         + '<div class="detail-breadcrumb">'
@@ -1042,9 +1181,17 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
         + starsSection
         + '<div class="sidebar-section"><div class="sidebar-label">First Seen</div>'
         + '<div class="sidebar-value">' + (detail.firstSeen || 'N/A') + '</div></div>'
+        + securitySection
         + (agentRows ? '<div class="sidebar-section"><div class="sidebar-label">Installed On</div>'
           + '<div class="agent-table">' + agentRows + '</div></div>' : '')
         + '</aside></div></div>';
+    }
+
+    function getAuditBadgeClass(status) {
+      var s = (status || '').toLowerCase();
+      if (s === 'pass' || s === 'safe') return 'audit-badge-pass';
+      if (s === 'fail' || s === 'high' || s === 'critical') return 'audit-badge-fail';
+      return 'audit-badge-warn';
     }
 
     function escapeHtml(str) {
@@ -1065,6 +1212,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
         link.addEventListener('click', () => {
           const nav = link.getAttribute('data-nav');
           if (nav === 'home') {
+            navigationStack = [];
             goBack();
           } else if (nav === 'external') {
             const url = link.getAttribute('data-url');
@@ -1082,6 +1230,111 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
           showCopyFeedback(copyCmd.querySelector('.copy-icon'));
         });
       }
+    }
+
+    // === Audits View ===
+    function renderAuditsView(data) {
+      var rows = (data.skills || []).map(function(skill, i) {
+        var badges = (skill.audits || []).map(function(a) {
+          var cls = getAuditBadgeClass(a.status);
+          return '<span class="audit-badge ' + cls + '">' + escapeHtml(a.status) + '</span>';
+        });
+        // Pad to 3 columns if fewer badges
+        while (badges.length < 3) { badges.push('<span class="audit-badge">—</span>'); }
+
+        return '<div class="audits-row" data-source="' + escapeHtml(skill.source)
+          + '" data-skill="' + escapeHtml(skill.skillId) + '">'
+          + '<span class="row-rank">' + (i + 1) + '</span>'
+          + '<div class="row-info">'
+          + '<div class="row-name">' + escapeHtml(skill.name) + '</div>'
+          + '<div class="row-source">' + escapeHtml(skill.source) + '</div>'
+          + '</div>'
+          + '<div class="audits-results">' + badges.join('') + '</div>'
+          + '</div>';
+      }).join('');
+
+      return '<div class="audits-view">'
+        + '<button class="back-btn" id="backBtn">${backIcon.replace(/'/g, "\\'")} Back</button>'
+        + '<h1 class="detail-title">Security Audits</h1>'
+        + '<p class="audits-subtitle">Combined security audit results from Gen Agent Trust Hub, Socket, and Snyk.</p>'
+        + '<div class="audits-header">'
+        + '<span>#</span><span>Skill</span>'
+        + '<span>Gen Trust Hub</span><span>Socket</span><span>Snyk</span>'
+        + '</div>'
+        + rows
+        + (rows.length === 0 ? '<div class="empty-state">No audit data available</div>' : '')
+        + '</div>';
+    }
+
+    function attachAuditsListeners() {
+      var backBtn = document.getElementById('backBtn');
+      if (backBtn) {
+        backBtn.addEventListener('click', function() { navigateBack(); });
+      }
+      // Click audit row to navigate to skill detail
+      document.querySelectorAll('.audits-row').forEach(function(row) {
+        row.addEventListener('click', function() {
+          var source = row.getAttribute('data-source');
+          var skillId = row.getAttribute('data-skill');
+          if (source && skillId) {
+            navigationStack.push('audits');
+            currentView = 'detail';
+            vscode.postMessage({ command: 'detail', payload: { source: source, skillId: skillId } });
+            document.querySelector('.container').innerHTML =
+              '<div class="empty-state">Loading skill details...</div>';
+          }
+        });
+      });
+    }
+
+    // === Docs View ===
+    function renderDocsView(data) {
+      var pages = [
+        { page: 'overview', label: 'Overview' },
+        { page: 'cli', label: 'CLI' },
+        { page: 'faq', label: 'FAQ' },
+      ];
+      var sidebarLinks = pages.map(function(p) {
+        var active = p.page === data.page ? ' active' : '';
+        return '<a class="docs-sidebar-link' + active + '" data-docs-page="' + p.page + '">' + p.label + '</a>';
+      }).join('');
+
+      return '<div class="docs-view">'
+        + '<button class="back-btn" id="backBtn">${backIcon.replace(/'/g, "\\'")} Back</button>'
+        + '<div class="docs-layout">'
+        + '<nav class="docs-sidebar">'
+        + '<div class="docs-sidebar-title">Documentation</div>'
+        + sidebarLinks
+        + '</nav>'
+        + '<div class="docs-content prose">' + (data.html || '') + '</div>'
+        + '</div></div>';
+    }
+
+    function attachDocsListeners() {
+      var backBtn = document.getElementById('backBtn');
+      if (backBtn) {
+        backBtn.addEventListener('click', function() { navigateBack(); });
+      }
+      // Sidebar navigation
+      document.querySelectorAll('[data-docs-page]').forEach(function(link) {
+        link.addEventListener('click', function() {
+          var page = link.getAttribute('data-docs-page');
+          if (page) {
+            navigateToDocs(page);
+          }
+        });
+      });
+      // External links in docs content
+      document.querySelectorAll('.docs-content [data-nav="external"]').forEach(function(link) {
+        link.addEventListener('click', function() {
+          var url = link.getAttribute('data-url');
+          if (url) { vscode.postMessage({ command: 'openExternal', payload: { url: url } }); }
+        });
+      });
+      // Home links
+      document.querySelectorAll('.docs-content [data-nav="home"]').forEach(function(link) {
+        link.addEventListener('click', function() { navigateBack(); });
+      });
     }
 
     function showCopyFeedback(iconEl) {

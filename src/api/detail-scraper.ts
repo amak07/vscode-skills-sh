@@ -1,4 +1,4 @@
-import { SkillDetail } from '../types';
+import { SkillDetail, SkillSecurityAudit } from '../types';
 
 interface CacheEntry {
   detail: SkillDetail;
@@ -72,6 +72,9 @@ function parseRenderedHtml(
     // SKILL.md rendered content from the prose div
     const skillMdHtml = extractSkillMdContent(html);
 
+    // Security audit badges (Gen Agent Trust Hub, Socket, Snyk)
+    const securityAudits = extractSecurityAudits(html);
+
     return {
       name: skillId,
       source: `${owner}/${repo}`,
@@ -82,6 +85,7 @@ function parseRenderedHtml(
       perAgent,
       skillMdHtml,
       githubStars,
+      securityAudits: securityAudits.length > 0 ? securityAudits : undefined,
     };
   } catch {
     return null;
@@ -111,6 +115,34 @@ function extractPerAgentData(html: string): { agent: string; installs: string }[
   }
 
   return agents;
+}
+
+function extractSecurityAudits(html: string): SkillSecurityAudit[] {
+  const audits: SkillSecurityAudit[] = [];
+
+  // The Security Audits section contains <a> links with partner name and status badge:
+  //   <a ... href="/owner/repo/skill/security/partner-slug">
+  //     <span class="...text-foreground...">Partner Name</span>
+  //     <span class="...font-mono uppercase...bg-green-500/10 text-green-500">Pass</span>
+  //   </a>
+  const section = html.match(
+    /Security Audits<\/div>\s*<div class="divide-y[^"]*">([\s\S]*?)<\/div>\s*<\/div>/
+  );
+  if (!section) {
+    return audits;
+  }
+
+  const rowRegex = /href="([^"]*\/security\/[^"]*)"[\s\S]*?text-foreground[^>]*>([^<]+)<\/span>[\s\S]*?font-mono\s+uppercase[^>]*>([^<]+)<\/span>/g;
+  let match;
+  while ((match = rowRegex.exec(section[1])) !== null) {
+    audits.push({
+      partner: match[2].trim(),
+      status: match[3].trim(),
+      url: `https://skills.sh${match[1]}`,
+    });
+  }
+
+  return audits;
 }
 
 function extractSkillMdContent(html: string): string {

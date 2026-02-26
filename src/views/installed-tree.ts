@@ -5,7 +5,7 @@ import { fetchRepoSkillList } from '../api/github';
 import { getLastUpdateResult } from '../api/updates';
 import { getManifestSkillNames } from '../manifest/manifest';
 
-type TreeItem = GroupItem | SkillItem | CustomSourceItem | RemoteSkillItem;
+type TreeItem = GroupItem | SkillItem | CustomSourceItem | RemoteSkillItem | QuickLinkItem;
 
 const GROUP_ICONS: Record<string, string> = {
   source: 'repo',
@@ -14,12 +14,13 @@ const GROUP_ICONS: Record<string, string> = {
   project: 'folder-library',
   'custom-sources': 'repo',
   updates: 'cloud-upload',
+  'quick-links': 'link',
 };
 
 class GroupItem extends vscode.TreeItem {
   constructor(
     public readonly label: string,
-    public readonly groupType: 'source' | 'custom' | 'untracked' | 'project' | 'custom-sources' | 'updates',
+    public readonly groupType: 'source' | 'custom' | 'untracked' | 'project' | 'custom-sources' | 'updates' | 'quick-links',
     public readonly children: TreeItem[],
     collapsibleState = vscode.TreeItemCollapsibleState.Collapsed,
   ) {
@@ -114,6 +115,21 @@ class RemoteSkillItem extends vscode.TreeItem {
     this.iconPath = new vscode.ThemeIcon(
       isInstalled ? 'check' : 'cloud-download',
     );
+  }
+}
+
+class QuickLinkItem extends vscode.TreeItem {
+  constructor(
+    label: string,
+    icon: string,
+    commandId: string,
+    tooltip: string,
+  ) {
+    super(label, vscode.TreeItemCollapsibleState.None);
+    this.iconPath = new vscode.ThemeIcon(icon);
+    this.tooltip = tooltip;
+    this.contextValue = 'quickLink';
+    this.command = { command: commandId, title: label };
   }
 }
 
@@ -282,6 +298,16 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
           sourceItems,
         ));
       }
+
+      // --- Quick Links (Audits, Docs) ---
+      groups.push(new GroupItem(
+        'Quick Links',
+        'quick-links',
+        [
+          new QuickLinkItem('Security Audits', 'shield', 'skills-sh.openAudits', 'Browse security audit results on skills.sh'),
+          new QuickLinkItem('Documentation', 'book', 'skills-sh.openDocs', 'Read skills.sh documentation'),
+        ],
+      ));
 
       return groups;
     }

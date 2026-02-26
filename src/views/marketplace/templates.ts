@@ -21,6 +21,21 @@ const HERO_AGENTS = [
   'goose', 'kiro-cli', 'trae', 'vscode',
 ];
 
+const shieldIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
+const bookOpenIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`;
+
+export function renderNavBar(): string {
+  return `
+    <nav class="nav-bar">
+      <span class="nav-brand">skills.sh</span>
+      <div class="nav-links">
+        <a class="nav-link" data-nav-page="audits">${shieldIcon} Audits</a>
+        <a class="nav-link" data-nav-page="docs">${bookOpenIcon} Docs</a>
+      </div>
+    </nav>
+  `;
+}
+
 export function renderHero(): string {
   const agentBadges = HERO_AGENTS
     .map(a => `<span class="hero-agent-badge">${a}</span>`)
