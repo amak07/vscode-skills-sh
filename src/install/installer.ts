@@ -1,4 +1,7 @@
 import * as vscode from 'vscode';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as os from 'os';
 import { getLog } from '../logger';
 import { clearUpdateForSkill } from '../api/updates';
 
@@ -240,7 +243,7 @@ export async function updateSkills(
 
 export async function uninstallSkill(
   skillName: string,
-  options?: { agent?: string; global?: boolean }
+  options?: { agent?: string; global?: boolean; skillPath?: string; folderName?: string }
 ): Promise<void> {
   const agent = options?.agent || getDefaultAgent();
   const isGlobal = options?.global ?? (getInstallScope() === 'global');
@@ -253,13 +256,78 @@ export async function uninstallSkill(
     return;
   }
 
+  const log = getLog();
+
+  // Project-scoped skills: delete directly (the skills.sh CLI only manages
+  // global installs and doesn't know about project-level directories).
+  // Three artifacts to clean up:
+  //   1. The symlink/dir at <project>/.claude/skills/<name>
+  //   2. The content at ~/.agents/skills/<name> (if no global symlink still uses it)
+  //   3. The lock file entry in ~/.agents/.skill-lock.json
+  if (!isGlobal && options?.skillPath) {
+    try {
+      const folderName = options.folderName || path.basename(options.skillPath);
+
+      // Resolve link target — readlinkSync works for both symlinks AND
+      // directory junctions on Windows (lstatSync().isSymbolicLink() returns
+      // false for junctions, which caused content cleanup to be skipped).
+      let symlinkTarget: string | undefined;
+      try {
+        const linkTarget = fs.readlinkSync(options.skillPath);
+        symlinkTarget = path.isAbsolute(linkTarget)
+          ? path.resolve(linkTarget)
+          : path.resolve(path.dirname(options.skillPath), linkTarget);
+        log.info(`[installer] uninstall: "${options.skillPath}" links to -> "${symlinkTarget}"`);
+      } catch {
+        log.info(`[installer] uninstall: "${options.skillPath}" is not a symlink/junction (or already removed)`);
+      }
+
+      // 1. Remove the project skill entry (symlink or directory)
+      fs.rmSync(options.skillPath, { recursive: true, force: true });
+      log.info(`[installer] uninstall: removed project entry "${options.skillPath}"`);
+
+      // 2. If it was a symlink to ~/.agents/skills/, also clean up the content
+      //    — but only if no global symlink still references it
+      const agentsSkillsDir = path.join(os.homedir(), '.agents', 'skills');
+      const contentDir = symlinkTarget || path.join(agentsSkillsDir, folderName);
+
+      const isUnderAgentsDir = process.platform === 'win32'
+        ? contentDir.toLowerCase().startsWith(agentsSkillsDir.toLowerCase())
+        : contentDir.startsWith(agentsSkillsDir);
+
+      if (isUnderAgentsDir && fs.existsSync(contentDir)) {
+        const globalSkillsDir = path.join(os.homedir(), '.claude', 'skills');
+        const globalSymlink = path.join(globalSkillsDir, folderName);
+        const globalStillExists = fs.existsSync(globalSymlink);
+        log.info(`[installer] uninstall: contentDir="${contentDir}", globalSymlink="${globalSymlink}", globalStillExists=${globalStillExists}`);
+
+        if (!globalStillExists) {
+          fs.rmSync(contentDir, { recursive: true, force: true });
+          log.info(`[installer] uninstall: removed content dir "${contentDir}"`);
+
+          // 3. Clean up lock file entry
+          removeLockEntry(folderName, log);
+        } else {
+          log.info(`[installer] uninstall: skipping content cleanup — global symlink still exists at "${globalSymlink}"`);
+        }
+      }
+
+      _onOperationCompleted.fire();
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Unknown error';
+      log.error(`[installer] uninstall: failed for "${skillName}": ${msg}`);
+      vscode.window.showErrorMessage(`Failed to uninstall "${skillName}": ${msg}`);
+    }
+    return;
+  }
+
+  // Global-scoped skills: delegate to skills.sh CLI
   let cmd = `npx skills remove ${skillName} -a ${agent}`;
   if (isGlobal) {
     cmd += ' -g';
   }
   cmd += ' -y';
 
-  const log = getLog();
   const terminal = getTerminal();
   terminal.show();
   terminal.sendText(cmd);
@@ -277,6 +345,42 @@ export async function uninstallSkill(
 
   // Clean up listener if it never fires
   setTimeout(() => { disposable.dispose(); }, 30_000);
+}
+
+/** Remove a skill entry from ~/.agents/.skill-lock.json */
+function removeLockEntry(folderName: string, log: { info: (msg: string) => void }): void {
+  const lockPath = path.join(os.homedir(), '.agents', '.skill-lock.json');
+  try {
+    const content = fs.readFileSync(lockPath, 'utf-8');
+    const lockFile = JSON.parse(content);
+    if (!lockFile?.skills) { return; }
+
+    // Try direct key match first
+    let keyToRemove: string | undefined;
+    if (lockFile.skills[folderName]) {
+      keyToRemove = folderName;
+    } else {
+      // Fallback: match by skillPath folder component
+      for (const [key, entry] of Object.entries(lockFile.skills)) {
+        const sp = (entry as { skillPath?: string }).skillPath;
+        if (sp) {
+          const parts = sp.replace(/\/SKILL\.md$/i, '').split('/');
+          if (parts[parts.length - 1] === folderName) {
+            keyToRemove = key;
+            break;
+          }
+        }
+      }
+    }
+
+    if (keyToRemove) {
+      delete lockFile.skills[keyToRemove];
+      fs.writeFileSync(lockPath, JSON.stringify(lockFile, null, 2), 'utf-8');
+      log.info(`[installer] uninstall: removed lock entry "${keyToRemove}"`);
+    }
+  } catch {
+    // Lock file may not exist or be unreadable — non-fatal
+  }
 }
 
 export function disposeTerminal(): void {

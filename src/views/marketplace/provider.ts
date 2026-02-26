@@ -284,10 +284,15 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
       }
 
       case 'uninstall': {
-        const { skillName } = message.payload as { skillName: string };
-        const skill = this.installedSkills.find(s => s.folderName === skillName);
+        const { skillName, folderName } = message.payload as { skillName?: string; folderName?: string };
+        const lookupName = folderName || skillName;
+        const skill = this.installedSkills.find(s => s.folderName === lookupName);
         if (skill) {
-          await uninstallSkill(skill.name, { global: skill.scope === 'global' });
+          await uninstallSkill(skill.name, {
+            global: skill.scope === 'global',
+            skillPath: skill.path,
+            folderName: skill.folderName,
+          });
         }
         break;
       }

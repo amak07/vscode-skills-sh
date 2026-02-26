@@ -66,6 +66,7 @@ export function activate(context: vscode.ExtensionContext) {
       name: s.name,
       folderName: s.folderName,
       description: s.description,
+      path: s.path,
       source: s.source,
       scope: s.scope,
       hasUpdate: updatableNames.has(s.name),
@@ -288,6 +289,8 @@ export function activate(context: vscode.ExtensionContext) {
       if (!skill) { return; }
       await uninstallSkill(skill.name, {
         global: skill.scope === 'global',
+        skillPath: skill.path,
+        folderName: skill.folderName,
       });
     })
   );
