@@ -338,6 +338,23 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
         break;
       }
 
+      case 'ready': {
+        // Push all cached state to the newly initialized webview
+        if (this.installedSkills.length > 0) {
+          targetWebview.postMessage({
+            command: 'installedSkillsData',
+            payload: this.installedSkills,
+          });
+        }
+        const readyPayload = {
+          installedNames: [...this.installedNames],
+          updatableNames: [...this.updatableNames],
+          manifestSkillNames: [...getManifestSkillNames()],
+        };
+        targetWebview.postMessage({ command: 'updateButtonStates', payload: readyPayload });
+        break;
+      }
+
       case 'changeTab':
       case 'categoryClick':
       case 'loadMore':
@@ -452,6 +469,9 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
         }
       });
     }
+
+    // === Init: request cached data from extension ===
+    vscode.postMessage({ command: 'ready' });
 
     // === Init: restore saved state or load default ===
     if (savedState.currentView === 'installed') {
@@ -742,7 +762,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
           const updatable = new Set(updatableNames || []);
           if (mfNames) manifestSkillNames = new Set(mfNames);
 
-          if (page === 0) {
+          if (page === 0 && currentTab === 'all-time') {
             updateTabCount(total);
           }
 

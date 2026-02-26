@@ -178,7 +178,8 @@ export type WebviewCommand =
   | 'installFromManifest'
   | 'uninstall'
   | 'audits'
-  | 'docs';
+  | 'docs'
+  | 'ready';
 
 export interface WebviewMessage {
   command: WebviewCommand;
