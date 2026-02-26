@@ -314,6 +314,72 @@ export function getStyles(fontUri: string): string {
 
     /* === Detail View === */
     .detail-view { padding: 1.5rem 0 0; }
+    .detail-view .btn-install {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.75rem;
+      background: var(--gray-1000);
+      color: var(--bg-100);
+      border-color: var(--gray-1000);
+      font-weight: 600;
+    }
+    .detail-view .btn-install:hover {
+      background: var(--gray-1000);
+      color: var(--bg-100);
+      opacity: 0.8;
+    }
+    .detail-view .btn-installed {
+      background: transparent;
+      color: var(--green-700);
+      border-color: var(--green-700);
+      opacity: 1;
+    }
+    .detail-view .btn-installed:hover {
+      background: transparent;
+      color: var(--green-700);
+      opacity: 1;
+    }
+    .detail-view .btn-action {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .detail-view .btn-action-manifest {
+      background: var(--blue-600);
+      color: var(--bg-200);
+      border-color: var(--blue-600);
+    }
+    .detail-view .btn-action-manifest:hover {
+      background: var(--blue-600);
+      color: var(--bg-200);
+      opacity: 0.8;
+    }
+    .detail-view .btn-action-manifest.btn-action-active {
+      opacity: 1;
+    }
+    .detail-view .btn-action-manifest.btn-action-active:hover {
+      opacity: 0.8;
+    }
+    .detail-view .btn-action-remove {
+      background: var(--red-600, #dc2626);
+      color: var(--bg-200);
+      border-color: var(--red-600, #dc2626);
+    }
+    .detail-view .btn-action-remove:hover {
+      background: var(--red-600, #dc2626);
+      color: var(--bg-200);
+      opacity: 0.8;
+    }
+    .detail-view .btn-action-update {
+      background: var(--amber-700, #b45309);
+      color: var(--bg-200, #fff);
+      border-color: var(--amber-700, #b45309);
+    }
+    .detail-view .btn-action-update:hover {
+      background: var(--amber-700, #b45309);
+      color: var(--bg-200, #fff);
+      opacity: 0.8;
+    }
     .detail-breadcrumb {
       display: flex;
       align-items: center;

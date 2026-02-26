@@ -687,10 +687,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
         return;
       }
 
-      const row = e.target.closest('.grid-row');
-      if (!row) return;
-
-      // Don't navigate if clicking install/update button
+      // Handle install button (leaderboard grid rows + detail page)
       if (e.target.closest('.btn-install')) {
         const btn = e.target.closest('.btn-install');
         if (btn.classList.contains('btn-updatable')) {
@@ -706,6 +703,9 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
         }
         return;
       }
+
+      const row = e.target.closest('.grid-row');
+      if (!row) return;
 
       const source = row.dataset.source;
       const skillId = row.dataset.skill;
@@ -787,12 +787,12 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
         case 'detailResult': {
           const detail = msg.payload;
           const detailHtml = renderDetailHtml(detail);
-          if (resultsEl.parentNode) {
-            resultsEl.innerHTML = detailHtml;
-          } else {
-            // resultsEl was detached (navigated from audits/docs view) — render into container
-            document.querySelector('.container').innerHTML = detailHtml;
+          // Ensure resultsEl is in the DOM so delegated click handlers work
+          if (!resultsEl.parentNode) {
+            document.querySelector('.container').innerHTML = '';
+            document.querySelector('.container').appendChild(resultsEl);
           }
+          resultsEl.innerHTML = detailHtml;
           attachDetailListeners();
           break;
         }
@@ -830,7 +830,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
             if (!skillName) return;
             const inMf = manifestSkillNames.has(skillName);
             btn.className = 'btn-manifest' + (btn.classList.contains('btn-manifest-detail') ? ' btn-manifest-detail' : '') + (inMf ? ' btn-manifest-active' : '');
-            btn.textContent = inMf ? '✓ In skills.json' : '+ skills.json';
+            btn.textContent = inMf ? '✓ Remove from skills.json' : '+ skills.json';
             btn.title = inMf ? 'Remove from skills.json' : 'Add to skills.json';
           });
           // Update action-style manifest buttons (installed tab)
@@ -844,7 +844,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
               btn.classList.remove('btn-action-active');
             }
             var label = btn.querySelector('span');
-            if (label) label.textContent = inMf ? 'In Skills.json' : 'Add to Skills.json';
+            if (label) label.textContent = inMf ? 'Remove from Skills.json' : 'Add to Skills.json';
             btn.title = inMf ? 'Remove from skills.json' : 'Add to skills.json';
           });
           // Re-render Installed tab if active to sync manifest state on rows
@@ -1016,7 +1016,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
           + ' data-source="' + escapeHtml(source) + '"'
           + ' data-skill-name="' + escapeHtml(skill.folderName) + '"'
           + ' title="' + (inMf ? 'Remove from skills.json' : 'Add to skills.json') + '">'
-          + shareIcon + '<span>' + (inMf ? 'In Skills.json' : 'Add to Skills.json') + '</span>'
+          + shareIcon + '<span>' + (inMf ? 'Remove from Skills.json' : 'Add to Skills.json') + '</span>'
           + '</button>'
         : '';
 
@@ -1165,16 +1165,18 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
       var dUpdateIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>';
 
       var detailActionsHtml = '';
-      if (detailSource) {
-        detailActionsHtml += '<button class="btn-action btn-action-manifest'
-          + (detailInManifest ? ' btn-action-active' : '') + '"'
-          + ' data-source="' + escapeHtml(detailSource) + '"'
-          + ' data-skill-name="' + escapeHtml(skillId) + '"'
-          + ' title="' + (detailInManifest ? 'Remove from skills.json' : 'Add to skills.json') + '">'
-          + dShareIcon + '<span>' + (detailInManifest ? 'In Skills.json' : 'Add to Skills.json') + '</span>'
-          + '</button>';
-      }
       if (detailIsInstalled) {
+        // Manifest button (only for installed skills)
+        if (detailSource) {
+          detailActionsHtml += '<button class="btn-action btn-action-manifest'
+            + (detailInManifest ? ' btn-action-active' : '') + '"'
+            + ' data-source="' + escapeHtml(detailSource) + '"'
+            + ' data-skill-name="' + escapeHtml(skillId) + '"'
+            + ' title="' + (detailInManifest ? 'Remove from skills.json' : 'Add to skills.json') + '">'
+            + dShareIcon + '<span>' + (detailInManifest ? 'Remove from Skills.json' : 'Add to Skills.json') + '</span>'
+            + '</button>';
+        }
+        // Uninstall or Update
         if (detail.hasUpdate) {
           detailActionsHtml += '<button class="btn-action btn-action-update"'
             + ' data-install="' + escapeHtml(detailSource) + '"'
@@ -1185,6 +1187,12 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
             + ' data-skill-name="' + escapeHtml(skillId) + '">'
             + dTrashIcon + '<span>Uninstall</span></button>';
         }
+      } else if (detailSource) {
+        // Not installed — show Install button (reuses existing btn-install handler)
+        detailActionsHtml += '<button class="btn-install"'
+          + ' data-install="' + escapeHtml(detailSource) + '"'
+          + ' data-skill-name="' + escapeHtml(skillId) + '">'
+          + 'Install</button>';
       }
       var actionsSection = detailActionsHtml
         ? '<div class="sidebar-section"><div class="row-actions">' + detailActionsHtml + '</div></div>'
@@ -1415,8 +1423,8 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
         vscode.postMessage({ command: 'addToManifest', payload: { source, skillName } });
         btn.classList.add(isActionStyle ? 'btn-action-active' : 'btn-manifest-active');
         var label2 = btn.querySelector('span');
-        if (label2) { label2.textContent = 'In Skills.json'; }
-        else { btn.textContent = '✓ In skills.json'; }
+        if (label2) { label2.textContent = 'Remove from Skills.json'; }
+        else { btn.textContent = '✓ Remove from skills.json'; }
         btn.title = 'Remove from skills.json';
       }
     }
