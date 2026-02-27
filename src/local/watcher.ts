@@ -7,6 +7,8 @@ export class SkillWatcher implements vscode.Disposable {
   private watchers: vscode.FileSystemWatcher[] = [];
   private _onDidChange = new vscode.EventEmitter<void>();
   readonly onDidChange = this._onDidChange.event;
+  private debounceTimer: ReturnType<typeof setTimeout> | undefined;
+  private static readonly DEBOUNCE_MS = 300;
 
   constructor(private scanner: SkillScanner) {}
 
@@ -69,9 +71,15 @@ export class SkillWatcher implements vscode.Disposable {
   }
 
   private addWatcher(watcher: vscode.FileSystemWatcher): void {
-    watcher.onDidCreate(() => this._onDidChange.fire());
-    watcher.onDidDelete(() => this._onDidChange.fire());
-    watcher.onDidChange(() => this._onDidChange.fire());
+    const fire = () => {
+      if (this.debounceTimer) { clearTimeout(this.debounceTimer); }
+      this.debounceTimer = setTimeout(() => {
+        this._onDidChange.fire();
+      }, SkillWatcher.DEBOUNCE_MS);
+    };
+    watcher.onDidCreate(fire);
+    watcher.onDidDelete(fire);
+    watcher.onDidChange(fire);
     this.watchers.push(watcher);
   }
 
@@ -83,6 +91,7 @@ export class SkillWatcher implements vscode.Disposable {
   }
 
   dispose(): void {
+    if (this.debounceTimer) { clearTimeout(this.debounceTimer); }
     this.disposeWatchers();
     this._onDidChange.dispose();
   }

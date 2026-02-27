@@ -14,6 +14,11 @@ import {
   backIcon,
   fileIcon,
   copyIcon,
+  githubIcon,
+  starIcon,
+  shareIcon,
+  trashIcon,
+  updateIcon,
   renderSearchInput,
   renderTabs,
   renderChips,
@@ -22,6 +27,7 @@ import {
   renderHero,
   renderNavBar,
 } from './templates';
+import { toErrorMessage } from '../../utils/errors';
 
 const marked = new Marked();
 
@@ -34,6 +40,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
   private fontsUri = '';
   private panels: vscode.WebviewPanel[] = [];
   private tabWebviews = new WeakSet<vscode.Webview>();
+  private detailRequestId = 0;
 
   private onManifestChanged?: () => void;
 
@@ -163,8 +170,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
             payload: { ...data, installedNames: [...this.installedNames], updatableNames: [...this.updatableNames], manifestSkillNames: [...getManifestSkillNames()] },
           });
         } catch (e: unknown) {
-          const msg = e instanceof Error ? e.message : 'Unknown error';
-          targetWebview.postMessage({ command: 'error', payload: msg });
+          targetWebview.postMessage({ command: 'error', payload: toErrorMessage(e) });
         }
         break;
       }
@@ -178,8 +184,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
             payload: { ...data, installedNames: [...this.installedNames], updatableNames: [...this.updatableNames], manifestSkillNames: [...getManifestSkillNames()] },
           });
         } catch (e: unknown) {
-          const msg = e instanceof Error ? e.message : 'Unknown error';
-          targetWebview.postMessage({ command: 'error', payload: msg });
+          targetWebview.postMessage({ command: 'error', payload: toErrorMessage(e) });
         }
         break;
       }
@@ -187,11 +192,14 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
       case 'detail': {
         const { source, skillId } = message.payload as { source: string; skillId: string };
         const [owner, repo] = source.split('/');
+        const requestId = ++this.detailRequestId;
         try {
           let detail = await fetchSkillDetail(owner, repo, skillId);
+          if (requestId !== this.detailRequestId) { break; }
 
           if (detail && !detail.skillMdHtml) {
             const md = await fetchSkillMd(source, skillId);
+            if (requestId !== this.detailRequestId) { break; }
             if (md) {
               detail.skillMdHtml = await marked.parse(md);
             }
@@ -199,6 +207,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
 
           if (!detail) {
             const md = await fetchSkillMd(source, skillId);
+            if (requestId !== this.detailRequestId) { break; }
             detail = {
               name: skillId,
               source,
@@ -217,8 +226,8 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
           const hasUpdate = this.updatableNames.has(skillId);
           targetWebview.postMessage({ command: 'detailResult', payload: { ...detail, isInstalled, inManifest, hasUpdate } });
         } catch (e: unknown) {
-          const msg = e instanceof Error ? e.message : 'Unknown error';
-          targetWebview.postMessage({ command: 'error', payload: msg });
+          if (requestId !== this.detailRequestId) { break; }
+          targetWebview.postMessage({ command: 'error', payload: toErrorMessage(e) });
         }
         break;
       }
@@ -286,8 +295,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
           const data = await fetchAuditListing();
           targetWebview.postMessage({ command: 'auditsResult', payload: data });
         } catch (e: unknown) {
-          const msg = e instanceof Error ? e.message : 'Unknown error';
-          targetWebview.postMessage({ command: 'error', payload: msg });
+          targetWebview.postMessage({ command: 'error', payload: toErrorMessage(e) });
         }
         break;
       }
@@ -332,8 +340,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
           const data = await fetchDocsPage(page);
           targetWebview.postMessage({ command: 'docsResult', payload: data });
         } catch (e: unknown) {
-          const msg = e instanceof Error ? e.message : 'Unknown error';
-          targetWebview.postMessage({ command: 'error', payload: msg });
+          targetWebview.postMessage({ command: 'error', payload: toErrorMessage(e) });
         }
         break;
       }
@@ -396,8 +403,12 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
   <script nonce="${nonce}">
     const vscode = acquireVsCodeApi();
     const savedState = vscode.getState() || {};
-    const githubIcon = '<svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>';
-    const starIcon = '<svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14"><path fill-rule="evenodd" d="m8 .43.66 1.21 1.93 3.54 3.97.75 1.35.25-.95 1-2.77 2.93.52 4 .18 1.37-1.24-.6L8 13.17l-3.65 1.73-1.24.59.18-1.37.52-4-2.77-2.93-.95-1 1.35-.25 3.97-.75 1.93-3.54zm0 3.14L6.56 6.2l-.17.32-.35.06-2.97.56 2.07 2.19.25.26-.05.35-.39 3 2.73-1.3.32-.15.32.15 2.73 1.3-.4-3-.04-.35.25-.26 2.07-2.2-2.97-.55-.35-.06-.17-.32z" clip-rule="evenodd"/></svg>';
+    const githubIcon = '${githubIcon.replace(/'/g, "\\'")}';
+    const starIcon = '${starIcon.replace(/'/g, "\\'")}';
+    const shareIcon = '${shareIcon.replace(/'/g, "\\'")}';
+    const trashIcon = '${trashIcon.replace(/'/g, "\\'")}';
+    const updateIcon = '${updateIcon.replace(/'/g, "\\'")}';
+
     let currentView = savedState.currentView || 'leaderboard';
     let currentTab = savedState.currentTab || 'all-time';
     let currentPage = 0;
@@ -410,7 +421,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
     let currentDocsPage = 'overview';
 
     function saveState() {
-      vscode.setState({ currentView, currentTab, currentChip });
+      vscode.setState({ currentView, currentTab, currentChip, searchQuery: searchInput ? searchInput.value : '' });
     }
 
     const searchInput = document.getElementById('searchInput');
@@ -474,7 +485,15 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
     vscode.postMessage({ command: 'ready' });
 
     // === Init: restore saved state or load default ===
-    if (savedState.currentView === 'installed') {
+    if (savedState.searchQuery && searchInput) {
+      searchInput.value = savedState.searchQuery;
+      searchKbd.style.display = 'none';
+      searchClear.style.display = 'block';
+      setHeroVisible(false);
+      currentView = 'search-results';
+      resultsEl.innerHTML = '${renderSkeletonRows(5).replace(/'/g, "\\'").replace(/\n/g, '')}';
+      vscode.postMessage({ command: 'search', payload: { query: savedState.searchQuery } });
+    } else if (savedState.currentView === 'installed') {
       currentTab = 'installed';
       updateTabs();
       showLeaderboardChrome(false);
@@ -560,18 +579,27 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
       searchKbd.style.display = q ? 'none' : '';
       searchClear.style.display = q ? 'block' : 'none';
 
+      // Collapse hero when searching, expand when cleared
+      if (q.length > 0) {
+        setHeroVisible(false);
+      } else {
+        setHeroVisible(true);
+      }
+
       clearTimeout(debounceTimer);
       if (q.length >= 2) {
         debounceTimer = setTimeout(() => {
           currentView = 'search-results';
           vscode.postMessage({ command: 'search', payload: { query: q } });
           resultsEl.innerHTML = '${renderSkeletonRows(5).replace(/'/g, "\\'").replace(/\n/g, '')}';
+          saveState();
         }, 300);
       } else if (q.length === 0) {
         currentView = 'leaderboard';
         currentChip = null;
         updateChips();
         loadLeaderboard(currentTab, 0);
+        saveState();
       }
     });
 
@@ -607,21 +635,32 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
       tab.addEventListener('click', () => {
         currentTab = tab.dataset.tab;
         currentPage = 0;
-        searchInput.value = '';
-        searchKbd.style.display = '';
-        searchClear.style.display = 'none';
         currentChip = null;
         updateTabs();
         updateChips();
 
         if (currentTab === 'installed') {
+          // Clear search when switching to Installed tab
+          searchInput.value = '';
+          searchKbd.style.display = '';
+          searchClear.style.display = 'none';
+          setHeroVisible(true);
           currentView = 'installed';
           showLeaderboardChrome(false);
           renderInstalledView();
         } else {
-          currentView = 'leaderboard';
           showLeaderboardChrome(true);
-          loadLeaderboard(currentTab, 0);
+          // If search is active, re-fire search instead of loading leaderboard
+          var activeQuery = searchInput ? searchInput.value.trim() : '';
+          if (activeQuery.length >= 2) {
+            currentView = 'search-results';
+            resultsEl.innerHTML = '${renderSkeletonRows(5).replace(/'/g, "\\'").replace(/\n/g, '')}';
+            vscode.postMessage({ command: 'search', payload: { query: activeQuery } });
+          } else {
+            currentView = 'leaderboard';
+            setHeroVisible(true);
+            loadLeaderboard(currentTab, 0);
+          }
         }
         saveState();
       });
@@ -736,7 +775,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
           query: searchInput ? searchInput.value : '',
           scrollY: window.scrollY,
           html: resultsEl.innerHTML,
-          heroVisible: document.querySelector('.hero') ? document.querySelector('.hero').style.display !== 'none' : false,
+          heroVisible: document.querySelector('.hero') ? !document.querySelector('.hero').classList.contains('collapsed') : false,
           leaderboardChrome: document.querySelector('.search-container') ? document.querySelector('.search-container').style.display !== 'none' : true
         });
         navigationStack.push(currentView);
@@ -929,7 +968,12 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
       var tabsNav = document.querySelector('.tabs');
       if (tabsNav) tabsNav.style.display = '';
       updateTabs();
-      if (searchInput) searchInput.value = prev.query || '';
+      if (searchInput) {
+        searchInput.value = prev.query || '';
+        var hasQuery = (prev.query || '').length > 0;
+        searchKbd.style.display = hasQuery ? 'none' : '';
+        searchClear.style.display = hasQuery ? 'block' : 'none';
+      }
       requestAnimationFrame(function() { window.scrollTo(0, prev.scrollY || 0); });
       saveState();
     }
@@ -937,8 +981,8 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
     function setHeroVisible(visible) {
       const hero = document.querySelector('.hero');
       const heading = document.querySelector('.hero-leaderboard-heading');
-      if (hero) hero.style.display = visible ? '' : 'none';
-      if (heading) heading.style.display = visible ? '' : 'none';
+      if (hero) hero.classList.toggle('collapsed', !visible);
+      if (heading) heading.classList.toggle('collapsed', !visible);
     }
 
     function showLeaderboardChrome(visible) {
@@ -1024,11 +1068,6 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
       const scopeLabel = skill.scope === 'project' ? 'project' : 'global';
       const desc = skill.description || '';
       const inMf = skill.inManifest;
-
-      // SVG icons (12x12)
-      var shareIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg>';
-      var trashIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
-      var updateIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>';
 
       // Manifest button (add to / in skills.json)
       var manifestBtn = source
@@ -1179,11 +1218,6 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
       const detailIsInstalled = detail.isInstalled || false;
       const detailInManifest = detail.inManifest || false;
 
-      // Action buttons (same components as Installed tab)
-      var dShareIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg>';
-      var dTrashIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
-      var dUpdateIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>';
-
       var detailActionsHtml = '';
       if (detailIsInstalled) {
         // Manifest button (only for installed skills)
@@ -1193,7 +1227,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
             + ' data-source="' + escapeHtml(detailSource) + '"'
             + ' data-skill-name="' + escapeHtml(skillId) + '"'
             + ' title="' + (detailInManifest ? 'Remove from skills.json' : 'Add to skills.json') + '">'
-            + dShareIcon + '<span>' + (detailInManifest ? 'Remove from Skills.json' : 'Add to Skills.json') + '</span>'
+            + shareIcon + '<span>' + (detailInManifest ? 'Remove from Skills.json' : 'Add to Skills.json') + '</span>'
             + '</button>';
         }
         // Uninstall or Update
@@ -1201,11 +1235,11 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
           detailActionsHtml += '<button class="btn-action btn-action-update"'
             + ' data-install="' + escapeHtml(detailSource) + '"'
             + ' data-skill-name="' + escapeHtml(skillId) + '">'
-            + dUpdateIcon + '<span>Update</span></button>';
+            + updateIcon + '<span>Update</span></button>';
         } else {
           detailActionsHtml += '<button class="btn-action btn-action-remove"'
             + ' data-skill-name="' + escapeHtml(skillId) + '">'
-            + dTrashIcon + '<span>Uninstall</span></button>';
+            + trashIcon + '<span>Uninstall</span></button>';
         }
       } else if (detailSource) {
         // Not installed — show Install button (reuses existing btn-install handler)

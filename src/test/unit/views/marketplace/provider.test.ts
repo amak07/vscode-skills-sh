@@ -369,7 +369,7 @@ describe('MarketplaceViewProvider', () => {
       });
     });
 
-    it('handles non-Error exceptions with generic message', async () => {
+    it('handles non-Error exceptions with the string value', async () => {
       mockGetLeaderboard.mockRejectedValue('string error');
       const { webview, sendMessage } = resolveProvider(provider);
 
@@ -377,7 +377,7 @@ describe('MarketplaceViewProvider', () => {
 
       expect(webview.postMessage).toHaveBeenCalledWith({
         command: 'error',
-        payload: 'Unknown error',
+        payload: 'string error',
       });
     });
 

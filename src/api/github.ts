@@ -1,26 +1,31 @@
-interface CacheEntry {
-  content: string;
-  timestamp: number;
+import { ApiCache } from '../utils/api-cache';
+import { GITHUB_RAW_BASE, GITHUB_API_BASE, BRANCH_FALLBACKS, CACHE_TTL_GITHUB } from '../utils/constants';
+
+const contentCache = new ApiCache<string>(CACHE_TTL_GITHUB);
+
+interface TreeItem {
+  path: string;
+  type: string;
+  sha: string;
 }
 
-const cache = new Map<string, CacheEntry>();
-const CACHE_TTL = 3600 * 1000; // 1 hour
+const treeCache = new ApiCache<TreeItem[]>(CACHE_TTL_GITHUB);
 
 export async function fetchSkillMd(source: string, skillName: string): Promise<string | null> {
   const cacheKey = `${source}/${skillName}`;
-  const cached = cache.get(cacheKey);
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-    return cached.content;
+  const cached = contentCache.get(cacheKey);
+  if (cached) {
+    return cached;
   }
 
   // Try main branch first, then master
-  for (const branch of ['main', 'master']) {
-    const url = `https://raw.githubusercontent.com/${source}/${branch}/skills/${skillName}/SKILL.md`;
+  for (const branch of BRANCH_FALLBACKS) {
+    const url = `${GITHUB_RAW_BASE}/${source}/${branch}/skills/${skillName}/SKILL.md`;
     try {
       const response = await fetch(url);
       if (response.ok) {
         const content = await response.text();
-        cache.set(cacheKey, { content, timestamp: Date.now() });
+        contentCache.set(cacheKey, content);
         return content;
       }
     } catch {
@@ -31,30 +36,22 @@ export async function fetchSkillMd(source: string, skillName: string): Promise<s
   return null;
 }
 
-interface TreeItem {
-  path: string;
-  type: string;
-  sha: string;
-}
-
-const treeCache = new Map<string, { tree: TreeItem[]; timestamp: number }>();
-
-/** Fetch the full repo tree (main → master fallback, cached 1h). Returns null if both fail. */
+/** Fetch the full repo tree (main -> master fallback, cached 1h). Returns null if both fail. */
 async function fetchRepoTree(source: string): Promise<TreeItem[] | null> {
   const cached = treeCache.get(source);
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-    return cached.tree;
+  if (cached) {
+    return cached;
   }
 
-  for (const branch of ['main', 'master']) {
-    const url = `https://api.github.com/repos/${source}/git/trees/${branch}?recursive=1`;
+  for (const branch of BRANCH_FALLBACKS) {
+    const url = `${GITHUB_API_BASE}/repos/${source}/git/trees/${branch}?recursive=1`;
     try {
       const response = await fetch(url, {
         headers: { 'Accept': 'application/vnd.github.v3+json' },
       });
       if (!response.ok) { continue; }
       const data = (await response.json()) as { tree: TreeItem[] };
-      treeCache.set(source, { tree: data.tree, timestamp: Date.now() });
+      treeCache.set(source, data.tree);
       return data.tree;
     } catch {
       continue;
@@ -74,8 +71,8 @@ export async function fetchRepoSkillList(source: string): Promise<string[]> {
     });
 }
 
-/** Fetch the tree SHA for each skill folder in a repo (main → master fallback).
- *  Returns Map<folderPath, treeSHA> e.g. "skills/react-email" → "83ea2cb2..." */
+/** Fetch the tree SHA for each skill folder in a repo (main -> master fallback).
+ *  Returns Map<folderPath, treeSHA> e.g. "skills/react-email" -> "83ea2cb2..." */
 export async function fetchSkillFolderHashes(
   source: string
 ): Promise<Map<string, string>> {

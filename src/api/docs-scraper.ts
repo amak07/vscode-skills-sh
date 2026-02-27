@@ -1,17 +1,13 @@
 import { DocsContent, DocsPage } from '../types';
+import { ApiCache } from '../utils/api-cache';
+import { SKILLS_SH_BASE, CACHE_TTL_DOCS } from '../utils/constants';
 
-interface CacheEntry {
-  data: DocsContent;
-  timestamp: number;
-}
-
-const cache = new Map<string, CacheEntry>();
-const CACHE_TTL = 3600 * 1000; // 60 minutes — docs change very rarely
+const cache = new ApiCache<DocsContent>(CACHE_TTL_DOCS);
 
 const DOCS_URLS: Record<DocsPage, string> = {
-  overview: 'https://skills.sh/docs',
-  cli: 'https://skills.sh/docs/cli',
-  faq: 'https://skills.sh/docs/faq',
+  overview: `${SKILLS_SH_BASE}/docs`,
+  cli: `${SKILLS_SH_BASE}/docs/cli`,
+  faq: `${SKILLS_SH_BASE}/docs/faq`,
 };
 
 const DOCS_TITLES: Record<DocsPage, string> = {
@@ -23,8 +19,8 @@ const DOCS_TITLES: Record<DocsPage, string> = {
 export async function fetchDocsPage(page: DocsPage): Promise<DocsContent | null> {
   const cacheKey = `docs:${page}`;
   const cached = cache.get(cacheKey);
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-    return cached.data;
+  if (cached) {
+    return cached;
   }
 
   try {
@@ -43,7 +39,7 @@ export async function fetchDocsPage(page: DocsPage): Promise<DocsContent | null>
       html: sanitized || `<p>Could not load ${page} documentation.</p>`,
     };
 
-    cache.set(cacheKey, { data: result, timestamp: Date.now() });
+    cache.set(cacheKey, result);
     return result;
   } catch {
     return null;
@@ -79,7 +75,7 @@ function sanitizeDocsHtml(html: string): string {
   sanitized = sanitized.replace(/<style[\s\S]*?<\/style>/gi, '');
 
   // Rewrite relative links to use data-nav attributes for internal navigation
-  // /docs/cli → data-nav="docs-page" data-page="cli"
+  // /docs/cli -> data-nav="docs-page" data-page="cli"
   sanitized = sanitized.replace(
     /<a([^>]*?)href="\/docs\/cli"([^>]*?)>/g,
     '<a$1data-docs-page="cli"$2 style="cursor:pointer">'

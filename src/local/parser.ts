@@ -20,6 +20,15 @@ export function parseSkillMd(filePath: string): ParsedSkillMd | null {
   }
 }
 
+export async function parseSkillMdAsync(filePath: string): Promise<ParsedSkillMd | null> {
+  try {
+    const content = await fs.promises.readFile(filePath, 'utf-8');
+    return parseSkillMdContent(content);
+  } catch {
+    return null;
+  }
+}
+
 export function parseSkillMdContent(content: string): ParsedSkillMd | null {
   try {
     const { data, content: body } = matter(content);

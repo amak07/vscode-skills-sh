@@ -9,6 +9,7 @@ import {
   SAMPLE_GITHUB_TREE,
 } from '../../helpers/fixtures';
 import type { InstalledSkill } from '../../../types';
+import { invalidateManifestCache } from '../../../manifest/manifest';
 
 // ---------------------------------------------------------------------------
 // Module mocks — MUST be set up BEFORE importing the module under test
@@ -180,6 +181,7 @@ beforeEach(async () => {
   process.env.HOME = sandbox.home;
   process.env.USERPROFILE = sandbox.home;
   delete process.env.CLAUDE_CONFIG_DIR;
+  invalidateManifestCache();
 
   // Point workspace to the sandbox
   (workspace as any).workspaceFolders = [
