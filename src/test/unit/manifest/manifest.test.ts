@@ -15,6 +15,7 @@ import {
   isSkillInManifest,
   getManifestSkillNames,
   getMissingSkills,
+  invalidateManifestCache,
 } from '../../../manifest/manifest';
 import { InstalledSkill, SkillManifest } from '../../../types';
 
@@ -22,6 +23,7 @@ let sandbox: Sandbox;
 
 beforeEach(() => {
   sandbox = createSandbox('manifest-test-');
+  invalidateManifestCache();
   // Point the vscode workspace mock at our sandbox workspace
   (workspace as any).workspaceFolders = [
     { uri: { fsPath: sandbox.workspaceRoot }, name: 'test-workspace' },

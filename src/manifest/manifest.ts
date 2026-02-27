@@ -5,6 +5,24 @@ import { SkillManifest, SkillManifestEntry, InstalledSkill } from '../types';
 
 const MANIFEST_FILENAME = 'skills.json';
 
+// In-memory cache for manifest reads
+let cachedManifest: SkillManifest | null | undefined = undefined; // undefined = not yet loaded
+let cacheTimestamp = 0;
+const MANIFEST_CACHE_TTL = 5000; // 5 seconds
+
+function getCachedManifest(): SkillManifest | null {
+  if (cachedManifest !== undefined && Date.now() - cacheTimestamp < MANIFEST_CACHE_TTL) {
+    return cachedManifest;
+  }
+  cachedManifest = readManifest();
+  cacheTimestamp = Date.now();
+  return cachedManifest;
+}
+
+export function invalidateManifestCache(): void {
+  cachedManifest = undefined;
+}
+
 /** Get the path to skills.json in the workspace root */
 export function getManifestPath(): string | null {
   const ws = vscode.workspace.workspaceFolders;
@@ -57,6 +75,7 @@ export function addSkillToManifest(source: string, skillName: string): void {
   manifest.skills.sort((a, b) => a.source.localeCompare(b.source));
 
   writeManifest(manifest);
+  invalidateManifestCache();
 }
 
 /** Remove a skill from skills.json by folder name */
@@ -75,18 +94,19 @@ export function removeSkillFromManifest(skillName: string): void {
   manifest.skills = manifest.skills.filter(e => e.skills.length > 0);
 
   writeManifest(manifest);
+  invalidateManifestCache();
 }
 
 /** Check if a skill is in the manifest (by folder name) */
 export function isSkillInManifest(skillName: string): boolean {
-  const manifest = readManifest();
+  const manifest = getCachedManifest();
   if (!manifest) { return false; }
   return manifest.skills.some(e => e.skills.includes(skillName));
 }
 
 /** Get all skill names currently listed in the manifest */
 export function getManifestSkillNames(): Set<string> {
-  const manifest = readManifest();
+  const manifest = getCachedManifest();
   if (!manifest) { return new Set(); }
   const names = new Set<string>();
   for (const entry of manifest.skills) {

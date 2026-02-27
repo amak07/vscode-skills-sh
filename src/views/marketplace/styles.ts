@@ -699,6 +699,16 @@ export function getStyles(fontUri: string): string {
       max-width: 1152px;
       margin: 0 auto;
       padding: 4rem 1rem 3rem;
+      max-height: 1000px;
+      overflow: hidden;
+      transition: max-height 300ms ease-out, opacity 200ms ease-out,
+                  padding-top 300ms ease-out, padding-bottom 300ms ease-out;
+    }
+    .hero.collapsed {
+      max-height: 0;
+      opacity: 0;
+      padding-top: 0;
+      padding-bottom: 0;
     }
     .hero-grid {
       display: grid;
@@ -836,6 +846,15 @@ export function getStyles(fontUri: string): string {
       max-width: 1152px;
       margin: 0 auto;
       padding: 1rem 1rem 0;
+      max-height: 100px;
+      overflow: hidden;
+      transition: max-height 300ms ease-out, opacity 200ms ease-out,
+                  padding-top 300ms ease-out;
+    }
+    .hero-leaderboard-heading.collapsed {
+      max-height: 0;
+      opacity: 0;
+      padding-top: 0;
     }
     .light-theme .hero-cmd { background: rgba(235, 235, 235, 0.5); }
 
