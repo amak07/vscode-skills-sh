@@ -98,7 +98,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
     webviewView.webview.html = this.getHtml(webviewView.webview, this.fontsUri);
   }
 
-  openInTab(): void {
+  openInTab(initialTab?: string): void {
     const panel = vscode.window.createWebviewPanel(
       'skills-sh.marketplaceTab',
       'Skills.sh Marketplace',
@@ -123,6 +123,16 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
     });
 
     panel.webview.html = this.getHtml(panel.webview, panelFontsUri, true);
+
+    // Switch to a specific tab after the webview is ready
+    if (initialTab) {
+      const disposable = panel.webview.onDidReceiveMessage((msg: WebviewMessage) => {
+        if (msg.command === 'ready') {
+          panel.webview.postMessage({ command: 'switchTab', payload: { tab: initialTab } });
+          disposable.dispose();
+        }
+      });
+    }
 
     panel.onDidDispose(() => {
       this.panels = this.panels.filter(p => p !== panel);
@@ -909,6 +919,23 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
           }
           break;
         }
+
+        case 'switchTab': {
+          var switchTo = msg.payload.tab;
+          currentTab = switchTo;
+          updateTabs();
+          if (switchTo === 'installed') {
+            currentView = 'installed';
+            showLeaderboardChrome(false);
+            renderInstalledView();
+          } else {
+            currentView = 'leaderboard';
+            showLeaderboardChrome(true);
+            loadLeaderboard(switchTo, 0);
+          }
+          saveState();
+          break;
+        }
       }
     });
 
@@ -1001,8 +1028,8 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
       // Updates Available (expanded)
       html += renderInstalledGroup('Updates Available', updates, true);
 
-      // My Skills (custom, user-created)
-      html += renderInstalledGroup('My Skills', custom, true);
+      // Custom Skills (user-created, not from marketplace)
+      html += renderInstalledGroup('Custom Skills', custom, true);
 
       // Source-based groups (sorted alphabetically)
       var sources = Object.keys(bySource).sort();

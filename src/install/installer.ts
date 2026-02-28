@@ -15,12 +15,12 @@ function getTerminal(): vscode.Terminal {
   return sharedTerminal;
 }
 
-function getDefaultAgent(): string {
-  return vscode.workspace.getConfiguration('skills-sh').get<string>('defaultAgent', 'claude-code');
+function getInstallScope(): string {
+  return vscode.workspace.getConfiguration('skills-sh').get<string>('installScope', 'global');
 }
 
-function getInstallScope(): string {
-  return vscode.workspace.getConfiguration('skills-sh').get<string>('installScope', 'ask');
+function shouldConfirm(): boolean {
+  return vscode.workspace.getConfiguration('skills-sh').get<boolean>('confirmBeforeInstall', true);
 }
 
 // Event emitter for install detection — watcher fires this when a new skill appears
@@ -39,39 +39,49 @@ export const onOperationCompleted = _onOperationCompleted.event;
 
 export async function installSkill(
   source: string,
-  options?: { agent?: string; skill?: string; global?: boolean }
+  options?: { skill?: string; global?: boolean }
 ): Promise<boolean> {
-  const agent = options?.agent || getDefaultAgent();
   const skillName = options?.skill || source;
 
   let isGlobal: boolean;
+  const confirm = shouldConfirm();
 
   if (options?.global !== undefined) {
     // Explicit scope from caller (e.g. manifest install)
     isGlobal = options.global;
-    const scopeLabel = isGlobal ? 'globally' : 'in this project';
-    const answer = await vscode.window.showInformationMessage(
-      `Install "${skillName}" ${scopeLabel} for ${agent}?`, 'Install');
-    if (answer !== 'Install') { return false; }
+    if (confirm) {
+      const scopeLabel = isGlobal ? 'globally' : 'in this project';
+      const answer = await vscode.window.showInformationMessage(
+        `Install "${skillName}" ${scopeLabel}?`, 'Install');
+      if (answer !== 'Install') { return false; }
+    }
   } else {
     const pref = getInstallScope();
     if (pref === 'global' || pref === 'project') {
-      // Fixed scope from config
+      // Fixed scope from config — show scope in toast with option to change
       isGlobal = pref === 'global';
-      const scopeLabel = isGlobal ? 'globally' : 'in this project';
-      const answer = await vscode.window.showInformationMessage(
-        `Install "${skillName}" ${scopeLabel} for ${agent}?`, 'Install');
-      if (answer !== 'Install') { return false; }
+      if (confirm) {
+        const scopeLabel = isGlobal ? 'globally' : 'in this project';
+        const answer = await vscode.window.showInformationMessage(
+          `Install "${skillName}" ${scopeLabel}?`, 'Install', 'Change Scope');
+        if (answer === 'Change Scope') {
+          vscode.commands.executeCommand('workbench.action.openSettings', 'skills-sh.installScope');
+          return false;
+        }
+        if (answer !== 'Install') { return false; }
+      }
     } else {
       // "ask" mode — two-button toast combines scope selection + confirmation
+      // Always show this prompt even when confirmBeforeInstall is false,
+      // because the user needs to choose the install scope.
       const answer = await vscode.window.showInformationMessage(
-        `Install "${skillName}" for ${agent}?`, 'Install Globally', 'Install in Project');
+        `Install "${skillName}"?`, 'Install Globally', 'Install in Project');
       if (!answer) { return false; }
       isGlobal = answer === 'Install Globally';
     }
   }
 
-  let cmd = `npx skills add ${source} -a ${agent}`;
+  let cmd = `npx skills add ${source}`;
   if (options?.skill) {
     cmd += ` -s ${options.skill}`;
   }
@@ -155,21 +165,22 @@ export async function updateSkills(
   if (updates.length === 0) { return; }
 
   const names = updates.map(u => u.name).join(', ');
-  const action = await vscode.window.showInformationMessage(
-    `Skills.sh: Update ${updates.length} skill(s) — ${names}`,
-    'Update'
-  );
-  if (action !== 'Update') { return; }
+  if (shouldConfirm()) {
+    const action = await vscode.window.showInformationMessage(
+      `Skills.sh: Update ${updates.length} skill(s) — ${names}`,
+      'Update'
+    );
+    if (action !== 'Update') { return; }
+  }
 
-  const agent = getDefaultAgent();
   const log = getLog();
   const terminal = getTerminal();
   terminal.show();
 
   // Send remove+add commands individually (cross-shell compatible — no && or ;)
   for (const u of updates) {
-    const removeCmd = `npx skills remove ${u.name} -a ${agent} -g -y`;
-    const addCmd = `npx skills add https://github.com/${u.source} -s ${u.name} -a ${agent} -g -y`;
+    const removeCmd = `npx skills remove ${u.name} -g -y`;
+    const addCmd = `npx skills add https://github.com/${u.source} -s ${u.name} -g -y`;
     terminal.sendText(removeCmd);
     terminal.sendText(addCmd);
     log.info(`[installer] update: sent commands for "${u.name}": ${removeCmd} ; ${addCmd}`);
@@ -243,17 +254,18 @@ export async function updateSkills(
 
 export async function uninstallSkill(
   skillName: string,
-  options?: { agent?: string; global?: boolean; skillPath?: string; folderName?: string }
+  options?: { global?: boolean; skillPath?: string; folderName?: string }
 ): Promise<void> {
-  const agent = options?.agent || getDefaultAgent();
   const isGlobal = options?.global ?? (getInstallScope() === 'global');
 
-  const answer = await vscode.window.showWarningMessage(
-    `Uninstall "${skillName}"?`,
-    'Uninstall'
-  );
-  if (answer !== 'Uninstall') {
-    return;
+  if (shouldConfirm()) {
+    const answer = await vscode.window.showWarningMessage(
+      `Uninstall "${skillName}"?`,
+      'Uninstall'
+    );
+    if (answer !== 'Uninstall') {
+      return;
+    }
   }
 
   const log = getLog();
@@ -322,7 +334,7 @@ export async function uninstallSkill(
   }
 
   // Global-scoped skills: delegate to skills.sh CLI
-  let cmd = `npx skills remove ${skillName} -a ${agent}`;
+  let cmd = `npx skills remove ${skillName}`;
   if (isGlobal) {
     cmd += ' -g';
   }

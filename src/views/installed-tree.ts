@@ -1,18 +1,16 @@
 import * as vscode from 'vscode';
 import { InstalledSkill } from '../types';
 import { SkillScanner } from '../local/scanner';
-import { fetchRepoSkillList } from '../api/github';
 import { getLastUpdateResult } from '../api/updates';
 import { getManifestSkillNames } from '../manifest/manifest';
 
-type TreeItem = GroupItem | SkillItem | CustomSourceItem | RemoteSkillItem | QuickLinkItem;
+type TreeItem = GroupItem | SkillItem | QuickLinkItem;
 
 const GROUP_ICONS: Record<string, string> = {
   source: 'repo',
   custom: 'account',
   untracked: 'question',
   project: 'folder-library',
-  'custom-sources': 'repo',
   updates: 'cloud-upload',
   'quick-links': 'link',
 };
@@ -20,7 +18,7 @@ const GROUP_ICONS: Record<string, string> = {
 class GroupItem extends vscode.TreeItem {
   constructor(
     public readonly label: string,
-    public readonly groupType: 'source' | 'custom' | 'untracked' | 'project' | 'custom-sources' | 'updates' | 'quick-links',
+    public readonly groupType: 'source' | 'custom' | 'untracked' | 'project' | 'updates' | 'quick-links',
     public readonly children: TreeItem[],
     collapsibleState = vscode.TreeItemCollapsibleState.Collapsed,
   ) {
@@ -44,28 +42,24 @@ class SkillItem extends vscode.TreeItem {
   ) {
     super(skill.name, vscode.TreeItemCollapsibleState.None);
 
-    // Only show agent badges when installed for 2+ agents (otherwise it's noise)
-    const agentSuffix = skill.agents.length > 1 ? ` · ${skill.agents.join(', ')}` : '';
-
     if (hasUpdate) {
-      this.description = `Update available${agentSuffix}`;
+      this.description = 'Update available';
       this.iconPath = new vscode.ThemeIcon('arrow-up');
     } else if (skill.isCustom) {
-      this.description = `${skill.description}${agentSuffix}`;
+      this.description = skill.description;
       this.iconPath = new vscode.ThemeIcon('file-code');
     } else if (!skill.source || !skill.hash) {
       this.description = skill.description
-        ? `${skill.description} (untracked)${agentSuffix}`
-        : `(untracked)${agentSuffix}`;
+        ? `${skill.description} (untracked)`
+        : '(untracked)';
       this.iconPath = new vscode.ThemeIcon('file-code');
     } else {
-      this.description = `${skill.description}${agentSuffix}`;
+      this.description = skill.description;
       this.iconPath = new vscode.ThemeIcon('file-code');
     }
 
     const tooltipLines = [skill.name];
     if (skill.description) { tooltipLines.push(skill.description); }
-    if (skill.agents.length > 0) { tooltipLines.push(`\nAgents: ${skill.agents.join(', ')}`); }
     tooltipLines.push(`\nPath: ${skill.path}`);
     if (skill.source) {
       tooltipLines.push(`Source: ${skill.source}`);
@@ -90,33 +84,7 @@ class SkillItem extends vscode.TreeItem {
   }
 }
 
-class CustomSourceItem extends vscode.TreeItem {
-  constructor(
-    public readonly source: string,
-    public readonly skillCount: number,
-  ) {
-    super(source, vscode.TreeItemCollapsibleState.Collapsed);
-    this.description = `${skillCount} skills`;
-    this.contextValue = 'customSource';
-    this.iconPath = new vscode.ThemeIcon('repo');
-  }
-}
-
-class RemoteSkillItem extends vscode.TreeItem {
-  constructor(
-    public readonly skillName: string,
-    public readonly source: string,
-    public readonly isInstalled: boolean,
-  ) {
-    super(skillName, vscode.TreeItemCollapsibleState.None);
-    this.description = isInstalled ? 'Installed' : '';
-    this.tooltip = `${skillName} from ${source}`;
-    this.contextValue = 'remoteSkill';
-    this.iconPath = new vscode.ThemeIcon(
-      isInstalled ? 'check' : 'cloud-download',
-    );
-  }
-}
+// CustomSourceItem and RemoteSkillItem commented out — Part 6E (future enhancement, see beads backlog)
 
 class QuickLinkItem extends vscode.TreeItem {
   constructor(
@@ -139,8 +107,6 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
 
   private globalSkills: InstalledSkill[] = [];
   private projectSkills: InstalledSkill[] = [];
-  private customSourceSkillCounts = new Map<string, number>();
-  private customSourceSkills = new Map<string, string[]>();
   private hasInitiallyScanned = false;
 
   constructor(private scanner: SkillScanner) {}
@@ -155,18 +121,11 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
     this.projectSkills = projectSkills;
     this.hasInitiallyScanned = true;
 
-    const customSources = vscode.workspace.getConfiguration('skills-sh')
-      .get<string[]>('customSources', []);
     const noSkills = this.globalSkills.length === 0
-      && this.projectSkills.length === 0
-      && customSources.length === 0;
+      && this.projectSkills.length === 0;
     vscode.commands.executeCommand('setContext', 'skills-sh.noSkillsFound', noSkills);
 
-    // Refresh immediately with local data, load custom sources in background
     this.refresh();
-
-    // Fire-and-forget: load custom source counts, then refresh again when done
-    this.loadCustomSourceCounts().then(() => this.refresh());
   }
 
   getInstalledSkillNames(): Set<string> {
@@ -217,7 +176,7 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
         }
       }
 
-      // --- Source-based groups for global skills ---
+      // --- Skill groups: by source / custom / untracked ---
       const bySource = new Map<string, InstalledSkill[]>();
       const custom: InstalledSkill[] = [];
       const untracked: InstalledSkill[] = [];
@@ -236,11 +195,12 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
 
       // Custom skills — user-created, regular directories (not symlinks)
       if (custom.length > 0) {
-        const children = custom.map(s =>
+        const sorted = this.sortSkills(custom);
+        const children = sorted.map(s =>
           new SkillItem(s, false, manifestNames.has(s.folderName)),
         );
         groups.push(new GroupItem(
-          `My Skills (${custom.length})`,
+          `Custom Skills (${custom.length})`,
           'custom',
           children,
         ));
@@ -250,7 +210,8 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
         .sort(([a], [b]) => a.localeCompare(b));
 
       for (const [source, skills] of sortedSources) {
-        const children = skills.map(s =>
+        const sorted = this.sortSkills(skills);
+        const children = sorted.map(s =>
           new SkillItem(s, updatableNames.has(s.name), manifestNames.has(s.folderName)),
         );
         groups.push(new GroupItem(
@@ -262,7 +223,8 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
 
       // Untracked — orphaned symlinks missing lock entries
       if (untracked.length > 0) {
-        const children = untracked.map(s =>
+        const sorted = this.sortSkills(untracked);
+        const children = sorted.map(s =>
           new SkillItem(s, false, manifestNames.has(s.folderName)),
         );
         groups.push(new GroupItem(
@@ -274,7 +236,8 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
 
       // --- Project skills ---
       if (this.projectSkills.length > 0) {
-        const children = this.projectSkills.map(s =>
+        const sorted = this.sortSkills(this.projectSkills);
+        const children = sorted.map(s =>
           new SkillItem(s, updatableNames.has(s.name), manifestNames.has(s.folderName)),
         );
         groups.push(new GroupItem(
@@ -284,26 +247,13 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
         ));
       }
 
-      // --- Custom sources ---
-      const customSources = vscode.workspace.getConfiguration('skills-sh')
-        .get<string[]>('customSources', []);
-      if (customSources.length > 0) {
-        const sourceItems = customSources.map(source => {
-          const count = this.customSourceSkillCounts.get(source) ?? 0;
-          return new CustomSourceItem(source, count);
-        });
-        groups.push(new GroupItem(
-          `Custom Sources (${customSources.length})`,
-          'custom-sources',
-          sourceItems,
-        ));
-      }
-
-      // --- Quick Links (Audits, Docs) ---
-      groups.push(new GroupItem(
+      // --- Quick Links (pinned at top) ---
+      groups.unshift(new GroupItem(
         'Quick Links',
         'quick-links',
         [
+          new QuickLinkItem('Browse Marketplace', 'extensions', 'skills-sh.openMarketplaceTab', 'Open the full marketplace in an editor tab'),
+          new QuickLinkItem('View Installed in Detail', 'list-flat', 'skills-sh.viewInstalledInEditor', 'View installed skills with full actions in editor'),
           new QuickLinkItem('Security Audits', 'shield', 'skills-sh.openAudits', 'Browse security audit results on skills.sh'),
           new QuickLinkItem('Documentation', 'book', 'skills-sh.openDocs', 'Read skills.sh documentation'),
         ],
@@ -316,35 +266,11 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
       return element.children;
     }
 
-    if (element instanceof CustomSourceItem) {
-      const skills = this.customSourceSkills.get(element.source) ?? [];
-      const installedNames = this.getInstalledSkillNames();
-      return skills.map(name =>
-        new RemoteSkillItem(name, element.source, installedNames.has(name)),
-      );
-    }
-
     return [];
   }
 
-  private async loadCustomSourceCounts(): Promise<void> {
-    const customSources = vscode.workspace.getConfiguration('skills-sh')
-      .get<string[]>('customSources', []);
-
-    this.customSourceSkillCounts.clear();
-    this.customSourceSkills.clear();
-
-    const promises = customSources.map(async (source) => {
-      try {
-        const skills = await fetchRepoSkillList(source);
-        this.customSourceSkillCounts.set(source, skills.length);
-        this.customSourceSkills.set(source, skills);
-      } catch {
-        this.customSourceSkillCounts.set(source, 0);
-        this.customSourceSkills.set(source, []);
-      }
-    });
-
-    await Promise.allSettled(promises);
+  /** Sort skills alphabetically by name. */
+  private sortSkills(skills: InstalledSkill[]): InstalledSkill[] {
+    return [...skills].sort((a, b) => a.name.localeCompare(b.name));
   }
 }

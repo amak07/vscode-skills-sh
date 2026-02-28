@@ -1,7 +1,8 @@
-import * as vscode from 'vscode';
 import { SearchResponse, LeaderboardResponse, LeaderboardView } from '../types';
 
 const SKILLS_SH_API = 'https://skills.sh/api';
+const CACHE_TTL_MS = 3_600_000; // 1 hour
+const SEARCH_RESULTS_LIMIT = 50; // matches skills.sh website
 
 interface CacheEntry<T> {
   data: T;
@@ -10,17 +11,12 @@ interface CacheEntry<T> {
 
 const cache = new Map<string, CacheEntry<unknown>>();
 
-function getCacheTTL(): number {
-  return vscode.workspace.getConfiguration('skills-sh').get<number>('searchCacheTTL', 3600) * 1000;
-}
-
 function getCached<T>(key: string): T | null {
   const entry = cache.get(key);
   if (!entry) {
     return null;
   }
-  const ttl = getCacheTTL();
-  if (ttl > 0 && Date.now() - entry.timestamp < ttl) {
+  if (CACHE_TTL_MS > 0 && Date.now() - entry.timestamp < CACHE_TTL_MS) {
     return entry.data as T;
   }
   cache.delete(key);
@@ -36,7 +32,7 @@ export async function searchSkills(query: string, limit?: number): Promise<Searc
     return { query, searchType: 'fuzzy', skills: [], count: 0, duration_ms: 0 };
   }
 
-  const resultLimit = limit ?? vscode.workspace.getConfiguration('skills-sh').get<number>('searchResultsLimit', 20);
+  const resultLimit = limit ?? SEARCH_RESULTS_LIMIT;
   const cacheKey = `search:${query}:${resultLimit}`;
   const cached = getCached<SearchResponse>(cacheKey);
   if (cached) {

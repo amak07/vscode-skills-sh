@@ -3,12 +3,21 @@ import { SkillScanner } from './local/scanner';
 import { SkillWatcher } from './local/watcher';
 import { InstalledSkillsTreeProvider } from './views/installed-tree';
 import { MarketplaceViewProvider } from './views/marketplace/provider';
-import { installSkill, updateSkills, uninstallSkill, disposeTerminal, notifyInstallDetected, onOperationCompleted } from './install/installer';
+import { updateSkills, uninstallSkill, disposeTerminal, notifyInstallDetected, onOperationCompleted } from './install/installer';
 import { checkUpdates, getLastUpdateResult, clearUpdateForSkill } from './api/updates';
-import { searchSkills } from './api/search';
+
 import { InstalledSkill, InstalledSkillCard } from './types';
 import { getLog } from './logger';
-import { addSkillToManifest, removeSkillFromManifest, readManifest, writeManifest, getManifestPath, getMissingSkills, isSkillInManifest, getManifestSkillNames } from './manifest/manifest';
+import { addSkillToManifest, removeSkillFromManifest, readManifest, writeManifest, getManifestPath, getMissingSkills, getManifestSkillNames } from './manifest/manifest';
+
+/** Check whether a notification at the given level should be shown, per user config. */
+function shouldNotify(level: 'info' | 'error'): boolean {
+  const pref = vscode.workspace.getConfiguration('skills-sh')
+    .get<string>('showNotifications', 'all');
+  if (pref === 'all') { return true; }
+  if (pref === 'errors') { return level === 'error'; }
+  return false; // "none"
+}
 
 // Extract InstalledSkill from either a direct InstalledSkill or a SkillItem tree item
 function resolveSkill(arg: any): InstalledSkill | undefined {
@@ -110,14 +119,16 @@ export function activate(context: vscode.ExtensionContext) {
 
     const added = newNames.size - oldNames.size;
     if (oldNames.size > 0 && added > 0) {
-      vscode.window.showInformationMessage(
-        `Skills.sh: ${added} new skill(s) installed.`,
-        'View Installed',
-      ).then(action => {
-        if (action === 'View Installed') {
-          vscode.commands.executeCommand('skills-sh.installedSkills.focus');
-        }
-      });
+      if (shouldNotify('info')) {
+        vscode.window.showInformationMessage(
+          `Skills.sh: ${added} new skill(s) installed.`,
+          'View Installed',
+        ).then(action => {
+          if (action === 'View Installed') {
+            vscode.commands.executeCommand('skills-sh.installedSkills.focus');
+          }
+        });
+      }
 
       // Post-install: offer to add newly installed skills to skills.json
       if (oldSkills.length > 0 && readManifest()) {
@@ -141,9 +152,11 @@ export function activate(context: vscode.ExtensionContext) {
         }
       }
     } else if (oldNames.size > 0 && newNames.size < oldNames.size) {
-      vscode.window.showInformationMessage(
-        `Skills.sh: ${oldNames.size - newNames.size} skill(s) removed.`,
-      );
+      if (shouldNotify('info')) {
+        vscode.window.showInformationMessage(
+          `Skills.sh: ${oldNames.size - newNames.size} skill(s) removed.`,
+        );
+      }
 
       // Post-uninstall: offer to remove uninstalled skills from skills.json
       if (readManifest()) {
@@ -247,39 +260,8 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('skills-sh.installSkill', async () => {
-      const query = await vscode.window.showInputBox({
-        prompt: 'Search for a skill to install',
-        placeHolder: 'e.g. react, supabase, testing...',
-      });
-      if (!query || query.length < 2) { return; }
-
-      try {
-        const results = await searchSkills(query);
-        if (results.skills.length === 0) {
-          vscode.window.showInformationMessage('No skills found.');
-          return;
-        }
-
-        const items = results.skills.map(s => ({
-          label: s.name,
-          description: `${s.source} — ${s.installs.toLocaleString()} installs`,
-          source: s.source,
-          skillId: s.skillId,
-        }));
-
-        const picked = await vscode.window.showQuickPick(items, {
-          placeHolder: 'Select a skill to install',
-        });
-        if (!picked) { return; }
-
-        await installSkill(`https://github.com/${picked.source}`, {
-          skill: picked.skillId,
-        });
-      } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : 'Unknown error';
-        vscode.window.showErrorMessage(`Search failed: ${msg}`);
-      }
+    vscode.commands.registerCommand('skills-sh.installSkill', () => {
+      vscode.commands.executeCommand('skills-sh.marketplace.focus');
     })
   );
 
@@ -403,62 +385,32 @@ export function activate(context: vscode.ExtensionContext) {
       const skill = resolveSkill(arg);
       if (!skill) { return; }
       vscode.env.clipboard.writeText(skill.path);
-      vscode.window.showInformationMessage(`Copied: ${skill.path}`);
-    })
-  );
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand('skills-sh.addCustomSource', async () => {
-      const source = await vscode.window.showInputBox({
-        prompt: 'Enter a GitHub repository (owner/repo)',
-        placeHolder: 'e.g. my-org/my-skills',
-        validateInput: (value) => {
-          if (!value.match(/^[\w.-]+\/[\w.-]+$/)) {
-            return 'Must be in owner/repo format';
-          }
-          return null;
-        },
-      });
-      if (!source) { return; }
-
-      const config = vscode.workspace.getConfiguration('skills-sh');
-      const current = config.get<string[]>('customSources', []);
-      if (current.includes(source)) {
-        vscode.window.showInformationMessage(`"${source}" is already in your custom sources.`);
-        return;
-      }
-
-      await config.update('customSources', [...current, source], vscode.ConfigurationTarget.Global);
-      await treeProvider.rescan();
-      vscode.window.showInformationMessage(`Added "${source}" to custom sources.`);
-    })
-  );
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand('skills-sh.removeCustomSource', async (item: { source?: string }) => {
-      const source = item?.source;
-      if (!source) { return; }
-
-      const config = vscode.workspace.getConfiguration('skills-sh');
-      const current = config.get<string[]>('customSources', []);
-      const updated = current.filter(s => s !== source);
-      await config.update('customSources', updated, vscode.ConfigurationTarget.Global);
-      await treeProvider.rescan();
-      vscode.window.showInformationMessage(`Removed "${source}" from custom sources.`);
-    })
-  );
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand('skills-sh.browseCustomSource', (item: { source?: string }) => {
-      if (item?.source) {
-        vscode.commands.executeCommand('skills-sh.marketplace.focus');
+      if (shouldNotify('info')) {
+        vscode.window.showInformationMessage(`Copied: ${skill.path}`);
       }
     })
   );
+
+  // Custom Sources commands — commented out (Part 6E, see beads backlog)
+  // context.subscriptions.push(
+  //   vscode.commands.registerCommand('skills-sh.addCustomSource', async () => { ... })
+  // );
+  // context.subscriptions.push(
+  //   vscode.commands.registerCommand('skills-sh.removeCustomSource', async (item) => { ... })
+  // );
+  // context.subscriptions.push(
+  //   vscode.commands.registerCommand('skills-sh.browseCustomSource', (item) => { ... })
+  // );
 
   context.subscriptions.push(
     vscode.commands.registerCommand('skills-sh.openMarketplaceTab', () => {
       marketplaceProvider.openInTab();
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('skills-sh.viewInstalledInEditor', () => {
+      marketplaceProvider.openInTab('installed');
     })
   );
 
@@ -484,15 +436,21 @@ export function activate(context: vscode.ExtensionContext) {
     })
   );
 
-  // Install from custom source command
-  context.subscriptions.push(
-    vscode.commands.registerCommand('skills-sh.installFromSource', async (item: { skillName?: string; source?: string }) => {
-      if (!item?.skillName || !item?.source) { return; }
-      await installSkill(`https://github.com/${item.source}`, {
-        skill: item.skillName,
-      });
-    })
-  );
+  // Sort commands — commented out (Part 6F, see beads backlog)
+  // for (const [cmd, value] of [
+  //   ['skills-sh.sortByName', 'name'],
+  //   ['skills-sh.sortByAgent', 'agent'],
+  //   ['skills-sh.sortByRecent', 'recentlyModified'],
+  // ] as const) {
+  //   context.subscriptions.push(
+  //     vscode.commands.registerCommand(cmd, async () => { ... })
+  //   );
+  // }
+
+  // Install from custom source command — commented out (Part 6E, see beads backlog)
+  // context.subscriptions.push(
+  //   vscode.commands.registerCommand('skills-sh.installFromSource', async (item) => { ... })
+  // );
 
   // === Manifest (skills.json) commands ===
 
@@ -508,7 +466,9 @@ export function activate(context: vscode.ExtensionContext) {
       }
       addSkillToManifest(skill.source, skill.folderName);
       treeProvider.refresh();
-      vscode.window.showInformationMessage(`Added "${skill.name}" to skills.json`);
+      if (shouldNotify('info')) {
+        vscode.window.showInformationMessage(`Added "${skill.name}" to skills.json`);
+      }
     })
   );
 
@@ -518,7 +478,9 @@ export function activate(context: vscode.ExtensionContext) {
       if (!skill) { return; }
       removeSkillFromManifest(skill.folderName);
       treeProvider.refresh();
-      vscode.window.showInformationMessage(`Removed "${skill.name}" from skills.json`);
+      if (shouldNotify('info')) {
+        vscode.window.showInformationMessage(`Removed "${skill.name}" from skills.json`);
+      }
     })
   );
 
@@ -529,6 +491,16 @@ export function activate(context: vscode.ExtensionContext) {
       if (skillsWithSource.length === 0) {
         vscode.window.showInformationMessage('No installed skills have source tracking. Install skills from the Marketplace first.');
         return;
+      }
+
+      // Check if manifest already exists — if not, explain and confirm creation
+      const existingManifest = readManifest();
+      if (!existingManifest) {
+        const create = await vscode.window.showInformationMessage(
+          'No skills.json found in this project. Create one to share recommended skills with your team?',
+          'Create skills.json', 'Cancel',
+        );
+        if (create !== 'Create skills.json') { return; }
       }
 
       const manifestNames = getManifestSkillNames();
@@ -569,7 +541,12 @@ export function activate(context: vscode.ExtensionContext) {
         const doc = await vscode.workspace.openTextDocument(manifestPath);
         await vscode.window.showTextDocument(doc);
       }
-      vscode.window.showInformationMessage(`Updated skills.json with ${picked.length} skill(s)`);
+      const verb = existingManifest ? 'Updated' : 'Created';
+      if (shouldNotify('info')) {
+        vscode.window.showInformationMessage(
+          `${verb} skills.json with ${picked.length} skill(s). Team members can run "Install from skills.json" to sync.`,
+        );
+      }
     })
   );
 
@@ -602,16 +579,17 @@ export function activate(context: vscode.ExtensionContext) {
       });
       if (!picked || picked.length === 0) { return; }
 
-      const agent = vscode.workspace.getConfiguration('skills-sh').get<string>('defaultAgent', 'claude-code');
       const terminal = vscode.window.createTerminal({ name: 'Skills.sh — Install from manifest' });
       terminal.show();
 
       for (const item of picked) {
-        const cmd = `npx skills add https://github.com/${item.missing.source} -s ${item.missing.skillName} -a ${agent} -g -y`;
+        const cmd = `npx skills add https://github.com/${item.missing.source} -s ${item.missing.skillName} -g -y`;
         terminal.sendText(cmd);
       }
 
-      vscode.window.showInformationMessage(`Installing ${picked.length} skill(s) from skills.json...`);
+      if (shouldNotify('info')) {
+        vscode.window.showInformationMessage(`Installing ${picked.length} skill(s) from skills.json...`);
+      }
     })
   );
 

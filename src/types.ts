@@ -105,12 +105,9 @@ export interface AgentConfig {
   projectDir: string;
 }
 
-export const KNOWN_AGENTS: AgentConfig[] = [
-  { id: 'claude',   displayName: 'Claude',   globalDir: '.claude/skills',           projectDir: '.claude/skills' },
-  { id: 'cursor',   displayName: 'Cursor',   globalDir: '.cursor/skills',           projectDir: '.cursor/skills' },
-  { id: 'windsurf', displayName: 'Windsurf', globalDir: '.codeium/windsurf/skills', projectDir: '.windsurf/skills' },
-  { id: 'codex',    displayName: 'Codex',    globalDir: '.codex/skills',            projectDir: '.codex/skills' },
-];
+// KNOWN_AGENTS removed in Part 6 — scanner now uses canonical dirs directly.
+// Kept AgentConfig type above for potential future use.
+// See: ~/.agents/skills/ (all marketplace skills) + ~/.claude/skills/ (custom skills)
 
 export interface InstalledSkill {
   name: string;
@@ -122,7 +119,6 @@ export interface InstalledSkill {
   source?: string;
   hash?: string;
   skillPath?: string; // e.g. "skills/react-email/SKILL.md" — from lock file
-  agents: string[];
   isCustom: boolean; // true = regular directory (user-created), false = symlink (marketplace)
 }
 
