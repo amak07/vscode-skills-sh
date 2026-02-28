@@ -1,12 +1,8 @@
 import { SkillDetail, SkillSecurityAudit } from '../types';
+import { ApiCache } from '../utils/api-cache';
+import { SKILLS_SH_BASE, CACHE_TTL_DETAIL } from '../utils/constants';
 
-interface CacheEntry {
-  detail: SkillDetail;
-  timestamp: number;
-}
-
-const cache = new Map<string, CacheEntry>();
-const CACHE_TTL = 1800 * 1000; // 30 minutes — detail data changes slowly
+const cache = new ApiCache<SkillDetail>(CACHE_TTL_DETAIL);
 
 export async function fetchSkillDetail(
   owner: string,
@@ -15,12 +11,12 @@ export async function fetchSkillDetail(
 ): Promise<SkillDetail | null> {
   const cacheKey = `${owner}/${repo}/${skillId}`;
   const cached = cache.get(cacheKey);
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-    return cached.detail;
+  if (cached) {
+    return cached;
   }
 
   try {
-    const url = `https://skills.sh/${owner}/${repo}/${skillId}`;
+    const url = `${SKILLS_SH_BASE}/${owner}/${repo}/${skillId}`;
     const response = await fetch(url);
     if (!response.ok) {
       return null;
@@ -29,7 +25,7 @@ export async function fetchSkillDetail(
     const html = await response.text();
     const detail = parseRenderedHtml(html, owner, repo, skillId);
     if (detail) {
-      cache.set(cacheKey, { detail, timestamp: Date.now() });
+      cache.set(cacheKey, detail);
     }
     return detail;
   } catch {
@@ -138,7 +134,7 @@ function extractSecurityAudits(html: string): SkillSecurityAudit[] {
     audits.push({
       partner: match[2].trim(),
       status: match[3].trim(),
-      url: `https://skills.sh${match[1]}`,
+      url: `${SKILLS_SH_BASE}${match[1]}`,
     });
   }
 

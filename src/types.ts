@@ -201,6 +201,7 @@ export interface InstalledSkillCard {
   name: string;
   folderName: string;
   description: string;
+  path: string;
   source?: string;
   scope: SkillScope;
   hasUpdate: boolean;

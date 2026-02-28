@@ -3,9 +3,12 @@ import * as path from 'path';
 import * as os from 'os';
 import * as vscode from 'vscode';
 import { InstalledSkill, SkillScope, SkillLockFile, LocalLockFile, ScanResult } from '../types';
-import { parseSkillMd } from './parser';
+import { parseSkillMd, parseSkillMdAsync } from './parser';
 import { getLog } from '../logger';
+import { findLockEntryByFolder } from '../utils/lock-file';
+import { getGlobalLockPath } from '../utils/constants';
 
+// Part 6: Simplified diagnostic — no per-agent tracking
 export interface ScanDiagnostic {
   globalDirs: { path: string; exists: boolean; skillCount: number }[];
   projectDirs: string[];
@@ -17,7 +20,17 @@ export class SkillScanner {
   private localLockData: LocalLockFile | null = null;
 
   /** Check if a dirent is a directory, following symlinks */
-  private isDirectoryEntry(dir: string, entry: fs.Dirent): boolean {
+  private async isDirectoryEntry(dir: string, entry: fs.Dirent): Promise<boolean> {
+    if (entry.isDirectory()) { return true; }
+    if (entry.isSymbolicLink()) {
+      try { return (await fs.promises.stat(path.join(dir, entry.name))).isDirectory(); }
+      catch { return false; }
+    }
+    return false;
+  }
+
+  /** Sync version for getDiagnostics() where sync I/O is acceptable */
+  private isDirectoryEntrySync(dir: string, entry: fs.Dirent): boolean {
     if (entry.isDirectory()) { return true; }
     if (entry.isSymbolicLink()) {
       try { return fs.statSync(path.join(dir, entry.name)).isDirectory(); }
@@ -71,8 +84,8 @@ export class SkillScanner {
   }
 
   async scan(): Promise<ScanResult> {
-    this.loadLockFile();
-    this.loadLocalLockFile();
+    await this.loadLockFile();
+    await this.loadLocalLockFile();
 
     const canonicalDir = this.getCanonicalGlobalDir();
     const claudeDir = this.getClaudeGlobalDir();
@@ -98,7 +111,7 @@ export class SkillScanner {
   /**
    * Deduplicate skills found across canonical + Claude dirs.
    * Prefer canonical entry. Only include Claude entries that aren't
-   * symlinks (those are custom/manual skills).
+   * already present (those would be custom/manual skills).
    */
   private deduplicateGlobal(
     canonicalSkills: InstalledSkill[],
@@ -125,13 +138,15 @@ export class SkillScanner {
     const log = getLog();
     const skills: InstalledSkill[] = [];
 
-    if (!fs.existsSync(dir)) {
+    try {
+      await fs.promises.access(dir);
+    } catch {
       return skills;
     }
 
     let entries: fs.Dirent[];
     try {
-      entries = fs.readdirSync(dir, { withFileTypes: true });
+      entries = await fs.promises.readdir(dir, { withFileTypes: true });
     } catch {
       return skills;
     }
@@ -139,12 +154,12 @@ export class SkillScanner {
     log.info(`[scanner] Scanning ${dir} (${scope}): ${entries.length} entries`);
 
     for (const entry of entries) {
-      if (!this.isDirectoryEntry(dir, entry)) {
+      if (!(await this.isDirectoryEntry(dir, entry))) {
         continue;
       }
 
       const skillMdPath = path.join(dir, entry.name, 'SKILL.md');
-      const parsed = parseSkillMd(skillMdPath);
+      const parsed = await parseSkillMdAsync(skillMdPath);
       if (!parsed) {
         continue;
       }
@@ -184,7 +199,7 @@ export class SkillScanner {
         try {
           const entries = fs.readdirSync(dir, { withFileTypes: true });
           for (const entry of entries) {
-            if (this.isDirectoryEntry(dir, entry)) {
+            if (this.isDirectoryEntrySync(dir, entry)) {
               const skillMdPath = path.join(dir, entry.name, 'SKILL.md');
               if (parseSkillMd(skillMdPath)) { skillCount++; }
             }
@@ -209,11 +224,11 @@ export class SkillScanner {
     return { globalDirs, projectDirs, issues };
   }
 
-  private loadLockFile(): void {
+  private async loadLockFile(): Promise<void> {
     const log = getLog();
-    const lockPath = path.join(os.homedir(), '.agents', '.skill-lock.json');
+    const lockPath = getGlobalLockPath();
     try {
-      const content = fs.readFileSync(lockPath, 'utf-8');
+      const content = await fs.promises.readFile(lockPath, 'utf-8');
       this.lockFileData = JSON.parse(content) as SkillLockFile;
       const keys = Object.keys(this.lockFileData?.skills ?? {});
       log.info(`[scanner] Lock file loaded: ${keys.length} skills — [${keys.join(', ')}]`);
@@ -224,13 +239,13 @@ export class SkillScanner {
   }
 
   /** Load project-level skills-lock.json (created by npx skills add without -g) */
-  private loadLocalLockFile(): void {
+  private async loadLocalLockFile(): Promise<void> {
     const log = getLog();
     const ws = vscode.workspace.workspaceFolders;
     if (!ws || ws.length === 0) { this.localLockData = null; return; }
     const lockPath = path.join(ws[0].uri.fsPath, 'skills-lock.json');
     try {
-      const content = fs.readFileSync(lockPath, 'utf-8');
+      const content = await fs.promises.readFile(lockPath, 'utf-8');
       this.localLockData = JSON.parse(content) as LocalLockFile;
       const keys = Object.keys(this.localLockData?.skills ?? {});
       log.info(`[scanner] Local lock file loaded: ${keys.length} skills — [${keys.join(', ')}]`);
@@ -240,25 +255,10 @@ export class SkillScanner {
   }
 
   private findLockEntry(folderName: string) {
-    // Check global lock (~/.agents/.skill-lock.json)
-    if (this.lockFileData?.skills) {
-      // Direct key match (works for single-skill repos where key == folder name)
-      if (this.lockFileData.skills[folderName]) {
-        return this.lockFileData.skills[folderName];
-      }
-
-      // Fallback: the CLI uses prefixed lock keys (e.g. "vercel-react-best-practices")
-      // but the installed folder is just the bare skill ID ("react-best-practices").
-      // Match folder name against the folder portion of skillPath.
-      for (const entry of Object.values(this.lockFileData.skills)) {
-        if (entry.skillPath) {
-          const parts = entry.skillPath.replace(/\/SKILL\.md$/i, '').split('/');
-          const skillFolder = parts[parts.length - 1];
-          if (skillFolder === folderName) {
-            return entry;
-          }
-        }
-      }
+    // Check global lock (~/.agents/.skill-lock.json) via shared utility
+    const globalEntry = findLockEntryByFolder(this.lockFileData, folderName);
+    if (globalEntry) {
+      return globalEntry;
     }
 
     // Check local lock (<project>/skills-lock.json) for project-scope installs

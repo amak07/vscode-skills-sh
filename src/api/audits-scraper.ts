@@ -1,20 +1,17 @@
 import { AuditListingResponse, AuditListingSkill, SkillAuditResult } from '../types';
+import { SingleCache } from '../utils/api-cache';
+import { SKILLS_SH_BASE, CACHE_TTL_AUDITS } from '../utils/constants';
 
-interface CacheEntry {
-  data: AuditListingResponse;
-  timestamp: number;
-}
-
-let cached: CacheEntry | null = null;
-const CACHE_TTL = 1800 * 1000; // 30 minutes
+const cache = new SingleCache<AuditListingResponse>(CACHE_TTL_AUDITS);
 
 export async function fetchAuditListing(): Promise<AuditListingResponse> {
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-    return cached.data;
+  const hit = cache.get();
+  if (hit) {
+    return hit;
   }
 
   try {
-    const response = await fetch('https://skills.sh/audits');
+    const response = await fetch(`${SKILLS_SH_BASE}/audits`);
     if (!response.ok) {
       return { skills: [], total: 0 };
     }
@@ -23,7 +20,7 @@ export async function fetchAuditListing(): Promise<AuditListingResponse> {
     const skills = parseAuditListing(html);
     const result: AuditListingResponse = { skills, total: skills.length };
 
-    cached = { data: result, timestamp: Date.now() };
+    cache.set(result);
     return result;
   } catch {
     return { skills: [], total: 0 };

@@ -13,6 +13,17 @@ Node.js `Dirent.isDirectory()` returns `false` for symlinks. Use `isSymbolicLink
 ### File watching gotcha
 VS Code's `FileSystemWatcher` may not detect content changes through symlinks on Windows. The watcher also monitors `~/.agents/.skill-lock.json` (a regular file) as a reliable fallback for detecting installs and updates.
 
+## Local VSIX Install (Testing)
+
+To build and install the extension locally for testing:
+
+```bash
+npm.cmd run build && npx.cmd vsce package --no-dependencies
+"/c/Users/abelm/AppData/Local/Programs/Microsoft VS Code/bin/code" --install-extension skills-sh-0.1.0.vsix --force
+```
+
+Then reload the target VS Code window: **Ctrl+Shift+P → "Developer: Reload Window"**.
+
 ## Windows MINGW64
 
 Use `npm.cmd` not `npm`, `npx.cmd` not `npx` when running commands via Claude Code's Bash tool (MINGW64 shell wrapper issue). The VS Code integrated terminal resolves these correctly on its own — this only applies to Claude's Bash tool.
