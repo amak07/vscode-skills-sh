@@ -41,7 +41,7 @@ describe('searchSkills', () => {
     expect(fetchFn).toHaveBeenCalledTimes(1);
     const calledUrl = fetchFn.mock.calls[0][0] as string;
     expect(calledUrl).toContain('/search?q=react');
-    expect(calledUrl).toContain('&limit=20'); // default limit from config
+    expect(calledUrl).toContain('&limit=50'); // hardcoded SEARCH_RESULTS_LIMIT
   });
 
   it('uses the provided limit parameter', async () => {
@@ -55,8 +55,9 @@ describe('searchSkills', () => {
     expect(calledUrl).toContain('&limit=5');
   });
 
-  it('uses config-based limit when no explicit limit is given', async () => {
-    (workspace as any).__setConfigValue('skills-sh.searchResultsLimit', 50);
+  it('always uses hardcoded limit of 50 regardless of config', async () => {
+    // searchResultsLimit config was removed in Part 6 — limit is hardcoded
+    (workspace as any).__setConfigValue('skills-sh.searchResultsLimit', 10);
     const fetchFn = mockFetch({
       'skills.sh/api/search': jsonResponse(SAMPLE_SEARCH_RESPONSE),
     });
@@ -133,9 +134,7 @@ describe('searchSkills', () => {
   });
 
   it('expires cache after TTL', async () => {
-    // Set TTL to 1 second for testing
-    (workspace as any).__setConfigValue('skills-sh.searchCacheTTL', 1);
-
+    // TTL is hardcoded to 3,600,000ms (1 hour) — config no longer used
     let now = 1000000;
     const dateNowSpy = vi.spyOn(Date, 'now').mockImplementation(() => now);
 
@@ -146,8 +145,8 @@ describe('searchSkills', () => {
     await searchSkills('react');
     expect(fetchFn).toHaveBeenCalledTimes(1);
 
-    // Advance time past 1-second TTL (TTL is multiplied by 1000 in the module)
-    now += 2000;
+    // Advance time past 1-hour hardcoded TTL
+    now += 3_600_001;
 
     await searchSkills('react');
     expect(fetchFn).toHaveBeenCalledTimes(2);

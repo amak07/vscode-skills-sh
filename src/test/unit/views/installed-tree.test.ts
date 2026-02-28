@@ -47,7 +47,6 @@ function makeSkill(overrides: Partial<InstalledSkill> & { name: string }): Insta
     path: `/skills/${overrides.name}`,
     scope: 'global',
     metadata: {},
-    agents: ['Claude'],
     isCustom: false,
     ...overrides,
   };
@@ -116,7 +115,7 @@ describe('InstalledSkillsTreeProvider', () => {
       const children = await provider.getChildren();
       const customGroup = children.find((c: any) => c.groupType === 'custom');
       expect(customGroup).toBeDefined();
-      expect((customGroup as any).label).toContain('My Skills');
+      expect((customGroup as any).label).toContain('Custom Skills');
       expect((customGroup as any).children).toHaveLength(1);
     });
 
@@ -148,7 +147,7 @@ describe('InstalledSkillsTreeProvider', () => {
       expect((projectGroup as any).label).toContain('Project Skills');
     });
 
-    it('creates "Updates Available" group at the top when updates exist', async () => {
+    it('creates "Updates Available" group near the top when updates exist', async () => {
       mockUpdateResult = {
         updates: [{ name: 'react-skill', source: 'vercel/repo', newHash: 'xyz' }],
       };
@@ -161,24 +160,14 @@ describe('InstalledSkillsTreeProvider', () => {
       const provider = new InstalledSkillsTreeProvider(scanner);
 
       const children = await provider.getChildren();
-      // Updates group should be first
-      expect((children[0] as any).groupType).toBe('updates');
-      expect((children[0] as any).label).toContain('Updates Available (1)');
-      expect((children[0] as any).collapsibleState).toBe(TreeItemCollapsibleState.Expanded);
+      // Quick Links is unshifted to position 0; Updates is at position 1
+      expect((children[0] as any).groupType).toBe('quick-links');
+      expect((children[1] as any).groupType).toBe('updates');
+      expect((children[1] as any).label).toContain('Updates Available (1)');
+      expect((children[1] as any).collapsibleState).toBe(TreeItemCollapsibleState.Expanded);
     });
 
-    it('creates "Custom Sources" group when config has custom sources', async () => {
-      (workspace as any).__setConfigValue('skills-sh.customSources', ['my-org/custom-repo']);
-      const scanner = createMockScanner({});
-      const provider = new InstalledSkillsTreeProvider(scanner);
-
-      const children = await provider.getChildren();
-      const customSourcesGroup = children.find((c: any) => c.groupType === 'custom-sources');
-      expect(customSourcesGroup).toBeDefined();
-      expect((customSourcesGroup as any).label).toContain('Custom Sources');
-    });
-
-    it('always includes Quick Links as the last group', async () => {
+    it('always includes Quick Links as the first group', async () => {
       const scanner = createMockScanner({
         globalSkills: [
           makeSkill({ name: 'some-skill', source: 'org/repo', hash: 'abc' }),
@@ -187,19 +176,17 @@ describe('InstalledSkillsTreeProvider', () => {
       const provider = new InstalledSkillsTreeProvider(scanner);
 
       const children = await provider.getChildren();
-      const lastGroup = children[children.length - 1] as any;
-      expect(lastGroup.groupType).toBe('quick-links');
+      expect((children[0] as any).groupType).toBe('quick-links');
     });
   });
 
   // --- Group ordering (full spectrum) -------------------------------------
 
   describe('group ordering', () => {
-    it('orders groups: updates, custom, sources, untracked, project, custom-sources, quick-links', async () => {
+    it('orders groups: quick-links, updates, custom, source, untracked, project', async () => {
       mockUpdateResult = {
         updates: [{ name: 'updatable', source: 'org/repo', newHash: 'new' }],
       };
-      (workspace as any).__setConfigValue('skills-sh.customSources', ['ext/repo']);
 
       const scanner = createMockScanner({
         globalSkills: [
@@ -217,13 +204,12 @@ describe('InstalledSkillsTreeProvider', () => {
       const children = await provider.getChildren();
       const groupTypes = children.map((c: any) => c.groupType);
       expect(groupTypes).toEqual([
+        'quick-links',
         'updates',
         'custom',
         'source',
         'untracked',
         'project',
-        'custom-sources',
-        'quick-links',
       ]);
     });
   });
@@ -313,33 +299,6 @@ describe('InstalledSkillsTreeProvider', () => {
       const children = await provider.getChildren();
       const updatesGroup = children.find((c: any) => c.groupType === 'updates') as any;
       expect(updatesGroup.children[0].description).toContain('Update available');
-    });
-
-    it('shows agent badges when skill is installed for 2+ agents', async () => {
-      const scanner = createMockScanner({
-        globalSkills: [
-          makeSkill({ name: 'multi-agent', source: 'org/repo', hash: 'abc', agents: ['Claude', 'Cursor'] }),
-        ],
-      });
-      const provider = new InstalledSkillsTreeProvider(scanner);
-
-      const children = await provider.getChildren();
-      const sourceGroup = children.find((c: any) => c.groupType === 'source') as any;
-      expect(sourceGroup.children[0].description).toContain('Claude, Cursor');
-    });
-
-    it('does not show agent badges for single-agent skills', async () => {
-      const scanner = createMockScanner({
-        globalSkills: [
-          makeSkill({ name: 'single', source: 'org/repo', hash: 'abc', agents: ['Claude'] }),
-        ],
-      });
-      const provider = new InstalledSkillsTreeProvider(scanner);
-
-      const children = await provider.getChildren();
-      const sourceGroup = children.find((c: any) => c.groupType === 'source') as any;
-      // The description should just be the skill description, not have agent info
-      expect(sourceGroup.children[0].description).not.toContain('Claude');
     });
 
     it('shows (untracked) for skills without source or hash', async () => {
@@ -466,16 +425,18 @@ describe('InstalledSkillsTreeProvider', () => {
   // --- Quick Links content ------------------------------------------------
 
   describe('Quick Links', () => {
-    it('contains Security Audits and Documentation quick links', async () => {
+    it('contains all four quick links', async () => {
       const scanner = createMockScanner({});
       const provider = new InstalledSkillsTreeProvider(scanner);
 
       const children = await provider.getChildren();
       const quickLinks = children.find((c: any) => c.groupType === 'quick-links') as any;
-      expect(quickLinks.children).toHaveLength(2);
-      expect(quickLinks.children[0].label).toBe('Security Audits');
-      expect(quickLinks.children[0].contextValue).toBe('quickLink');
-      expect(quickLinks.children[1].label).toBe('Documentation');
+      expect(quickLinks.children).toHaveLength(4);
+      expect(quickLinks.children[0].label).toBe('Browse Marketplace');
+      expect(quickLinks.children[1].label).toBe('View Installed in Detail');
+      expect(quickLinks.children[2].label).toBe('Security Audits');
+      expect(quickLinks.children[2].contextValue).toBe('quickLink');
+      expect(quickLinks.children[3].label).toBe('Documentation');
     });
   });
 

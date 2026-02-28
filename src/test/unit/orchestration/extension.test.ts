@@ -147,7 +147,6 @@ function makeSkill(overrides: Partial<InstalledSkill> & { name: string }): Insta
     path: `/skills/${overrides.name}`,
     scope: 'global',
     metadata: {},
-    agents: ['Claude'],
     isCustom: false,
     ...overrides,
   };
@@ -292,85 +291,14 @@ describe('resolveSkill (via commands that use it)', () => {
 });
 
 // ===========================================================================
-// 2. Install flow: showInputBox -> search -> showQuickPick -> installSkill
+// 2. Install skill — delegates to marketplace (Part 6)
 // ===========================================================================
 
 describe('skills-sh.installSkill command', () => {
-  it('prompts for query, searches, shows quick pick, and installs', async () => {
-    // User types "react" in the input box
-    (window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue('react');
-
-    // Search API returns fixtures
-    mockSearchSkills.mockResolvedValue(SAMPLE_SEARCH_RESPONSE);
-
-    // User picks the first result
-    (window.showQuickPick as ReturnType<typeof vi.fn>).mockImplementation(
-      async (items: any[]) => items[0],
-    );
-
+  it('delegates to marketplace focus', async () => {
     await exec('skills-sh.installSkill');
 
-    // Verify search was called with the query
-    expect(mockSearchSkills).toHaveBeenCalledWith('react');
-
-    // Verify installSkill was called with the correct source URL and skillId
-    expect(mockInstallSkill).toHaveBeenCalledWith(
-      'https://github.com/vercel-labs/agent-skills',
-      { skill: 'react-best-practices' },
-    );
-  });
-
-  it('does nothing when user cancels input box', async () => {
-    (window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
-
-    await exec('skills-sh.installSkill');
-
-    expect(mockSearchSkills).not.toHaveBeenCalled();
-    expect(mockInstallSkill).not.toHaveBeenCalled();
-  });
-
-  it('does nothing when query is too short', async () => {
-    (window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue('a');
-
-    await exec('skills-sh.installSkill');
-
-    expect(mockSearchSkills).not.toHaveBeenCalled();
-  });
-
-  it('shows message when no skills found', async () => {
-    (window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue('zzz-noresults');
-    mockSearchSkills.mockResolvedValue({
-      query: 'zzz-noresults',
-      searchType: 'fuzzy',
-      skills: [],
-      count: 0,
-      duration_ms: 5,
-    });
-
-    await exec('skills-sh.installSkill');
-
-    expect(window.showInformationMessage).toHaveBeenCalledWith('No skills found.');
-    expect(mockInstallSkill).not.toHaveBeenCalled();
-  });
-
-  it('does nothing when user cancels quick pick', async () => {
-    (window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue('react');
-    mockSearchSkills.mockResolvedValue(SAMPLE_SEARCH_RESPONSE);
-    (window.showQuickPick as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
-
-    await exec('skills-sh.installSkill');
-
-    expect(mockInstallSkill).not.toHaveBeenCalled();
-  });
-
-  it('shows error message when search fails', async () => {
-    (window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue('react');
-    mockSearchSkills.mockRejectedValue(new Error('Network timeout'));
-
-    await exec('skills-sh.installSkill');
-
-    expect(window.showErrorMessage).toHaveBeenCalledWith('Search failed: Network timeout');
-    expect(mockInstallSkill).not.toHaveBeenCalled();
+    expect(commands.executeCommand).toHaveBeenCalledWith('skills-sh.marketplace.focus');
   });
 });
 
@@ -519,11 +447,17 @@ describe('skills-sh.checkUpdates command', () => {
   });
 
   it('reports untracked skills when no skills have hashes', async () => {
-    // Create skill without lock file entry (no source/hash)
-    sandbox.createSkill(sandbox.globalSkillsDir, 'orphan-skill', {
-      frontmatter: { name: 'Orphan Skill', description: 'No tracking' },
-      asSymlink: true,
-    });
+    // Create a symlink skill in .claude/skills/ pointing to a location
+    // outside .agents/skills/ so canonical scan won't find it first.
+    // This makes it isCustom=false (symlink) but with no lock entry (untracked).
+    const fs = await import('fs');
+    const path = await import('path');
+    const externalDir = path.join(sandbox.root, 'external', 'orphan-skill');
+    fs.mkdirSync(externalDir, { recursive: true });
+    fs.writeFileSync(path.join(externalDir, 'SKILL.md'),
+      '---\nname: "Orphan Skill"\ndescription: "No tracking"\n---\n# orphan-skill');
+    const symlinkPath = path.join(sandbox.globalSkillsDir, 'orphan-skill');
+    fs.symlinkSync(externalDir, symlinkPath, 'junction');
 
     await exec('skills-sh.checkUpdates');
 
@@ -1235,90 +1169,7 @@ describe('skills-sh.previewSkillFile command', () => {
 });
 
 // ===========================================================================
-// 15. Custom source management
-// ===========================================================================
-
-describe('skills-sh.addCustomSource command', () => {
-  it('adds a new custom source to config', async () => {
-    (window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue('my-org/my-skills');
-
-    await exec('skills-sh.addCustomSource');
-
-    const updateCalls = workspace.getConfiguration('skills-sh').update as ReturnType<typeof vi.fn>;
-    // The command calls config.update — we check the mock was invoked
-    expect(window.showInformationMessage).toHaveBeenCalledWith(
-      expect.stringContaining('Added "my-org/my-skills" to custom sources'),
-    );
-  });
-
-  it('does nothing when user cancels', async () => {
-    (window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
-
-    await exec('skills-sh.addCustomSource');
-
-    expect(window.showInformationMessage).not.toHaveBeenCalledWith(
-      expect.stringContaining('Added'),
-    );
-  });
-
-  it('shows message when source already exists', async () => {
-    (workspace as any).__setConfigValue('skills-sh.customSources', ['my-org/my-skills']);
-    (window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue('my-org/my-skills');
-
-    await exec('skills-sh.addCustomSource');
-
-    expect(window.showInformationMessage).toHaveBeenCalledWith(
-      expect.stringContaining('already in your custom sources'),
-    );
-  });
-});
-
-describe('skills-sh.removeCustomSource command', () => {
-  it('removes a custom source from config', async () => {
-    (workspace as any).__setConfigValue('skills-sh.customSources', ['org/repo', 'other/repo']);
-
-    await exec('skills-sh.removeCustomSource', { source: 'org/repo' });
-
-    expect(window.showInformationMessage).toHaveBeenCalledWith(
-      expect.stringContaining('Removed "org/repo" from custom sources'),
-    );
-  });
-
-  it('does nothing when no source provided', async () => {
-    await exec('skills-sh.removeCustomSource', {});
-
-    expect(window.showInformationMessage).not.toHaveBeenCalled();
-  });
-});
-
-// ===========================================================================
-// 16. Install from custom source
-// ===========================================================================
-
-describe('skills-sh.installFromSource command', () => {
-  it('calls installSkill with correct arguments', async () => {
-    await exec('skills-sh.installFromSource', {
-      skillName: 'react-email',
-      source: 'vercel-labs/agent-skills',
-    });
-
-    expect(mockInstallSkill).toHaveBeenCalledWith(
-      'https://github.com/vercel-labs/agent-skills',
-      { skill: 'react-email' },
-    );
-  });
-
-  it('does nothing when skillName or source missing', async () => {
-    await exec('skills-sh.installFromSource', { skillName: 'test' });
-    expect(mockInstallSkill).not.toHaveBeenCalled();
-
-    await exec('skills-sh.installFromSource', { source: 'org/repo' });
-    expect(mockInstallSkill).not.toHaveBeenCalled();
-  });
-});
-
-// ===========================================================================
-// 17. Navigation / UI commands
+// 15. Navigation / UI commands
 // ===========================================================================
 
 describe('UI navigation commands', () => {
@@ -1484,14 +1335,11 @@ describe('command registration', () => {
       'skills-sh.updateAllSkills',
       'skills-sh.openMarketplace',
       'skills-sh.copySkillPath',
-      'skills-sh.addCustomSource',
-      'skills-sh.removeCustomSource',
-      'skills-sh.browseCustomSource',
+      'skills-sh.viewInstalledInEditor',
       'skills-sh.openMarketplaceTab',
       'skills-sh.openAudits',
       'skills-sh.openDocs',
       'skills-sh.openSettings',
-      'skills-sh.installFromSource',
       'skills-sh.addToManifest',
       'skills-sh.removeFromManifest',
       'skills-sh.editManifest',

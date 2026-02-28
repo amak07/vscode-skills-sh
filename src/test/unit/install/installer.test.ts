@@ -48,16 +48,6 @@ function acceptInstall() {
   (window.showInformationMessage as ReturnType<typeof vi.fn>).mockResolvedValue('Install');
 }
 
-/** Simulate the user clicking "Install Globally" */
-function acceptInstallGlobally() {
-  (window.showInformationMessage as ReturnType<typeof vi.fn>).mockResolvedValue('Install Globally');
-}
-
-/** Simulate the user clicking "Install in Project" */
-function acceptInstallInProject() {
-  (window.showInformationMessage as ReturnType<typeof vi.fn>).mockResolvedValue('Install in Project');
-}
-
 /** Simulate the user clicking "Uninstall" on the warning dialog */
 function acceptUninstall() {
   (window.showWarningMessage as ReturnType<typeof vi.fn>).mockResolvedValue('Uninstall');
@@ -87,28 +77,27 @@ describe('installSkill', () => {
   });
 
   it('returns true when user confirms install', async () => {
-    acceptInstallGlobally();
+    acceptInstall();
     const result = await installSkill('https://github.com/acme/tools');
     expect(result).toBe(true);
   });
 
   // --- Command construction ------------------------------------------------
 
-  it('builds correct command with source, agent, and -y flag', async () => {
-    acceptInstallGlobally();
-    (workspace as any).__setConfigValue('skills-sh.defaultAgent', 'claude-code');
+  it('builds correct command with source and -y flag', async () => {
+    acceptInstall();
 
     await installSkill('https://github.com/acme/tools');
     const terminal = getMockTerminal();
     expect(terminal.sendText).toHaveBeenCalled();
     const cmd = terminal.sendText.mock.calls[0][0] as string;
     expect(cmd).toContain('npx skills add https://github.com/acme/tools');
-    expect(cmd).toContain('-a claude-code');
+    expect(cmd).not.toContain('-a');
     expect(cmd).toContain('-y');
   });
 
   it('adds -g flag when installed globally', async () => {
-    acceptInstallGlobally();
+    acceptInstall();
     await installSkill('https://github.com/acme/tools');
     const terminal = getMockTerminal();
     const cmd = terminal.sendText.mock.calls[0][0] as string;
@@ -116,15 +105,15 @@ describe('installSkill', () => {
   });
 
   it('omits -g flag when installed in project', async () => {
-    acceptInstallInProject();
-    await installSkill('https://github.com/acme/tools');
+    acceptInstall();
+    await installSkill('https://github.com/acme/tools', { global: false });
     const terminal = getMockTerminal();
     const cmd = terminal.sendText.mock.calls[0][0] as string;
     expect(cmd).not.toContain('-g');
   });
 
   it('adds -s flag when skill option is provided', async () => {
-    acceptInstallGlobally();
+    acceptInstall();
     await installSkill('https://github.com/acme/tools', { skill: 'react-skill' });
     const terminal = getMockTerminal();
     const cmd = terminal.sendText.mock.calls[0][0] as string;
@@ -132,28 +121,11 @@ describe('installSkill', () => {
   });
 
   it('omits -s flag when no skill option is provided', async () => {
-    acceptInstallGlobally();
+    acceptInstall();
     await installSkill('https://github.com/acme/tools');
     const terminal = getMockTerminal();
     const cmd = terminal.sendText.mock.calls[0][0] as string;
     expect(cmd).not.toContain('-s');
-  });
-
-  it('uses custom agent from options', async () => {
-    acceptInstallGlobally();
-    await installSkill('https://github.com/acme/tools', { agent: 'cursor' });
-    const terminal = getMockTerminal();
-    const cmd = terminal.sendText.mock.calls[0][0] as string;
-    expect(cmd).toContain('-a cursor');
-  });
-
-  it('uses defaultAgent from config when no agent option is given', async () => {
-    (workspace as any).__setConfigValue('skills-sh.defaultAgent', 'windsurf');
-    acceptInstallGlobally();
-    await installSkill('https://github.com/acme/tools');
-    const terminal = getMockTerminal();
-    const cmd = terminal.sendText.mock.calls[0][0] as string;
-    expect(cmd).toContain('-a windsurf');
   });
 
   // --- Explicit scope via options ------------------------------------------
@@ -197,14 +169,14 @@ describe('installSkill', () => {
   // --- Terminal usage ------------------------------------------------------
 
   it('shows the terminal when running install', async () => {
-    acceptInstallGlobally();
+    acceptInstall();
     await installSkill('https://github.com/acme/tools');
     const terminal = getMockTerminal();
     expect(terminal.show).toHaveBeenCalled();
   });
 
   it('shows progress notification during install', async () => {
-    acceptInstallGlobally();
+    acceptInstall();
     await installSkill('https://github.com/acme/tools');
     expect(window.withProgress).toHaveBeenCalled();
   });
@@ -241,22 +213,6 @@ describe('uninstallSkill', () => {
     expect(cmd).toContain('-y');
   });
 
-  it('includes agent flag in uninstall command', async () => {
-    acceptUninstall();
-    await uninstallSkill('react-skill', { agent: 'cursor', global: true });
-    const terminal = getMockTerminal();
-    const cmd = terminal.sendText.mock.calls[0][0] as string;
-    expect(cmd).toContain('-a cursor');
-  });
-
-  it('uses defaultAgent from config when no agent option', async () => {
-    (workspace as any).__setConfigValue('skills-sh.defaultAgent', 'windsurf');
-    acceptUninstall();
-    await uninstallSkill('react-skill', { global: true });
-    const terminal = getMockTerminal();
-    const cmd = terminal.sendText.mock.calls[0][0] as string;
-    expect(cmd).toContain('-a windsurf');
-  });
 
   // --- Project-scoped uninstall (direct cleanup) ---
 
@@ -490,7 +446,7 @@ describe('disposeTerminal', () => {
   });
 
   it('disposes the shared terminal', async () => {
-    acceptInstallGlobally();
+    acceptInstall();
     await installSkill('https://github.com/acme/tools');
     const terminal = getMockTerminal();
 

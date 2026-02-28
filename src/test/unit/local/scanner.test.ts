@@ -71,6 +71,8 @@ describe('SkillScanner.scan()', () => {
   });
 
   it('follows symlinks via isDirectoryEntry()', async () => {
+    // asSymlink: creates real dir in .agents/skills/ + symlink in .claude/skills/
+    // Scanner finds real dir via canonical scan — skill IS discovered (symlink following works)
     sandbox.createSkill(sandbox.globalSkillsDir, 'linked-skill', {
       frontmatter: { name: 'linked-skill', description: 'Symlinked skill' },
       asSymlink: true,
@@ -80,7 +82,6 @@ describe('SkillScanner.scan()', () => {
 
     expect(result.globalSkills.length).toBe(1);
     expect(result.globalSkills[0].name).toBe('linked-skill');
-    expect(result.globalSkills[0].isCustom).toBe(false); // symlink => not custom
   });
 
   it('skips non-directory entries', async () => {
@@ -160,16 +161,19 @@ describe('SkillScanner.scan()', () => {
   });
 
   it('marks symlinked skills without lock entry as isCustom: false', async () => {
-    // Symlink but no lock entry => still not custom (symlink = marketplace install)
-    sandbox.createSkill(sandbox.globalSkillsDir, 'symlinked-no-lock', {
-      frontmatter: { name: 'symlinked-no-lock', description: 'Symlinked but no lock' },
-      asSymlink: true,
-    });
+    // Create a symlink in .claude/skills/ pointing to an external location
+    // (not in .agents/skills/ so canonical scan won't find the real dir first)
+    const externalDir = path.join(sandbox.root, 'external', 'symlinked-no-lock');
+    fs.mkdirSync(externalDir, { recursive: true });
+    fs.writeFileSync(path.join(externalDir, 'SKILL.md'),
+      '---\nname: "symlinked-no-lock"\ndescription: "Symlinked but no lock"\n---\n# symlinked-no-lock');
+    fs.symlinkSync(externalDir, path.join(sandbox.globalSkillsDir, 'symlinked-no-lock'), 'junction');
 
     const result = await scanner.scan();
 
-    expect(result.globalSkills.length).toBe(1);
-    expect(result.globalSkills[0].isCustom).toBe(false);
+    const skill = result.globalSkills.find(s => s.name === 'symlinked-no-lock');
+    expect(skill).toBeDefined();
+    expect(skill!.isCustom).toBe(false); // symlink => not custom
   });
 
   it('respects CLAUDE_CONFIG_DIR env var', async () => {
@@ -205,65 +209,22 @@ describe('SkillScanner.scan()', () => {
     expect(defaultSkill).toBeUndefined();
   });
 
-  it('respects globalSkillsDir setting override', async () => {
-    const customDir = path.join(sandbox.root, 'custom-skills-dir');
-    fs.mkdirSync(customDir, { recursive: true });
-    (workspace as any).__setConfigValue('skills-sh.globalSkillsDir', customDir);
-
-    sandbox.createSkill(customDir, 'setting-skill', {
-      frontmatter: { name: 'setting-skill', description: 'Found via setting' },
+  it('deduplicates skills across canonical and claude dirs', async () => {
+    // Same skill in both .agents/skills/ (canonical) and .claude/skills/ (claude dir)
+    sandbox.createSkill(sandbox.agentsDir, 'shared-skill', {
+      frontmatter: { name: 'shared-skill', description: 'Shared skill' },
     });
-
-    const result = await scanner.scan();
-
-    const skill = result.globalSkills.find(s => s.name === 'setting-skill');
-    expect(skill).toBeDefined();
-    expect(skill!.name).toBe('setting-skill');
-  });
-
-  it('respects scanAgents setting to filter agents', async () => {
-    // Only scan "claude" agent
-    (workspace as any).__setConfigValue('skills-sh.scanAgents', ['claude']);
-
-    sandbox.createSkill(sandbox.globalSkillsDir, 'claude-skill', {
-      frontmatter: { name: 'claude-skill', description: 'Claude skill' },
-    });
-
-    // Create a skill in cursor's directory — should not be scanned
-    const cursorDir = path.join(sandbox.home, '.cursor', 'skills');
-    fs.mkdirSync(cursorDir, { recursive: true });
-    sandbox.createSkill(cursorDir, 'cursor-skill', {
-      frontmatter: { name: 'cursor-skill', description: 'Cursor skill' },
-    });
-
-    const result = await scanner.scan();
-
-    const claudeSkill = result.globalSkills.find(s => s.name === 'claude-skill');
-    expect(claudeSkill).toBeDefined();
-
-    const cursorSkill = result.globalSkills.find(s => s.name === 'cursor-skill');
-    expect(cursorSkill).toBeUndefined();
-  });
-
-  it('deduplicates skills that appear across multiple agents', async () => {
-    // Install the same skill (same folder name) in both Claude and Cursor dirs
     sandbox.createSkill(sandbox.globalSkillsDir, 'shared-skill', {
       frontmatter: { name: 'shared-skill', description: 'Shared skill' },
     });
 
-    const cursorDir = path.join(sandbox.home, '.cursor', 'skills');
-    fs.mkdirSync(cursorDir, { recursive: true });
-    sandbox.createSkill(cursorDir, 'shared-skill', {
-      frontmatter: { name: 'shared-skill', description: 'Shared skill' },
-    });
-
     const result = await scanner.scan();
 
-    // Should appear only once, with multiple agents
+    // Should appear only once (canonical entry wins)
     const matches = result.globalSkills.filter(s => s.name === 'shared-skill');
     expect(matches.length).toBe(1);
-    expect(matches[0].agents).toContain('Claude');
-    expect(matches[0].agents).toContain('Cursor');
+    // Path should be from canonical dir
+    expect(matches[0].path).toContain('.agents');
   });
 
   it('returns empty project skills when no workspace is open', async () => {
@@ -296,65 +257,56 @@ describe('SkillScanner.scan()', () => {
 
 describe('SkillScanner.getDiagnostics()', () => {
 
-  it('reports agents and their global paths', () => {
+  it('reports global dirs with path, exists, and skillCount', () => {
     const diag = scanner.getDiagnostics();
 
-    expect(diag.agents.length).toBeGreaterThan(0);
-    // Claude agent should be present
-    const claude = diag.agents.find(a => a.agentId === 'claude');
-    expect(claude).toBeDefined();
-    expect(claude!.globalPath).toContain('.claude');
+    expect(diag.globalDirs.length).toBe(2);
+    // Both canonical (.agents/skills) and claude (.claude/skills) dirs should be present
+    const canonicalDir = diag.globalDirs.find(d => d.path.includes('.agents'));
+    const claudeDir = diag.globalDirs.find(d => d.path.includes('.claude'));
+    expect(canonicalDir).toBeDefined();
+    expect(claudeDir).toBeDefined();
+    expect(canonicalDir!.exists).toBe(true);
+    expect(claudeDir!.exists).toBe(true);
   });
 
-  it('reports when no agent directories are found', () => {
-    // Remove all agent skill directories
+  it('reports when no skill directories are found', () => {
+    // Remove both canonical and claude directories
     fs.rmSync(sandbox.globalSkillsDir, { recursive: true, force: true });
-
-    // Also remove cursor/windsurf/codex dirs (they don't exist yet, so this is safe)
-    const agentDirs = ['.cursor/skills', '.codeium/windsurf/skills', '.codex/skills'];
-    for (const d of agentDirs) {
-      const full = path.join(sandbox.home, d);
-      if (fs.existsSync(full)) {
-        fs.rmSync(full, { recursive: true, force: true });
-      }
-    }
+    fs.rmSync(sandbox.agentsDir, { recursive: true, force: true });
 
     const diag = scanner.getDiagnostics();
 
     expect(diag.issues).toContain(
-      'No agent skill directories found. Install skills via the Marketplace or npx skills add.',
+      'No skill directories found. Install skills via the Marketplace or npx skills add.',
     );
   });
 
-  it('reports when subdirs exist but none have valid SKILL.md', () => {
-    // Create a subdirectory without SKILL.md
+  it('reports skillCount: 0 when subdirs exist but none have valid SKILL.md', () => {
+    // Create a subdirectory without SKILL.md in the claude dir
     const emptyDir = path.join(sandbox.globalSkillsDir, 'bad-skill');
     fs.mkdirSync(emptyDir, { recursive: true });
     fs.writeFileSync(path.join(emptyDir, 'README.md'), '# Not a skill');
 
     const diag = scanner.getDiagnostics();
 
-    const claudeDiag = diag.agents.find(a => a.agentId === 'claude');
-    expect(claudeDiag).toBeDefined();
-    expect(claudeDiag!.subdirCount).toBe(1);
-    expect(claudeDiag!.validSkillCount).toBe(0);
-
-    const issueMsg = diag.issues.find(i => i.includes('none contain a valid SKILL.md'));
-    expect(issueMsg).toBeDefined();
+    const claudeDir = diag.globalDirs.find(d => d.path.includes('.claude'));
+    expect(claudeDir).toBeDefined();
+    expect(claudeDir!.exists).toBe(true);
+    expect(claudeDir!.skillCount).toBe(0);
   });
 
-  it('counts valid skills correctly', () => {
+  it('counts valid skills correctly in globalDirs', () => {
     sandbox.createSkill(sandbox.globalSkillsDir, 'valid-skill', {
       frontmatter: { name: 'valid-skill', description: 'Valid' },
     });
 
     const diag = scanner.getDiagnostics();
 
-    const claudeDiag = diag.agents.find(a => a.agentId === 'claude');
-    expect(claudeDiag).toBeDefined();
-    expect(claudeDiag!.subdirCount).toBe(1);
-    expect(claudeDiag!.validSkillCount).toBe(1);
-    expect(claudeDiag!.globalExists).toBe(true);
+    const claudeDir = diag.globalDirs.find(d => d.path.includes('.claude'));
+    expect(claudeDir).toBeDefined();
+    expect(claudeDir!.exists).toBe(true);
+    expect(claudeDir!.skillCount).toBe(1);
   });
 
   it('reports no workspace open', () => {
@@ -373,12 +325,6 @@ describe('SkillScanner helper methods', () => {
   it('getGlobalSkillsDir returns default path', () => {
     const dir = scanner.getGlobalSkillsDir();
     expect(dir).toBe(path.join(sandbox.home, '.claude', 'skills'));
-  });
-
-  it('getGlobalSkillsDir respects setting override', () => {
-    (workspace as any).__setConfigValue('skills-sh.globalSkillsDir', '/custom/path');
-    const dir = scanner.getGlobalSkillsDir();
-    expect(dir).toBe('/custom/path');
   });
 
   it('getGlobalSkillsDir respects CLAUDE_CONFIG_DIR', () => {
