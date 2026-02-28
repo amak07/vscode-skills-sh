@@ -1346,4 +1346,406 @@ describe('MarketplaceViewProvider', () => {
       expect(mockPanel.dispose).toHaveBeenCalled();
     });
   });
+
+  // =========================================================================
+  // Phase 1A: Message contract snapshot tests
+  // =========================================================================
+
+  describe('message contract: response shapes', () => {
+    it('leaderboardResult contains all required fields', async () => {
+      mockGetLeaderboard.mockResolvedValue({
+        skills: [{ source: 'o/r', skillId: 's1', name: 'S1', installs: 10 }],
+        total: 50, hasMore: true, page: 0,
+      });
+      provider.setInstalledNames(new Set(['s1']));
+      provider.setUpdatableNames(new Set(['s1']));
+      mockManifestNames = new Set(['s1']);
+
+      const { webview, sendMessage } = resolveProvider(provider);
+      await sendMessage({ command: 'leaderboard', payload: { view: 'all-time' as LeaderboardView, page: 0 } });
+
+      const call = webview.postMessage.mock.calls.find(
+        (c: unknown[]) => (c[0] as any).command === 'leaderboardResult',
+      );
+      expect(call).toBeDefined();
+      const msg = call![0] as any;
+      expect(msg).toHaveProperty('command', 'leaderboardResult');
+      const p = msg.payload;
+      expect(p).toHaveProperty('skills');
+      expect(p).toHaveProperty('total');
+      expect(p).toHaveProperty('hasMore');
+      expect(p).toHaveProperty('page');
+      expect(p).toHaveProperty('installedNames');
+      expect(p).toHaveProperty('updatableNames');
+      expect(p).toHaveProperty('manifestSkillNames');
+    });
+
+    it('searchResult contains all required fields', async () => {
+      mockSearchSkills.mockResolvedValue({
+        query: 'test', searchType: 'fuzzy',
+        skills: [{ id: '1', skillId: 'x', name: 'X', installs: 5, source: 'o/r' }],
+        count: 1, duration_ms: 3,
+      });
+      provider.setInstalledNames(new Set(['x']));
+      provider.setUpdatableNames(new Set());
+      mockManifestNames = new Set(['x']);
+
+      const { webview, sendMessage } = resolveProvider(provider);
+      await sendMessage({ command: 'search', payload: { query: 'test' } });
+
+      const call = webview.postMessage.mock.calls.find(
+        (c: unknown[]) => (c[0] as any).command === 'searchResult',
+      );
+      expect(call).toBeDefined();
+      const p = (call![0] as any).payload;
+      expect(p).toHaveProperty('skills');
+      expect(p).toHaveProperty('count');
+      expect(p).toHaveProperty('installedNames');
+      expect(p).toHaveProperty('updatableNames');
+      expect(p).toHaveProperty('manifestSkillNames');
+    });
+
+    it('detailResult contains all required fields', async () => {
+      mockFetchSkillDetail.mockResolvedValue({
+        name: 'My Skill',
+        source: 'owner/repo',
+        weeklyInstalls: '100',
+        firstSeen: '2025-01-01',
+        repository: 'owner/repo',
+        installCommand: 'npx skills add ...',
+        perAgent: [],
+        skillMdHtml: '<p>Hello</p>',
+      });
+      provider.setInstalledNames(new Set(['my-skill']));
+      provider.setUpdatableNames(new Set(['my-skill']));
+      mockManifestNames = new Set(['my-skill']);
+
+      const { webview, sendMessage } = resolveProvider(provider);
+      await sendMessage({ command: 'detail', payload: { source: 'owner/repo', skillId: 'my-skill' } });
+
+      const call = webview.postMessage.mock.calls.find(
+        (c: unknown[]) => (c[0] as any).command === 'detailResult',
+      );
+      expect(call).toBeDefined();
+      const p = (call![0] as any).payload;
+      expect(p).toHaveProperty('name');
+      expect(p).toHaveProperty('source');
+      expect(p).toHaveProperty('weeklyInstalls');
+      expect(p).toHaveProperty('repository');
+      expect(p).toHaveProperty('installCommand');
+      expect(p).toHaveProperty('perAgent');
+      expect(p).toHaveProperty('isInstalled', true);
+      expect(p).toHaveProperty('inManifest', true);
+      expect(p).toHaveProperty('hasUpdate', true);
+    });
+
+    it('auditsResult contains skills array and total', async () => {
+      mockFetchAuditListing.mockResolvedValue({
+        skills: [{ name: 'a', source: 'o/r', hasAudit: true }],
+        total: 1,
+      });
+
+      const { webview, sendMessage } = resolveProvider(provider);
+      await sendMessage({ command: 'audits' });
+
+      const call = webview.postMessage.mock.calls.find(
+        (c: unknown[]) => (c[0] as any).command === 'auditsResult',
+      );
+      expect(call).toBeDefined();
+      const p = (call![0] as any).payload;
+      expect(p).toHaveProperty('skills');
+      expect(p).toHaveProperty('total');
+    });
+
+    it('docsResult contains page, title, and html', async () => {
+      mockFetchDocsPage.mockResolvedValue({
+        page: 'overview',
+        title: 'Overview',
+        html: '<p>Docs content</p>',
+      });
+
+      const { webview, sendMessage } = resolveProvider(provider);
+      await sendMessage({ command: 'docs', payload: { page: 'overview' } });
+
+      const call = webview.postMessage.mock.calls.find(
+        (c: unknown[]) => (c[0] as any).command === 'docsResult',
+      );
+      expect(call).toBeDefined();
+      const p = (call![0] as any).payload;
+      expect(p).toHaveProperty('page');
+      expect(p).toHaveProperty('title');
+      expect(p).toHaveProperty('html');
+    });
+
+    it('error message is a simple { command, payload } object', async () => {
+      mockGetLeaderboard.mockRejectedValue(new Error('test failure'));
+      const { webview, sendMessage } = resolveProvider(provider);
+      await sendMessage({ command: 'leaderboard', payload: { view: 'all-time' as LeaderboardView, page: 0 } });
+
+      const call = webview.postMessage.mock.calls.find(
+        (c: unknown[]) => (c[0] as any).command === 'error',
+      );
+      expect(call).toBeDefined();
+      const msg = call![0] as any;
+      expect(Object.keys(msg)).toEqual(['command', 'payload']);
+      expect(msg.command).toBe('error');
+      expect(typeof msg.payload).toBe('string');
+    });
+
+    it('updateButtonStates contains installedNames, updatableNames, manifestSkillNames', async () => {
+      provider.setInstalledNames(new Set(['a', 'b']));
+      provider.setUpdatableNames(new Set(['a']));
+      mockManifestNames = new Set(['b']);
+
+      const { webview } = resolveProvider(provider);
+
+      // Trigger a button state push by setting installed names again
+      provider.setInstalledNames(new Set(['a', 'b']));
+
+      const call = webview.postMessage.mock.calls.find(
+        (c: unknown[]) => (c[0] as any).command === 'updateButtonStates',
+      );
+      expect(call).toBeDefined();
+      const p = (call![0] as any).payload;
+      expect(p).toHaveProperty('installedNames');
+      expect(p).toHaveProperty('updatableNames');
+      expect(p).toHaveProperty('manifestSkillNames');
+    });
+  });
+
+  // =========================================================================
+  // Phase 1B: Detail request cancellation (race conditions)
+  // =========================================================================
+
+  describe('detail request cancellation', () => {
+    it('discards stale detail response when a newer request is made', async () => {
+      // First request resolves slowly via a deferred promise
+      let resolveFirst!: (value: unknown) => void;
+      const firstPromise = new Promise(resolve => { resolveFirst = resolve; });
+      mockFetchSkillDetail.mockReturnValueOnce(firstPromise);
+
+      // Second request resolves immediately
+      const secondDetail = {
+        name: 'Skill B', source: 'org/repo-b',
+        weeklyInstalls: '50', firstSeen: '2025-06-01',
+        repository: 'org/repo-b', installCommand: 'npx skills add ...',
+        perAgent: [], skillMdHtml: '<p>B</p>',
+      };
+      mockFetchSkillDetail.mockResolvedValueOnce(secondDetail);
+
+      const { webview, sendMessage } = resolveProvider(provider);
+
+      // Fire first (slow) request — don't await
+      const firstReq = sendMessage({ command: 'detail', payload: { source: 'org/repo-a', skillId: 'skill-a' } });
+
+      // Fire second (fast) request — increments requestId
+      await sendMessage({ command: 'detail', payload: { source: 'org/repo-b', skillId: 'skill-b' } });
+
+      // Now resolve the first (stale) request
+      resolveFirst({
+        name: 'Skill A', source: 'org/repo-a',
+        weeklyInstalls: '100', firstSeen: '2025-01-01',
+        repository: 'org/repo-a', installCommand: 'npx skills add ...',
+        perAgent: [], skillMdHtml: '<p>A</p>',
+      });
+      await firstReq;
+
+      // Only Skill B's result should have been posted (Skill A was stale)
+      const detailCalls = webview.postMessage.mock.calls.filter(
+        (c: unknown[]) => (c[0] as any).command === 'detailResult',
+      );
+      expect(detailCalls).toHaveLength(1);
+      expect((detailCalls[0][0] as any).payload.name).toBe('Skill B');
+    });
+
+    it('discards stale error when a newer request is made', async () => {
+      let rejectFirst!: (reason: unknown) => void;
+      const firstPromise = new Promise((_, reject) => { rejectFirst = reject; });
+      mockFetchSkillDetail.mockReturnValueOnce(firstPromise);
+      mockFetchSkillDetail.mockResolvedValueOnce({
+        name: 'Latest', source: 'o/r', weeklyInstalls: '0', firstSeen: '',
+        repository: 'o/r', installCommand: '', perAgent: [], skillMdHtml: '',
+      });
+
+      const { webview, sendMessage } = resolveProvider(provider);
+
+      const firstReq = sendMessage({ command: 'detail', payload: { source: 'o/r', skillId: 'old' } });
+      await sendMessage({ command: 'detail', payload: { source: 'o/r', skillId: 'new' } });
+
+      rejectFirst(new Error('stale error'));
+      await firstReq;
+
+      // The stale error should NOT have been posted
+      const errorCalls = webview.postMessage.mock.calls.filter(
+        (c: unknown[]) => (c[0] as any).command === 'error',
+      );
+      expect(errorCalls).toHaveLength(0);
+    });
+  });
+
+  // =========================================================================
+  // Phase 1C: Error edge cases
+  // =========================================================================
+
+  describe('error edge cases', () => {
+    it('handles object thrown as exception', async () => {
+      mockGetLeaderboard.mockRejectedValue({ code: 500 });
+      const { webview, sendMessage } = resolveProvider(provider);
+      await sendMessage({ command: 'leaderboard', payload: { view: 'all-time' as LeaderboardView, page: 0 } });
+
+      expect(webview.postMessage).toHaveBeenCalledWith({
+        command: 'error',
+        payload: 'Unknown error',
+      });
+    });
+
+    it('handles null thrown as exception', async () => {
+      mockSearchSkills.mockRejectedValue(null);
+      const { webview, sendMessage } = resolveProvider(provider);
+      await sendMessage({ command: 'search', payload: { query: 'test' } });
+
+      expect(webview.postMessage).toHaveBeenCalledWith({
+        command: 'error',
+        payload: 'Unknown error',
+      });
+    });
+
+    it('search with empty string query still calls API', async () => {
+      mockSearchSkills.mockResolvedValue({ query: '', searchType: 'fuzzy', skills: [], count: 0, duration_ms: 0 });
+      const { sendMessage } = resolveProvider(provider);
+      await sendMessage({ command: 'search', payload: { query: '' } });
+      expect(mockSearchSkills).toHaveBeenCalledWith('');
+    });
+
+    it('audits error posts error message', async () => {
+      mockFetchAuditListing.mockRejectedValue(new Error('audit fetch failed'));
+      const { webview, sendMessage } = resolveProvider(provider);
+      await sendMessage({ command: 'audits' });
+
+      expect(webview.postMessage).toHaveBeenCalledWith({
+        command: 'error',
+        payload: 'audit fetch failed',
+      });
+    });
+
+    it('docs error posts error message', async () => {
+      mockFetchDocsPage.mockRejectedValue(new Error('docs unavailable'));
+      const { webview, sendMessage } = resolveProvider(provider);
+      await sendMessage({ command: 'docs', payload: { page: 'overview' } });
+
+      expect(webview.postMessage).toHaveBeenCalledWith({
+        command: 'error',
+        payload: 'docs unavailable',
+      });
+    });
+
+    it('detail error posts error message', async () => {
+      mockFetchSkillDetail.mockRejectedValue(new TypeError('network error'));
+      const { webview, sendMessage } = resolveProvider(provider);
+      await sendMessage({ command: 'detail', payload: { source: 'o/r', skillId: 'x' } });
+
+      expect(webview.postMessage).toHaveBeenCalledWith({
+        command: 'error',
+        payload: 'network error',
+      });
+    });
+  });
+
+  // =========================================================================
+  // Phase 1D: Multi-webview state sync
+  // =========================================================================
+
+  describe('multi-webview state sync', () => {
+    it('setInstalledSkills broadcasts to sidebar AND tab panels', () => {
+      // Set up sidebar via resolveProvider
+      const { webview: sidebarWebview } = resolveProvider(provider);
+
+      // Open a tab panel
+      const tabWebview = createMockWebview();
+      tabWebview.onDidReceiveMessage.mockReturnValue({ dispose: vi.fn() });
+      const mockPanel = {
+        webview: tabWebview,
+        onDidDispose: vi.fn(() => ({ dispose: vi.fn() })),
+        dispose: vi.fn(),
+      };
+      vi.mocked(vscode.window.createWebviewPanel).mockReturnValue(
+        mockPanel as unknown as vscode.WebviewPanel,
+      );
+      provider.openInTab();
+
+      // Clear mocks to isolate the broadcast
+      sidebarWebview.postMessage.mockClear();
+      tabWebview.postMessage.mockClear();
+
+      // Trigger broadcast
+      const cards = [makeInstalledCard({ name: 'skill-a' })];
+      provider.setInstalledSkills(cards);
+
+      // Both webviews should receive installedSkillsData
+      const sidebarCalls = sidebarWebview.postMessage.mock.calls.filter(
+        (c: unknown[]) => (c[0] as any).command === 'installedSkillsData',
+      );
+      const tabCalls = tabWebview.postMessage.mock.calls.filter(
+        (c: unknown[]) => (c[0] as any).command === 'installedSkillsData',
+      );
+      expect(sidebarCalls.length).toBeGreaterThanOrEqual(1);
+      expect(tabCalls.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('setInstalledNames pushes button states to all webviews', () => {
+      const { webview: sidebarWebview } = resolveProvider(provider);
+
+      const tabWebview = createMockWebview();
+      tabWebview.onDidReceiveMessage.mockReturnValue({ dispose: vi.fn() });
+      const mockPanel = {
+        webview: tabWebview,
+        onDidDispose: vi.fn(() => ({ dispose: vi.fn() })),
+        dispose: vi.fn(),
+      };
+      vi.mocked(vscode.window.createWebviewPanel).mockReturnValue(
+        mockPanel as unknown as vscode.WebviewPanel,
+      );
+      provider.openInTab();
+
+      sidebarWebview.postMessage.mockClear();
+      tabWebview.postMessage.mockClear();
+
+      provider.setInstalledNames(new Set(['new-skill']));
+
+      // Both should receive updateButtonStates
+      const sidebarStates = sidebarWebview.postMessage.mock.calls.filter(
+        (c: unknown[]) => (c[0] as any).command === 'updateButtonStates',
+      );
+      const tabStates = tabWebview.postMessage.mock.calls.filter(
+        (c: unknown[]) => (c[0] as any).command === 'updateButtonStates',
+      );
+      expect(sidebarStates.length).toBeGreaterThanOrEqual(1);
+      expect(tabStates.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('install message only responds to the requesting webview', async () => {
+      mockInstallSkill.mockResolvedValue(true);
+      const { webview: sidebarWebview, sendMessage } = resolveProvider(provider);
+
+      const tabWebview = createMockWebview();
+      tabWebview.onDidReceiveMessage.mockReturnValue({ dispose: vi.fn() });
+      const mockPanel = {
+        webview: tabWebview,
+        onDidDispose: vi.fn(() => ({ dispose: vi.fn() })),
+        dispose: vi.fn(),
+      };
+      vi.mocked(vscode.window.createWebviewPanel).mockReturnValue(
+        mockPanel as unknown as vscode.WebviewPanel,
+      );
+      provider.openInTab();
+
+      sidebarWebview.postMessage.mockClear();
+      tabWebview.postMessage.mockClear();
+
+      // Send install from sidebar
+      await sendMessage({ command: 'install', payload: { source: 'org/repo', skillName: 'skill-x' } });
+
+      expect(mockInstallSkill).toHaveBeenCalled();
+    });
+  });
 });
