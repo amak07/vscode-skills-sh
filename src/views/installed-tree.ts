@@ -42,24 +42,31 @@ class SkillItem extends vscode.TreeItem {
   ) {
     super(skill.name, vscode.TreeItemCollapsibleState.None);
 
+    // Agent badges: filter out "skills.sh" (canonical is implicit)
+    const agentNames = (skill.agents || []).filter(a => a !== 'skills.sh');
+    const showAgentBadge = agentNames.length >= 2;
+    const agentBadge = showAgentBadge ? agentNames.join(' · ') : '';
+
     if (hasUpdate) {
       this.description = 'Update available';
       this.iconPath = new vscode.ThemeIcon('arrow-up');
     } else if (skill.isCustom) {
-      this.description = skill.description;
+      this.description = agentBadge || skill.description;
       this.iconPath = new vscode.ThemeIcon('file-code');
     } else if (!skill.source || !skill.hash) {
-      this.description = skill.description
-        ? `${skill.description} (untracked)`
-        : '(untracked)';
+      const base = agentBadge || skill.description || '';
+      this.description = base ? `${base} (untracked)` : '(untracked)';
       this.iconPath = new vscode.ThemeIcon('file-code');
     } else {
-      this.description = skill.description;
+      this.description = agentBadge || skill.description;
       this.iconPath = new vscode.ThemeIcon('file-code');
     }
 
     const tooltipLines = [skill.name];
     if (skill.description) { tooltipLines.push(skill.description); }
+    if (agentNames.length > 0) {
+      tooltipLines.push(`\nAgents: ${agentNames.join(', ')}`);
+    }
     tooltipLines.push(`\nPath: ${skill.path}`);
     if (skill.source) {
       tooltipLines.push(`Source: ${skill.source}`);

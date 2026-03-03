@@ -48,6 +48,7 @@ function makeSkill(overrides: Partial<InstalledSkill> & { name: string }): Insta
     scope: 'global',
     metadata: {},
     isCustom: false,
+    agents: [],
     ...overrides,
   };
 }
@@ -299,6 +300,48 @@ describe('InstalledSkillsTreeProvider', () => {
       const children = await provider.getChildren();
       const updatesGroup = children.find((c: any) => c.groupType === 'updates') as any;
       expect(updatesGroup.children[0].description).toContain('Update available');
+    });
+
+    it('shows agent names in description when 2+ agents', async () => {
+      const scanner = createMockScanner({
+        globalSkills: [
+          makeSkill({
+            name: 'multi-agent',
+            source: 'org/repo',
+            hash: 'abc',
+            agents: ['Claude Code', 'Cursor', 'skills.sh'],
+          }),
+        ],
+      });
+      const provider = new InstalledSkillsTreeProvider(scanner);
+
+      const children = await provider.getChildren();
+      const sourceGroup = children.find((c: any) => c.groupType === 'source') as any;
+      const skillItem = sourceGroup.children[0];
+      // "skills.sh" is filtered out; remaining agents shown as badge
+      expect(skillItem.description).toContain('Claude Code');
+      expect(skillItem.description).toContain('Cursor');
+    });
+
+    it('shows normal description when single agent', async () => {
+      const scanner = createMockScanner({
+        globalSkills: [
+          makeSkill({
+            name: 'single-agent',
+            description: 'My description',
+            source: 'org/repo',
+            hash: 'abc',
+            agents: ['Claude Code'],
+          }),
+        ],
+      });
+      const provider = new InstalledSkillsTreeProvider(scanner);
+
+      const children = await provider.getChildren();
+      const sourceGroup = children.find((c: any) => c.groupType === 'source') as any;
+      const skillItem = sourceGroup.children[0];
+      // Should NOT show agent badge, should show normal description
+      expect(skillItem.description).not.toContain('Claude Code');
     });
 
     it('shows (untracked) for skills without source or hash', async () => {

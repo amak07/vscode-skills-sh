@@ -930,6 +930,24 @@ export function getStyles(fontUri: string): string {
       border: 1px solid var(--blue-600);
     }
 
+    /* === Agent chips (multi-agent awareness) === */
+    .row-agents {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+      margin-top: 0.25rem;
+    }
+    .agent-chip {
+      display: inline-block;
+      padding: 0.0625rem 0.375rem;
+      border-radius: 0.1875rem;
+      font-size: 0.6875rem;
+      font-family: var(--font-mono);
+      background: var(--vscode-badge-background, var(--gray-200));
+      color: var(--vscode-badge-foreground, var(--gray-700));
+      white-space: nowrap;
+    }
+
     /* === Manifest (skills.json) toggle button === */
     .btn-manifest {
       font-family: var(--font-mono);

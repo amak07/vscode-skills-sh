@@ -79,6 +79,7 @@ export function activate(context: vscode.ExtensionContext) {
       hasUpdate: updatableNames.has(s.name),
       isCustom: s.isCustom,
       inManifest: manifestNames.has(s.folderName),
+      agents: s.agents,
     }));
     marketplaceProvider.setInstalledSkills(cards);
   }

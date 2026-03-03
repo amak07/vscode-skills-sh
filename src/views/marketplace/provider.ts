@@ -236,7 +236,9 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
           const isInstalled = this.installedNames.has(skillId);
           const inManifest = manifestNames.has(skillId);
           const hasUpdate = this.updatableNames.has(skillId);
-          targetWebview.postMessage({ command: 'detailResult', payload: { ...detail, isInstalled, inManifest, hasUpdate } });
+          const installedSkill = this.installedSkills.find(s => s.folderName === skillId);
+          const agents = installedSkill?.agents ?? [];
+          targetWebview.postMessage({ command: 'detailResult', payload: { ...detail, isInstalled, inManifest, hasUpdate, agents } });
         } catch (e: unknown) {
           if (requestId !== this.detailRequestId) { break; }
           targetWebview.postMessage({ command: 'error', payload: toErrorMessage(e) });

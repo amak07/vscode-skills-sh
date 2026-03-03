@@ -347,7 +347,7 @@
     "viewsWelcome": [
       {
         "view": "skills-sh.installedSkills",
-        "contents": "No agent skills detected.\n\nSkills are scanned from:\n  ~/.claude/skills/\n  ~/.cursor/skills/\n  ~/.codeium/windsurf/skills/\n  ~/.codex/skills/\n\nEach skill must be a folder containing a SKILL.md file.\n\n[Browse Marketplace](command:skills-sh.openMarketplace)\n[Open Settings](command:skills-sh.openSettings)",
+        "contents": "No agent skills detected.\n\nSkills are scanned from the skill directories of all supported agents — Claude Code, Cursor, Windsurf, GitHub Copilot, Codex, Cline, and more.\n\nEach skill must be a folder containing a SKILL.md file.\n\n[Browse Marketplace](command:skills-sh.openMarketplace)\n[Open Settings](command:skills-sh.openSettings)",
         "when": "skills-sh.noSkillsFound"
       }
     ],

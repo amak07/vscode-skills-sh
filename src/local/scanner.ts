@@ -7,12 +7,18 @@ import { parseSkillMd, parseSkillMdAsync } from './parser';
 import { getLog } from '../logger';
 import { findLockEntryByFolder } from '../utils/lock-file';
 import { getGlobalLockPath } from '../utils/constants';
+import { KNOWN_AGENTS, KnownAgent } from './known-agents';
 
-// Part 6: Simplified diagnostic — no per-agent tracking
 export interface ScanDiagnostic {
-  globalDirs: { path: string; exists: boolean; skillCount: number }[];
+  globalDirs: { path: string; exists: boolean; skillCount: number; agent?: string }[];
   projectDirs: string[];
   issues: string[];
+}
+
+interface AgentScanEntry {
+  skill: InstalledSkill;
+  agentDisplayName: string;
+  isCanonical: boolean;
 }
 
 export class SkillScanner {
@@ -39,23 +45,21 @@ export class SkillScanner {
     return false;
   }
 
-  /** Canonical global dir where all marketplace skills live as real files */
-  private getCanonicalGlobalDir(): string {
-    return path.join(os.homedir(), '.agents', 'skills');
-  }
-
-  /** Claude-specific global dir (may contain custom/manual skills) */
-  private getClaudeGlobalDir(): string {
-    const envDir = process.env.CLAUDE_CONFIG_DIR;
-    if (envDir) {
-      return path.join(envDir, 'skills');
+  /** Resolve the global skill directory for a given agent. */
+  private resolveGlobalDir(agent: KnownAgent): string {
+    if (agent.envOverride) {
+      const envDir = process.env[agent.envOverride];
+      if (envDir) {
+        return path.join(envDir, 'skills');
+      }
     }
-    return path.join(os.homedir(), '.claude', 'skills');
+    return path.join(os.homedir(), agent.skillsDir);
   }
 
-  /** Returns the Claude-specific global dir (used by file watcher, update checker, etc.) */
+  /** Returns the Claude-specific global dir (used by update checker). */
   getGlobalSkillsDir(): string {
-    return this.getClaudeGlobalDir();
+    const claude = KNOWN_AGENTS.find(a => a.id === 'claude-code');
+    return claude ? this.resolveGlobalDir(claude) : path.join(os.homedir(), '.claude', 'skills');
   }
 
   /** Returns the Claude-specific project dir */
@@ -69,7 +73,7 @@ export class SkillScanner {
 
   /** Returns all global skill directories to watch for changes */
   getAllGlobalDirs(): string[] {
-    return [this.getCanonicalGlobalDir(), this.getClaudeGlobalDir()];
+    return KNOWN_AGENTS.map(agent => this.resolveGlobalDir(agent));
   }
 
   /** Returns all project-level skill directories */
@@ -77,61 +81,86 @@ export class SkillScanner {
     const ws = vscode.workspace.workspaceFolders;
     if (!ws || ws.length === 0) { return []; }
     const root = ws[0].uri.fsPath;
-    return [
-      path.join(root, '.agents', 'skills'),
-      path.join(root, '.claude', 'skills'),
-    ];
+    return KNOWN_AGENTS.map(agent => path.join(root, agent.skillsDir));
   }
 
   async scan(): Promise<ScanResult> {
     await this.loadLockFile();
     await this.loadLocalLockFile();
 
-    const canonicalDir = this.getCanonicalGlobalDir();
-    const claudeDir = this.getClaudeGlobalDir();
+    // -- Global skills: scan all known agent directories --
+    const globalEntries: AgentScanEntry[] = [];
+    for (const agent of KNOWN_AGENTS) {
+      const dir = this.resolveGlobalDir(agent);
+      const skills = await this.scanDirectory(dir, 'global');
+      for (const skill of skills) {
+        globalEntries.push({
+          skill,
+          agentDisplayName: agent.displayName,
+          isCanonical: agent.isCanonical === true,
+        });
+      }
+    }
+    const globalSkills = this.deduplicateAcrossAgents(globalEntries);
 
-    // Scan canonical dir first (all marketplace skills), then Claude dir (custom only)
-    const canonicalSkills = await this.scanDirectory(canonicalDir, 'global');
-    const claudeSkills = await this.scanDirectory(claudeDir, 'global');
-    const globalSkills = this.deduplicateGlobal(canonicalSkills, claudeSkills);
-
-    // Project scanning: canonical project dir + Claude project dir
+    // -- Project skills: scan all known agent project directories --
     const ws = vscode.workspace.workspaceFolders;
     const root = ws?.[0]?.uri.fsPath;
     let projectSkills: InstalledSkill[] = [];
     if (root) {
-      const projectCanonical = await this.scanDirectory(path.join(root, '.agents', 'skills'), 'project');
-      const projectClaude = await this.scanDirectory(path.join(root, '.claude', 'skills'), 'project');
-      projectSkills = this.deduplicateGlobal(projectCanonical, projectClaude);
+      const projectEntries: AgentScanEntry[] = [];
+      for (const agent of KNOWN_AGENTS) {
+        const dir = path.join(root, agent.skillsDir);
+        const skills = await this.scanDirectory(dir, 'project');
+        for (const skill of skills) {
+          projectEntries.push({
+            skill,
+            agentDisplayName: agent.displayName,
+            isCanonical: agent.isCanonical === true,
+          });
+        }
+      }
+      projectSkills = this.deduplicateAcrossAgents(projectEntries);
     }
 
     return { globalSkills, projectSkills };
   }
 
   /**
-   * Deduplicate skills found across canonical + Claude dirs.
-   * Prefer canonical entry. Only include Claude entries that aren't
-   * already present (those would be custom/manual skills).
+   * Deduplicate skills found across multiple agent directories.
+   * Same skill in multiple dirs → single entry with merged agents[].
+   * Canonical (~/.agents/skills/) entry is preferred for metadata.
    */
-  private deduplicateGlobal(
-    canonicalSkills: InstalledSkill[],
-    claudeSkills: InstalledSkill[],
-  ): InstalledSkill[] {
-    const map = new Map<string, InstalledSkill>();
+  private deduplicateAcrossAgents(entries: AgentScanEntry[]): InstalledSkill[] {
+    const map = new Map<string, {
+      skill: InstalledSkill;
+      agents: Set<string>;
+      hasCanonical: boolean;
+    }>();
 
-    // Add all canonical skills first (these are the source of truth)
-    for (const skill of canonicalSkills) {
-      map.set(skill.folderName, skill);
-    }
+    for (const { skill, agentDisplayName, isCanonical } of entries) {
+      const existing = map.get(skill.folderName);
 
-    // Add Claude skills only if not already present (these would be custom/manual)
-    for (const skill of claudeSkills) {
-      if (!map.has(skill.folderName)) {
-        map.set(skill.folderName, skill);
+      if (!existing) {
+        map.set(skill.folderName, {
+          skill: { ...skill, agents: [] },
+          agents: new Set([agentDisplayName]),
+          hasCanonical: isCanonical,
+        });
+      } else {
+        existing.agents.add(agentDisplayName);
+        // Prefer canonical entry for metadata (path, source, hash, etc.)
+        if (isCanonical && !existing.hasCanonical) {
+          existing.skill = { ...skill, agents: [] };
+          existing.hasCanonical = true;
+        }
       }
     }
 
-    return Array.from(map.values());
+    return Array.from(map.values()).map(({ skill, agents }) => ({
+      ...skill,
+      agents: Array.from(agents).sort(),
+    }));
   }
 
   private async scanDirectory(dir: string, scope: SkillScope): Promise<InstalledSkill[]> {
@@ -179,6 +208,7 @@ export class SkillScanner {
         hash: lockEntry?.skillFolderHash,
         skillPath: lockEntry?.skillPath,
         isCustom: !isSymlink && !lockEntry,
+        agents: [],
       });
     }
 
@@ -187,12 +217,9 @@ export class SkillScanner {
 
   getDiagnostics(): ScanDiagnostic {
     const issues: string[] = [];
-    const dirs = [
-      this.getCanonicalGlobalDir(),
-      this.getClaudeGlobalDir(),
-    ];
 
-    const globalDirs = dirs.map(dir => {
+    const globalDirs = KNOWN_AGENTS.map(agent => {
+      const dir = this.resolveGlobalDir(agent);
       const exists = fs.existsSync(dir);
       let skillCount = 0;
       if (exists) {
@@ -208,7 +235,7 @@ export class SkillScanner {
           issues.push(`Cannot read skills directory: ${dir}`);
         }
       }
-      return { path: dir, exists, skillCount };
+      return { path: dir, exists, skillCount, agent: agent.displayName };
     });
 
     if (!globalDirs.some(d => d.exists)) {

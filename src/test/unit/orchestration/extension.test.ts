@@ -148,6 +148,7 @@ function makeSkill(overrides: Partial<InstalledSkill> & { name: string }): Insta
     scope: 'global',
     metadata: {},
     isCustom: false,
+    agents: [],
     ...overrides,
   };
 }

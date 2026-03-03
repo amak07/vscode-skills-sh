@@ -2,6 +2,12 @@
 
 All notable changes to the Skills.sh Agent Skills Manager extension will be documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- **Multi-agent awareness** — scan skill directories for 11 AI coding agents (Claude Code, Cursor, Windsurf, GitHub Copilot, Codex, Roo Code, Gemini CLI, Trae, Kiro, Continue, and the canonical skills.sh directory). Skills found in multiple agent directories are deduplicated and show agent badges in the TreeView, webview installed tab, and skill detail page. All paths verified against the [skills.sh CLI source](https://github.com/vercel-labs/skills).
+
 ## [0.1.0] - 2026-02-25
 
 ### Added

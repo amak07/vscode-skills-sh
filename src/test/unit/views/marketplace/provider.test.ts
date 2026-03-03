@@ -156,6 +156,7 @@ function makeInstalledCard(overrides: Partial<InstalledSkillCard> & { name: stri
     hasUpdate: false,
     isCustom: false,
     inManifest: false,
+    agents: [],
     ...overrides,
   };
 }

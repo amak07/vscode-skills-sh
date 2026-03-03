@@ -44,6 +44,7 @@ export interface InstalledSkillData {
   isCustom?: boolean;
   hasUpdate?: boolean;
   inManifest?: boolean;
+  agents?: string[];
 }
 
 export interface DetailData {
@@ -60,6 +61,7 @@ export interface DetailData {
   githubStars?: string;
   firstSeen?: string;
   securityAudits?: { partner: string; status: string; url: string }[];
+  agents?: string[];
 }
 
 export interface AuditSkill {
@@ -190,6 +192,14 @@ export function renderInstalledRow(
       + '</button>';
   }
 
+  // Agent chips: filter out "skills.sh" (canonical), show when 2+ agents
+  const agentNames = (skill.agents || []).filter(function (a) { return a !== 'skills.sh'; });
+  const agentChipsHtml = agentNames.length >= 2
+    ? '<div class="row-agents">' + agentNames.map(function (a) {
+        return '<span class="agent-chip">' + escapeHtml(a) + '</span>';
+      }).join('') + '</div>'
+    : '';
+
   return '<div class="grid-row installed-row"'
     + (source ? ' data-source="' + source + '" data-skill="' + escapeHtml(skill.folderName) + '"' : '')
     + '>'
@@ -198,6 +208,7 @@ export function renderInstalledRow(
     + ' <span class="scope-badge scope-' + scopeLabel + '">' + scopeLabel + '</span>'
     + '</div>'
     + '<div class="row-source">' + (desc ? escapeHtml(desc) : (source ? escapeHtml(source) : 'Custom skill')) + '</div>'
+    + agentChipsHtml
     + '</div>'
     + '<div class="row-actions">'
     + manifestBtn
@@ -319,8 +330,16 @@ export function renderDetailHtml(detail: DetailData): string {
     + '<div class="sidebar-section"><div class="sidebar-label">First Seen</div>'
     + '<div class="sidebar-value">' + (detail.firstSeen || 'N/A') + '</div></div>'
     + securitySection
-    + (agentRows ? '<div class="sidebar-section"><div class="sidebar-label">Installed On</div>'
+    + (agentRows ? '<div class="sidebar-section"><div class="sidebar-label">Installs by Agent</div>'
       + '<div class="agent-table">' + agentRows + '</div></div>' : '')
+    + (function () {
+        var localAgents = (detail.agents || []).filter(function (a) { return a !== 'skills.sh'; });
+        if (localAgents.length === 0) { return ''; }
+        return '<div class="sidebar-section"><div class="sidebar-label">Installed In</div>'
+          + '<div class="row-agents">' + localAgents.map(function (a) {
+              return '<span class="agent-chip">' + escapeHtml(a) + '</span>';
+            }).join('') + '</div></div>';
+      })()
     + '</aside></div></div>';
 }
 

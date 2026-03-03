@@ -98,17 +98,6 @@ export interface DocsContent {
 
 export type SkillScope = 'global' | 'project';
 
-export interface AgentConfig {
-  id: string;
-  displayName: string;
-  globalDir: string;
-  projectDir: string;
-}
-
-// KNOWN_AGENTS removed in Part 6 — scanner now uses canonical dirs directly.
-// Kept AgentConfig type above for potential future use.
-// See: ~/.agents/skills/ (all marketplace skills) + ~/.claude/skills/ (custom skills)
-
 export interface InstalledSkill {
   name: string;
   folderName: string;
@@ -120,6 +109,7 @@ export interface InstalledSkill {
   hash?: string;
   skillPath?: string; // e.g. "skills/react-email/SKILL.md" — from lock file
   isCustom: boolean; // true = regular directory (user-created), false = symlink (marketplace)
+  agents: string[]; // display names of agents that have this skill (e.g. ["Claude Code", "Cursor"])
 }
 
 export interface ScanResult {
@@ -207,4 +197,5 @@ export interface InstalledSkillCard {
   hasUpdate: boolean;
   isCustom: boolean;
   inManifest: boolean;
+  agents: string[];
 }

@@ -47,6 +47,7 @@
 ### Installed Skills
 
 - TreeView showing all installed skills grouped by source repository
+- **Multi-agent awareness** — see which AI tools have each skill (Claude Code, Cursor, Windsurf, etc.)
 - Global (`~/.agents/skills/`) and project-level (`.claude/skills/`) scopes
 - "My Skills" group for locally-authored custom skills
 - SKILL.md preview (rendered Markdown) and raw file viewing
@@ -105,16 +106,24 @@ This extension is VSIX-based and works with any compatible editor:
 - **VSCodium** (via Open VSX)
 - **Theia**
 
-Skills are scanned from these directories:
+The extension scans skill directories for 11 AI coding agents (paths verified against the [skills.sh CLI source](https://github.com/vercel-labs/skills)):
 
-| Directory | Scope |
+| Directory | Agent |
 |-----------|-------|
-| `~/.agents/skills/` | Global (marketplace installs) |
-| `~/.claude/skills/` | Global (Claude Code custom skills) |
-| `~/.cursor/skills/` | Global (Cursor skills) |
-| `~/.codeium/windsurf/skills/` | Global (Windsurf skills) |
-| `~/.codex/skills/` | Global (Codex skills) |
+| `~/.agents/skills/` | skills.sh (canonical) |
+| `~/.claude/skills/` | Claude Code |
+| `~/.cursor/skills/` | Cursor |
+| `~/.codeium/windsurf/skills/` | Windsurf |
+| `~/.copilot/skills/` | GitHub Copilot |
+| `~/.codex/skills/` | Codex |
+| `~/.roo/skills/` | Roo Code |
+| `~/.gemini/skills/` | Gemini CLI |
+| `~/.trae/skills/` | Trae |
+| `~/.kiro/skills/` | Kiro |
+| `~/.continue/skills/` | Continue |
 | `.claude/skills/` | Project-level (team-shared via git) |
+
+Skills found in multiple agent directories are deduplicated and show agent badges in the sidebar.
 
 ## Installation
 

@@ -77,6 +77,96 @@ Both secrets are configured at: https://github.com/amak07/vscode-skills-sh/setti
 
 `.github/workflows/ci.yml` runs on every push/PR to master: Node 18+20 matrix, `npm ci && npm test && npm run build`, then packages VSIX artifact.
 
+## Commands
+
+- `npm.cmd run build` — Production build (esbuild)
+- `npm.cmd test` — Vitest (single run)
+- `npm.cmd run lint` — ESLint
+- `npx.cmd vsce package --no-dependencies` — Package VSIX
+
+## Architecture
+
+- **src/ directory:** All source code under `src/`
+- **Entry point:** `src/extension.ts` — activation, command registration, provider wiring
+- **Local scanning:** `src/local/scanner.ts` — multi-agent skill directory scanner
+- **Known agents:** `src/local/known-agents.ts` — static registry of 11 AI agent skill paths
+- **Install/uninstall:** `src/install/installer.ts` — delegates to `npx skills add/remove`
+- **TreeView:** `src/views/installed-tree.ts` — sidebar tree with source grouping + agent badges
+- **Webview:** `src/views/marketplace/` — search, detail pages, installed tab (provider.ts, webview-script.ts, styles.ts, templates.ts)
+- **API clients:** `src/api/` — skills.sh search, GitHub Trees, update checker, security audits, docs scraper
+- **Types:** `src/types.ts` — shared interfaces (InstalledSkill, InstalledSkillCard, etc.)
+- **Constants:** `src/utils/constants.ts` — URLs, cache TTLs, path helpers
+- **Tests:** `src/test/unit/` — mirrors src/ structure, uses `src/test/helpers/fs-sandbox.ts` for temp dirs
+
+## Beads Task Management
+
+Tasks persist across sessions in `.beads/`. Run at session start:
+
+```bash
+bd ready                                  # See pending tasks
+bd create --title="..." --type=task       # Create task
+bd update <id> --status=in_progress       # Start working
+bd close <id> --reason="done"             # Complete task
+```
+
+**Issue Quality:** Every beads issue MUST have a meaningful description at creation time. Include what needs to be done, why it matters, and technical notes if relevant.
+
+## Testing Rules
+
+- **No sneaky implementation changes**: When writing tests, do NOT modify production code to make tests easier to write or pass. Tests must work against the current codebase as-is.
+- **HARD STOP on production code changes**: If a test failure reveals a bug in production code, STOP — show the user what broke and wait for explicit approval before touching any production file.
+- **Do not modify existing test files** unless the user has approved the change.
+
+## Landing the Plane (Session Completion)
+
+Work is NOT complete until changes are committed, pushed, and CI passes.
+
+### 0. Code review (before committing)
+
+Use `superpowers:requesting-code-review` to launch a review subagent. Fix all Critical and Important issues before proceeding.
+
+### 1. Run quality gates
+
+```bash
+npm.cmd test          # Unit tests
+npm.cmd run build     # Build
+```
+
+### 2. Commit, push, and open PR
+
+```bash
+git add <files>
+git commit -m "..."
+git push -u origin <branch>
+gh pr create --title "..." --body "..."
+```
+
+### 3. Monitor PR until merged
+
+1. Wait for CI, then check: `gh pr checks <pr-number>`
+2. If CI fails: investigate, fix, push again, repeat
+3. Report status to the user — never leave a PR in limbo
+
+### 4. Release (if publishing a new version)
+
+1. Update `CHANGELOG.md`: rename `[Unreleased]` → `[x.y.z] - YYYY-MM-DD`
+2. Bump version and create tag:
+   ```bash
+   npm.cmd version patch   # or minor/major — bumps package.json, creates git commit + tag
+   ```
+3. Push to GitHub:
+   ```bash
+   git push origin master --tags
+   ```
+4. CI builds, tests, and publishes to **both** marketplaces automatically
+
+The `[Unreleased]` section in CHANGELOG.md is where new features/fixes accumulate between releases. Always add entries there as work is completed, then rename to the version number at publish time.
+
+**Critical rules:**
+- NEVER stop before the PR is merged
+- NEVER say "ready to push when you are" — YOU must push and open the PR
+- If CI fails, resolve and retry until it passes
+
 ## Windows MINGW64
 
 Use `npm.cmd` not `npm`, `npx.cmd` not `npx` when running commands via Claude Code's Bash tool (MINGW64 shell wrapper issue). The VS Code integrated terminal resolves these correctly on its own — this only applies to Claude's Bash tool.
