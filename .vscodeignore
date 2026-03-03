@@ -13,7 +13,8 @@ vitest.config.*
 CLAUDE.md
 AGENTS.md
 .gitattributes
+.github/**
 **/*.map
 **/*.ts
 **/*.vsix
-!dist/**
+!dist/*.js
