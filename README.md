@@ -23,7 +23,7 @@
 </p>
 
 <p align="center">
-  Works with <strong>VS Code</strong> · <strong>Cursor</strong> · <strong>Windsurf</strong> · <strong>VSCodium</strong> · any VSIX-compatible editor
+  Works with <strong>VS Code</strong> · <strong>Cursor</strong> · <strong>Windsurf</strong> · <strong>Antigravity</strong> · <strong>VSCodium</strong> · any VSIX-compatible editor
 </p>
 
 <!-- TODO: Add screenshots — capture these from the running extension:
