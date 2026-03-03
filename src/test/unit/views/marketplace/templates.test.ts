@@ -78,13 +78,17 @@ describe('renderHero', () => {
     expect(html).toContain('hero-ascii');
   });
 
-  it('includes the agent badges', () => {
+  it('includes the agent logo carousel', () => {
     const html = renderHero();
-    expect(html).toContain('claude-code');
-    expect(html).toContain('cursor');
-    expect(html).toContain('copilot');
-    expect(html).toContain('windsurf');
-    expect(html).toContain('gemini-cli');
+    expect(html).toContain('hero-agents-carousel');
+    expect(html).toContain('carousel-track');
+    expect(html).toContain('carousel-item');
+    // Check for agent display names in title attributes
+    expect(html).toContain('title="Claude Code"');
+    expect(html).toContain('title="Cursor"');
+    expect(html).toContain('title="GitHub Copilot"');
+    expect(html).toContain('title="Windsurf"');
+    expect(html).toContain('title="Gemini CLI"');
   });
 
   it('includes the "Try It Now" command section', () => {
@@ -106,15 +110,21 @@ describe('renderHero', () => {
     expect(html).toContain('copy-icon');
   });
 
-  it('renders all listed agents as hero-agent-badge elements', () => {
+  it('renders SVG logos for all agents with duplication for infinite scroll', () => {
     const html = renderHero();
-    const expectedAgents = [
-      'claude-code', 'cursor', 'copilot', 'codex', 'windsurf',
-      'gemini-cli', 'opencode', 'roo', 'cline', 'amp',
-      'goose', 'kiro-cli', 'trae', 'vscode',
+    // 16 agents × 2 (duplicated for seamless loop) = 32 carousel items
+    const itemCount = (html.match(/class="carousel-item"/g) || []).length;
+    expect(itemCount).toBe(32);
+    // Each item should contain an SVG
+    expect(html).toContain('<svg');
+    // Check all agent display names appear in title attributes
+    const expectedNames = [
+      'Claude Code', 'Cursor', 'GitHub Copilot', 'Codex', 'Windsurf',
+      'Gemini CLI', 'OpenCode', 'Roo Code', 'Cline', 'Amp',
+      'Goose', 'Kiro CLI', 'Trae', 'VS Code', 'Antigravity', 'Kilo',
     ];
-    for (const agent of expectedAgents) {
-      expect(html).toContain(`<span class="hero-agent-badge">${agent}</span>`);
+    for (const name of expectedNames) {
+      expect(html).toContain(`title="${name}"`);
     }
   });
 });

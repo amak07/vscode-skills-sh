@@ -1,3 +1,5 @@
+import { AGENT_LOGOS, HERO_AGENT_SLUGS } from './agent-logos';
+
 const searchIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>`;
 const clearIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>`;
 export const backIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>`;
@@ -18,12 +20,6 @@ const SKILLS_ASCII = `███████╗██╗  ██╗██╗█�
 ███████║██║  ██╗██║███████╗███████╗███████║
 ╚══════╝╚═╝  ╚═╝╚═╝╚══════╝╚══════╝╚══════╝`;
 
-const HERO_AGENTS = [
-  'claude-code', 'cursor', 'copilot', 'codex', 'windsurf',
-  'gemini-cli', 'opencode', 'roo', 'cline', 'amp',
-  'goose', 'kiro-cli', 'trae', 'vscode',
-];
-
 const shieldIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
 const bookOpenIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`;
 
@@ -40,9 +36,20 @@ export function renderNavBar(): string {
 }
 
 export function renderHero(): string {
-  const agentBadges = HERO_AGENTS
-    .map(a => `<span class="hero-agent-badge">${a}</span>`)
+  const makeItems = (suffix: string) => HERO_AGENT_SLUGS
+    .filter(slug => AGENT_LOGOS[slug])
+    .map(slug => {
+      const { displayName, svg } = AGENT_LOGOS[slug];
+      // Suffix internal SVG IDs to avoid collisions when items are duplicated
+      const uniqueSvg = svg
+        .replace(/id="([^"]+)"/g, `id="$1-${suffix}"`)
+        .replace(/url\(#([^)]+)\)/g, `url(#$1-${suffix})`);
+      return `<div class="carousel-item" title="${displayName}">${uniqueSvg}</div>`;
+    })
     .join('');
+
+  // Items are duplicated for seamless infinite scroll loop
+  const carouselTrack = `<div class="carousel-track">${makeItems('a')}${makeItems('b')}</div>`;
 
   return `
     <div class="hero">
@@ -55,20 +62,22 @@ export function renderHero(): string {
           Skills are reusable capabilities for AI agents. Install them with a single command to enhance your agents with access to procedural knowledge.
         </div>
       </div>
-      <div class="hero-try">
-        <div class="hero-try-label">Try It Now</div>
-        <div class="hero-cmd" id="heroCopyCmd">
-          <span class="dollar">$</span>
-          <span class="hero-cmd-static">npx skills</span>
-          <span class="hero-cmd-carousel" id="heroCmdCarousel">
-            <span class="hero-cmd-item active">add &lt;owner/repo&gt;</span>
-          </span>
-          <span class="copy-icon" id="heroCopyIcon" title="Copy to clipboard">${copyIcon}</span>
+      <div class="hero-bottom-grid">
+        <div class="hero-try">
+          <div class="hero-try-label">Try It Now</div>
+          <div class="hero-cmd" id="heroCopyCmd">
+            <span class="dollar">$</span>
+            <span class="hero-cmd-static">npx skills</span>
+            <span class="hero-cmd-carousel" id="heroCmdCarousel">
+              <span class="hero-cmd-item active">add &lt;owner/repo&gt;</span>
+            </span>
+            <span class="copy-icon" id="heroCopyIcon" title="Copy to clipboard">${copyIcon}</span>
+          </div>
         </div>
-      </div>
-      <div class="hero-agents-section">
-        <div class="hero-agents-label">Available For These Agents</div>
-        <div class="hero-agents">${agentBadges}</div>
+        <div class="hero-agents-section">
+          <div class="hero-agents-label">Available For These Agents</div>
+          <div class="hero-agents-carousel">${carouselTrack}</div>
+        </div>
       </div>
     </div>
     <div class="hero-leaderboard-heading">Skills Leaderboard</div>`;

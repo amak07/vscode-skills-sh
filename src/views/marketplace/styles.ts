@@ -743,8 +743,20 @@ export function getStyles(fontUri: string): string {
       color: var(--gray-600);
       text-wrap: balance;
     }
+    .hero-bottom-grid {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+    @media (max-width: 600px) {
+      .hero-bottom-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+    }
     .hero-try {
-      margin-bottom: 3rem;
+      margin-bottom: 0;
     }
     .hero-try-label {
       font-family: var(--font-mono);
@@ -821,20 +833,60 @@ export function getStyles(fontUri: string): string {
       color: var(--gray-1000);
       margin-bottom: 0.875rem;
     }
-    .hero-agents {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.375rem;
-      align-items: center;
+    /* === Agent Logo Carousel === */
+    .hero-agents-carousel {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      -webkit-mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        black 8%,
+        black 92%,
+        transparent 100%
+      );
+      mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        black 8%,
+        black 92%,
+        transparent 100%
+      );
     }
-    .hero-agent-badge {
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      color: var(--gray-600);
-      padding: 0.25rem 0.5rem;
-      border: 1px solid var(--gray-200);
-      border-radius: var(--radius-sm);
-      white-space: nowrap;
+    .carousel-track {
+      display: flex;
+      gap: 2rem;
+      animation: carousel-scroll 60s linear infinite;
+      width: max-content;
+    }
+    .carousel-item {
+      flex-shrink: 0;
+      width: 64px;
+      height: 64px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      cursor: default;
+      transition: transform 150ms ease;
+    }
+    .carousel-item:hover {
+      transform: scale(1.15);
+    }
+    .carousel-item svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    @keyframes carousel-scroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .hero-agents-carousel:hover .carousel-track {
+      animation-play-state: paused;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .carousel-track {
+        animation: none;
+      }
     }
     .hero-leaderboard-heading {
       font-family: var(--font-mono);
