@@ -2,7 +2,7 @@
   "name": "skills-sh",
   "displayName": "Skills.sh — Agent Skills Manager",
   "description": "The skills.sh client — browse, install, and manage AI agent skills for Claude Code, Cursor, Copilot, Windsurf, and Codex",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
   "publisher": "AbelMak",
   "engines": {
@@ -195,19 +195,58 @@
     ],
     "menus": {
       "commandPalette": [
-        { "command": "skills-sh.openSkillFile", "when": "false" },
-        { "command": "skills-sh.uninstallSkill", "when": "false" },
-        { "command": "skills-sh.copySkillPath", "when": "false" },
-        { "command": "skills-sh.previewSkillFile", "when": "false" },
-        { "command": "skills-sh.launchClaudeWithSkill", "when": "false" },
-        { "command": "skills-sh.updateSingleSkill", "when": "false" },
-        { "command": "skills-sh.updateAllSkills", "when": "false" },
-        { "command": "skills-sh.addToManifest", "when": "false" },
-        { "command": "skills-sh.removeFromManifest", "when": "false" },
-        { "command": "skills-sh.openMarketplaceTab", "when": "false" },
-        { "command": "skills-sh.openAudits", "when": "false" },
-        { "command": "skills-sh.openDocs", "when": "false" },
-        { "command": "skills-sh.viewInstalledInEditor", "when": "false" }
+        {
+          "command": "skills-sh.openSkillFile",
+          "when": "false"
+        },
+        {
+          "command": "skills-sh.uninstallSkill",
+          "when": "false"
+        },
+        {
+          "command": "skills-sh.copySkillPath",
+          "when": "false"
+        },
+        {
+          "command": "skills-sh.previewSkillFile",
+          "when": "false"
+        },
+        {
+          "command": "skills-sh.launchClaudeWithSkill",
+          "when": "false"
+        },
+        {
+          "command": "skills-sh.updateSingleSkill",
+          "when": "false"
+        },
+        {
+          "command": "skills-sh.updateAllSkills",
+          "when": "false"
+        },
+        {
+          "command": "skills-sh.addToManifest",
+          "when": "false"
+        },
+        {
+          "command": "skills-sh.removeFromManifest",
+          "when": "false"
+        },
+        {
+          "command": "skills-sh.openMarketplaceTab",
+          "when": "false"
+        },
+        {
+          "command": "skills-sh.openAudits",
+          "when": "false"
+        },
+        {
+          "command": "skills-sh.openDocs",
+          "when": "false"
+        },
+        {
+          "command": "skills-sh.viewInstalledInEditor",
+          "when": "false"
+        }
       ],
       "view/title": [
         {
