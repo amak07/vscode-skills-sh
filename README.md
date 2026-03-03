@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="https://marketplace.visualstudio.com/items?itemName=AbelMak.skills-sh"><img src="https://img.shields.io/visual-studio-marketplace/v/AbelMak.skills-sh?label=VS%20Code%20Marketplace" alt="VS Code Marketplace" /></a>
-  <a href="https://open-vsx.org/extension/AbelMak/skills-sh"><img src="https://img.shields.io/open-vsx/v/skills-sh/skills-sh?label=Open%20VSX" alt="Open VSX" /></a>
+  <a href="https://open-vsx.org/extension/AbelMak/skills-sh"><img src="https://img.shields.io/open-vsx/v/AbelMak/skills-sh?label=Open%20VSX" alt="Open VSX" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT" /></a>
 </p>
 
