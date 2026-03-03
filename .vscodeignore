@@ -11,6 +11,8 @@ vitest.config.*
 .eslintrc*
 .prettierrc*
 CLAUDE.md
+AGENTS.md
+.gitattributes
 **/*.map
 **/*.ts
 **/*.vsix

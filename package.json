@@ -1,34 +1,55 @@
 {
   "name": "skills-sh",
   "displayName": "Skills.sh — Agent Skills Manager",
-  "description": "Browse, install, and manage Agent Skills from skills.sh for Claude Code, Cursor, Copilot, and more",
+  "description": "The skills.sh client — browse, install, and manage AI agent skills for Claude Code, Cursor, Copilot, Windsurf, and Codex",
   "version": "0.1.0",
   "license": "MIT",
-  "publisher": "skills-sh",
+  "publisher": "AbelMak",
   "engines": {
     "vscode": "^1.93.0"
   },
   "categories": [
     "Machine Learning",
+    "Snippets",
+    "Education",
     "Other"
   ],
   "keywords": [
+    "skills.sh",
     "agent skills",
+    "ai",
     "claude",
+    "claude code",
     "cursor",
     "copilot",
-    "skills.sh",
-    "ai",
-    "mcp"
+    "windsurf",
+    "codex",
+    "mcp",
+    "ai agent",
+    "ai skills",
+    "ai assistant",
+    "prompt",
+    "prompt engineering",
+    "skills manager",
+    "skills marketplace",
+    "agent",
+    "llm",
+    "anthropic",
+    "ai tools"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/skills-sh/vscode-extension"
+    "url": "https://github.com/amak07/vscode-skills-sh"
   },
   "icon": "media/icon.png",
-  "activationEvents": [
-    "onView:skills-sh.installedSkills"
-  ],
+  "galleryBanner": {
+    "color": "#0a0a0a",
+    "theme": "dark"
+  },
+  "homepage": "https://skills.sh",
+  "bugs": {
+    "url": "https://github.com/amak07/vscode-skills-sh/issues"
+  },
   "main": "./dist/extension.js",
   "contributes": {
     "viewsContainers": {
