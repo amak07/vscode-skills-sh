@@ -210,6 +210,10 @@ The skills.sh API endpoint checks a repo's default branch for the latest hash, b
 - [Node.js](https://nodejs.org/) 18+
 - [skills.sh CLI](https://skills.sh) (`npx skills`) for install and uninstall operations
 
+## Roadmap
+
+See [ROADMAP.md](ROADMAP.md) for planned features, priorities, and what's been recently completed or dropped.
+
 ## Contributing
 
 Found a bug or have a feature request? [Open an issue](https://github.com/amak07/vscode-skills-sh/issues) on GitHub.
@@ -219,6 +223,7 @@ Found a bug or have a feature request? [Open an issue](https://github.com/amak07
 - [skills.sh](https://skills.sh) — Agent Skills marketplace
 - [GitHub Repository](https://github.com/amak07/vscode-skills-sh)
 - [Issue Tracker](https://github.com/amak07/vscode-skills-sh/issues)
+- [Roadmap](ROADMAP.md)
 
 ## License
 
