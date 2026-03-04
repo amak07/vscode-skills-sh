@@ -98,6 +98,36 @@ Both secrets are configured at: https://github.com/amak07/vscode-skills-sh/setti
 - **Constants:** `src/utils/constants.ts` — URLs, cache TTLs, path helpers
 - **Tests:** `src/test/unit/` — mirrors src/ structure, uses `src/test/helpers/fs-sandbox.ts` for temp dirs
 
+## Architecture Diagrams
+
+Excalidraw source files live in `docs/architecture/`. CI auto-exports to SVG for README embedding.
+
+### Best Practices (Interview-Ready Diagrams)
+- **One concept per diagram** — don't cram everything into a god diagram
+- **Annotate decisions, not just boxes** — interviewers care about WHY, not just WHAT
+- **Color-code by concern** (consistent across all diagrams):
+  - Blue: Extension internals
+  - Green: External APIs/services
+  - Orange: Filesystem/local
+  - Purple: Terminal/CLI
+  - Red: Error paths/fallbacks
+- **Layered detail** — scannable for PMs ("what it does"), deep enough for engineers ("how and why")
+- **Keep text minimal** — labels and short annotations, not paragraphs
+- **Number diagrams** for presentation order (01-, 02-, etc.)
+
+### Editing
+- Install the VS Code Excalidraw extension for in-editor editing
+- CI exports `.excalidraw` → `.svg` automatically on push (`.github/workflows/export-diagrams.yml`)
+- Local export: `npm.cmd run export-diagrams`
+- README references the SVGs (not the source files)
+
+### Adding a New Diagram
+1. Create `docs/architecture/NN-name.excalidraw`
+2. Follow the color coding convention above
+3. Add 2-3 decision annotations (italic callouts explaining trade-offs)
+4. Push — CI will generate the SVG
+5. Add `![Name](docs/architecture/NN-name.svg)` to README
+
 ## Beads Task Management
 
 Tasks persist across sessions in `.beads/`. Run at session start:

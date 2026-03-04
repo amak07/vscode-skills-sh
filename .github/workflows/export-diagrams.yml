@@ -1,0 +1,40 @@
+name: Export Diagrams
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'docs/architecture/*.excalidraw'
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    # Skip if this push was made by the bot itself
+    if: github.actor != 'github-actions[bot]'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Export Excalidraw to SVG
+        run: |
+          for f in docs/architecture/*.excalidraw; do
+            [ -f "$f" ] || continue
+            npx -y excalidraw-to-svg "$f" docs/architecture/
+          done
+
+      - name: Check for changes
+        id: diff
+        run: |
+          git diff --quiet docs/architecture/*.svg 2>/dev/null && echo "changed=false" >> "$GITHUB_OUTPUT" || echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Commit SVGs
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/architecture/*.svg
+          git commit -m "chore: auto-export architecture diagrams to SVG [skip ci]"
+          git push
