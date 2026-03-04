@@ -188,7 +188,7 @@ Additional commands are available from the TreeView context menu (right-click an
 
 ## Architecture
 
-See [Architecture Documentation](docs/architecture/architecture.md) for detailed diagrams covering the system overview, install flow, multi-agent scanning, webview communication, and CI/CD pipeline.
+See [Architecture Documentation](docs/architecture/architecture.md) for detailed diagrams covering the system context, install flow, multi-agent scanning, and webview communication.
 
 ## Known Issues
 

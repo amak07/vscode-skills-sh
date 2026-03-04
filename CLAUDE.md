@@ -102,60 +102,44 @@ Both secrets are configured at: https://github.com/amak07/vscode-skills-sh/setti
 
 Excalidraw source files live in `docs/architecture/`. The rendered documentation is in [`docs/architecture/architecture.md`](docs/architecture/architecture.md). CI auto-exports `.excalidraw` → `.svg` on push to master.
 
+### Current Diagrams (4)
+| # | Title | Question |
+|---|-------|----------|
+| 01 | System Context | What does this extension talk to? |
+| 02 | Install Flow | How does the extension know when a terminal install finishes? |
+| 03 | Multi-Agent Scanning | How does scanning work across 11 agents with symlinks? |
+| 04 | Webview Communication | How do two isolated JS contexts coordinate securely? |
+
 ### Best Practices (Interview-Ready Diagrams)
-- **One concept per diagram** — don't cram everything into a god diagram
+- **One concept per diagram** — each answers ONE question with 2-3 decision annotations
 - **Annotate decisions, not just boxes** — interviewers care about WHY, not just WHAT
 - **Color-code by concern** (consistent across all diagrams):
-  - Blue: Extension internals
-  - Green: External APIs/services
-  - Orange: Filesystem/local
-  - Purple: Terminal/CLI
-  - Red: Error paths/fallbacks
+  - Blue (`#a5d8ff` / `#1971c2`): Extension internals
+  - Green (`#b2f2bb` / `#2f9e44`): External APIs/services
+  - Orange (`#ffd8a8` / `#e8590c`): Filesystem/local
+  - Purple (`#eebefa` / `#7048e8`): Terminal/CLI
+  - Red (`#ffc9c9` / `#e03131`): Error paths / security
+  - Yellow (`#fff3bf` / `#e8590c`): Decision annotations
 - **Layered detail** — scannable for PMs ("what it does"), deep enough for engineers ("how and why")
 - **Keep text minimal** — labels and short annotations, not paragraphs
 - **Number diagrams** for presentation order (01-, 02-, etc.)
-- **Font**: Helvetica (fontFamily 2) — not Virgil (hand-drawn). Diagrams are ~1700px wide but render at ~800px in GitHub README. Hand-drawn font becomes illegible at that scale.
-- **Min font size**: 16px for annotations, 20px for labels, 24-32px for titles/section headers
+- **Font**: Excalifont (fontFamily 5) — clean, hand-crafted look. All shapes use `roughness: 0` (clean edges) and `roundness: { type: 3 }` (rounded corners).
+- **Min font size**: 14px for annotations, 18px for labels, 28px for titles
 
 ### Editing with Excalidraw MCP
 
-We use the [yctimlin/mcp_excalidraw](https://github.com/yctimlin/mcp_excalidraw) MCP server for visual diagram editing. This provides a closed feedback loop: import → screenshot → adjust → screenshot → export.
+Diagrams are edited via the Excalidraw MCP server (registered at user scope). Workflow:
+1. `import_scene` — load an `.excalidraw` file onto the canvas
+2. `get_canvas_screenshot` / `describe_scene` — assess current state
+3. `batch_create_elements` / `update_element` — make changes (use custom IDs for arrow binding)
+4. `get_canvas_screenshot` — verify fixes visually
+5. `export_scene` — save back to `.excalidraw` file
 
-**Why not the official Excalidraw MCP?** The [official one](https://github.com/excalidraw/excalidraw-mcp) is generation-only (streams new diagrams from prompts). It has no `import_scene`, `get_canvas_screenshot`, or `update_element` — useless for editing existing diagrams.
-
-**Setup (already done, persisted at user scope):**
-```bash
-# Canvas server lives at ~/Projects/mcp_excalidraw (cloned + built)
-# MCP registered with Claude Code:
-claude mcp add excalidraw --scope user \
-  -e EXPRESS_SERVER_URL=http://localhost:3777 \
-  -e ENABLE_CANVAS_SYNC=true \
-  -- node /c/Users/abelm/Projects/mcp_excalidraw/dist/index.js
-```
-
-**Before editing diagrams, start the canvas server:**
-```bash
-cd ~/Projects/mcp_excalidraw
-HOST=0.0.0.0 PORT=3777 node dist/server.js
-# Then open http://localhost:3777 in a browser (required for screenshots)
-```
-
-**Workflow for editing a diagram:**
-1. `clear_canvas` → `import_scene` (load the `.excalidraw` file)
-2. `get_canvas_screenshot` → assess current state
-3. `describe_scene` → get structured element IDs and positions
-4. `update_element` / `align_elements` / `distribute_elements` → make changes
-5. `get_canvas_screenshot` → verify fixes visually
-6. `export_scene` → save back to `.excalidraw` file
-7. `export_to_image(format: svg)` → export `.svg` for docs
-
-**Key MCP tools:**
-- `import_scene` / `export_scene` — load/save `.excalidraw` files
-- `get_canvas_screenshot` — visual verification (requires browser open)
-- `describe_scene` — structured list of all elements with IDs, positions, text
-- `update_element` — modify individual element properties (position, font, color)
-- `align_elements` / `distribute_elements` — layout helpers
-- `export_to_image` — export to SVG or PNG
+**Design spec for all elements:**
+- `fontFamily: 5` (Excalifont), `roughness: 0` (clean edges), `strokeWidth: 2`
+- Rectangles: `roundness: { type: 3 }` (rounded corners)
+- Arrows: always bind with `startElementId` / `endElementId` for auto-routing
+- Arrow labels: set as the arrow's `text` property (bound, not floating)
 
 ### SVG Export Pipeline
 

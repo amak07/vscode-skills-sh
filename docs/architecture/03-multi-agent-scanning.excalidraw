@@ -4,1671 +4,844 @@
   "source": "mcp-excalidraw-server",
   "elements": [
     {
-      "id": "callout-bg-90036",
-      "type": "rectangle",
-      "x": -75.71984126984128,
-      "y": 1164.2718253968253,
-      "width": 120.80000000000001,
-      "height": 44,
-      "backgroundColor": "#fff9db",
-      "strokeColor": "#ced4da",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [
-        "grp-27"
-      ],
-      "locked": false,
-      "roundness": {
-        "type": 3
-      },
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:35.062Z",
-      "version": 1
-    },
-    {
-      "id": "callout-bg-90039",
-      "type": "rectangle",
-      "x": 297.73015873015873,
-      "y": 1051.7718253968255,
-      "width": 358.40000000000003,
-      "height": 84,
-      "backgroundColor": "#fff9db",
-      "strokeColor": "#ced4da",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [
-        "grp-28"
-      ],
-      "locked": false,
-      "roundness": {
-        "type": 3
-      },
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:35.062Z",
-      "version": 1
-    },
-    {
-      "id": "callout-bg-90042",
-      "type": "rectangle",
-      "x": 1187.1301587301587,
-      "y": 548.0218253968254,
-      "width": 173.60000000000002,
-      "height": 64,
-      "backgroundColor": "#fff9db",
-      "strokeColor": "#ced4da",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [
-        "grp-29"
-      ],
-      "locked": false,
-      "roundness": {
-        "type": 3
-      },
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:35.062Z",
-      "version": 1
-    },
-    {
-      "id": "callout-bg-90045",
-      "type": "rectangle",
-      "x": 1187.1301587301587,
-      "y": 548.0218253968254,
-      "width": 173.60000000000002,
-      "height": 64,
-      "backgroundColor": "#fff9db",
-      "strokeColor": "#ced4da",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [
-        "grp-30"
-      ],
-      "locked": false,
-      "roundness": {
-        "type": 3
-      },
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:35.062Z",
-      "version": 1
-    },
-    {
-      "id": "callout-bg-90048",
-      "type": "rectangle",
-      "x": 722,
-      "y": 860,
-      "width": 330,
-      "height": 104,
-      "backgroundColor": "#fff9db",
-      "strokeColor": "#ced4da",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [
-        "grp-31"
-      ],
-      "locked": false,
-      "roundness": {
-        "type": 3
-      },
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:35.062Z",
-      "version": 1
-    },
-    {
-      "id": "callout-bg-90051",
-      "type": "rectangle",
-      "x": 694,
-      "y": 1000,
-      "width": 332,
-      "height": 84,
-      "backgroundColor": "#fff9db",
-      "strokeColor": "#ced4da",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [
-        "grp-32"
-      ],
-      "locked": false,
-      "roundness": {
-        "type": 3
-      },
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:35.062Z",
-      "version": 1
-    },
-    {
-      "id": "title-main",
+      "id": "d3-title",
       "type": "text",
-      "x": -77.06984126984128,
-      "y": -85.10317460317461,
-      "width": 340,
-      "height": 35,
-      "backgroundColor": "transparent",
-      "strokeColor": "#1971c2",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
+      "x": 40,
+      "y": 20,
+      "strokeColor": "#1e1e1e",
       "text": "Multi-Agent Scanning",
-      "fontSize": 32,
-      "fontFamily": 2,
-      "groupIds": [],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:42.847Z",
-      "version": 2
-    },
-    {
-      "id": "title-sub",
-      "type": "text",
-      "x": -79.56984126984128,
-      "y": -43.22817460317461,
-      "width": 320,
-      "height": 20,
-      "backgroundColor": "transparent",
-      "strokeColor": "#868e96",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "One extension, 11 agent ecosystems",
-      "fontSize": 20,
-      "fontFamily": 2,
-      "groupIds": [],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:43.713Z",
-      "version": 2
-    },
-    {
-      "id": "dir-agents",
-      "type": "rectangle",
-      "x": -82.06984126984128,
-      "y": 45.52182539682539,
-      "width": 200,
-      "height": 80,
-      "backgroundColor": "#ffe8cc",
-      "strokeColor": "#e8590c",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [
-        "grp-37"
-      ],
-      "locked": false,
-      "roundness": {
-        "type": 3
-      },
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:35.062Z",
+      "fontSize": 28,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T20:17:14.431Z",
+      "updatedAt": "2026-03-04T20:17:14.431Z",
       "version": 1
     },
     {
-      "id": "dir-agents-text",
+      "id": "d3-subtitle",
       "type": "text",
-      "x": -72.06984126984128,
-      "y": 63.64682539682539,
-      "width": 180,
-      "height": 25,
-      "backgroundColor": "transparent",
-      "strokeColor": "#e8590c",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "~/.agents/skills/",
-      "fontSize": 16,
-      "fontFamily": 2,
-      "groupIds": [
-        "grp-37"
-      ],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:44.194Z",
-      "version": 2
-    },
-    {
-      "id": "dir-agents-star",
-      "type": "text",
-      "x": -57.06984126984128,
-      "y": 1176.0218253968253,
-      "width": 150,
-      "height": 18,
-      "backgroundColor": "transparent",
-      "strokeColor": "#e8590c",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "★ canonical",
-      "fontSize": 16,
-      "fontFamily": 2,
-      "groupIds": [
-        "grp-27"
-      ],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:37:02.705Z",
-      "version": 2
-    },
-    {
-      "id": "dir-agents-skill",
-      "type": "text",
-      "x": -47.06984126984128,
-      "y": 81.52182539682539,
-      "width": 130,
-      "height": 18,
-      "backgroundColor": "transparent",
-      "strokeColor": "#2f9e44",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "react-email/",
-      "fontSize": 16,
-      "fontFamily": 2,
-      "groupIds": [],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:46.389Z",
-      "version": 2
-    },
-    {
-      "id": "dir-claude",
-      "type": "rectangle",
-      "x": 205.43015873015872,
-      "y": 45.52182539682539,
-      "width": 200,
-      "height": 80,
-      "backgroundColor": "#ffe8cc",
-      "strokeColor": "#e8590c",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [
-        "grp-33"
-      ],
-      "locked": false,
-      "roundness": {
-        "type": 3
-      },
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:35.062Z",
+      "x": 40,
+      "y": 58,
+      "strokeColor": "#868e96",
+      "text": "How does scanning work across 11 agents with symlinks?",
+      "fontSize": 18,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T20:17:14.431Z",
+      "updatedAt": "2026-03-04T20:17:14.431Z",
       "version": 1
     },
     {
-      "id": "dir-claude-text",
-      "type": "text",
-      "x": 215.43015873015872,
-      "y": 63.64682539682539,
-      "width": 180,
-      "height": 25,
-      "backgroundColor": "transparent",
-      "strokeColor": "#e8590c",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "~/.claude/skills/",
-      "fontSize": 16,
-      "fontFamily": 2,
-      "groupIds": [
-        "grp-33"
-      ],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:44.601Z",
-      "version": 2
-    },
-    {
-      "id": "dir-claude-label",
-      "type": "text",
-      "x": 245.43015873015872,
-      "y": 144.0218253968254,
-      "width": 120,
-      "height": 18,
-      "backgroundColor": "transparent",
-      "strokeColor": "#868e96",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "Claude Code",
-      "fontSize": 16,
-      "fontFamily": 2,
-      "groupIds": [
-        "grp-33"
-      ],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:48.187Z",
-      "version": 2
-    },
-    {
-      "id": "dir-claude-skill",
-      "type": "text",
-      "x": 240.43015873015872,
-      "y": 81.52182539682539,
-      "width": 130,
-      "height": 18,
-      "backgroundColor": "transparent",
-      "strokeColor": "#2f9e44",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "react-email/",
-      "fontSize": 16,
-      "fontFamily": 2,
-      "groupIds": [],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:46.844Z",
-      "version": 2
-    },
-    {
-      "id": "dir-cursor",
+      "id": "d3-agents",
       "type": "rectangle",
-      "x": 492.9301587301587,
-      "y": 45.52182539682539,
-      "width": 200,
-      "height": 80,
-      "backgroundColor": "#ffe8cc",
-      "strokeColor": "#e8590c",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [
-        "grp-34"
-      ],
-      "locked": false,
-      "roundness": {
-        "type": 3
-      },
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:35.062Z",
-      "version": 1
-    },
-    {
-      "id": "dir-cursor-text",
-      "type": "text",
-      "x": 502.9301587301587,
-      "y": 63.64682539682539,
-      "width": 180,
-      "height": 25,
-      "backgroundColor": "transparent",
-      "strokeColor": "#e8590c",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "~/.cursor/skills/",
-      "fontSize": 16,
-      "fontFamily": 2,
-      "groupIds": [
-        "grp-34"
-      ],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:45.090Z",
-      "version": 2
-    },
-    {
-      "id": "dir-cursor-label",
-      "type": "text",
-      "x": 549.1801587301587,
-      "y": 144.0218253968254,
-      "width": 100,
-      "height": 18,
-      "backgroundColor": "transparent",
-      "strokeColor": "#868e96",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "Cursor",
-      "fontSize": 16,
-      "fontFamily": 2,
-      "groupIds": [
-        "grp-34"
-      ],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:48.643Z",
-      "version": 2
-    },
-    {
-      "id": "dir-cursor-skill",
-      "type": "text",
-      "x": 527.9301587301587,
-      "y": 81.52182539682539,
-      "width": 130,
-      "height": 18,
-      "backgroundColor": "transparent",
-      "strokeColor": "#2f9e44",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "react-email/",
-      "fontSize": 16,
-      "fontFamily": 2,
-      "groupIds": [],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:47.305Z",
-      "version": 2
-    },
-    {
-      "id": "dir-copilot",
-      "type": "rectangle",
-      "x": 780.4301587301587,
-      "y": 45.52182539682539,
-      "width": 200,
-      "height": 80,
-      "backgroundColor": "#ffe8cc",
-      "strokeColor": "#e8590c",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [
-        "grp-35"
-      ],
-      "locked": false,
-      "roundness": {
-        "type": 3
-      },
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:35.062Z",
-      "version": 1
-    },
-    {
-      "id": "dir-copilot-text",
-      "type": "text",
-      "x": 790.4301587301587,
-      "y": 63.64682539682539,
-      "width": 180,
-      "height": 25,
-      "backgroundColor": "transparent",
-      "strokeColor": "#e8590c",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "~/.copilot/skills/",
-      "fontSize": 16,
-      "fontFamily": 2,
-      "groupIds": [
-        "grp-35"
-      ],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:45.527Z",
-      "version": 2
-    },
-    {
-      "id": "dir-copilot-label",
-      "type": "text",
-      "x": 815.4301587301587,
-      "y": 144.0218253968254,
-      "width": 130,
-      "height": 18,
-      "backgroundColor": "transparent",
-      "strokeColor": "#868e96",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "GitHub Copilot",
-      "fontSize": 16,
-      "fontFamily": 2,
-      "groupIds": [
-        "grp-35"
-      ],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:49.085Z",
-      "version": 2
-    },
-    {
-      "id": "dir-windsurf",
-      "type": "rectangle",
-      "x": 1067.9301587301588,
-      "y": 45.52182539682539,
-      "width": 200,
-      "height": 80,
-      "backgroundColor": "#ffe8cc",
-      "strokeColor": "#e8590c",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [
-        "grp-36"
-      ],
-      "locked": false,
-      "roundness": {
-        "type": 3
-      },
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:35.062Z",
-      "version": 1
-    },
-    {
-      "id": "dir-windsurf-text",
-      "type": "text",
-      "x": 1077.9301587301588,
-      "y": 59.27182539682539,
-      "width": 180,
-      "height": 40,
-      "backgroundColor": "transparent",
-      "strokeColor": "#e8590c",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "~/.codeium/windsurf/\nskills/",
-      "fontSize": 16,
-      "fontFamily": 2,
-      "groupIds": [
-        "grp-36"
-      ],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:45.984Z",
-      "version": 2
-    },
-    {
-      "id": "dir-windsurf-label",
-      "type": "text",
-      "x": 1117.9301587301588,
-      "y": 144.0218253968254,
-      "width": 100,
-      "height": 18,
-      "backgroundColor": "transparent",
-      "strokeColor": "#868e96",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "Windsurf",
-      "fontSize": 16,
-      "fontFamily": 2,
-      "groupIds": [
-        "grp-36"
-      ],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:49.533Z",
-      "version": 2
-    },
-    {
-      "id": "more-agents",
-      "type": "text",
-      "x": 1372.9301587301588,
-      "y": 69.27182539682539,
-      "width": 140,
-      "height": 20,
-      "backgroundColor": "transparent",
-      "strokeColor": "#868e96",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "+ 6 more agents",
-      "fontSize": 16,
-      "fontFamily": 2,
-      "groupIds": [],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:47.720Z",
-      "version": 2
-    },
-    {
-      "id": "scanner-container",
-      "type": "rectangle",
-      "x": 130.43015873015872,
-      "y": 320.5218253968254,
-      "width": 1200,
-      "height": 280,
-      "backgroundColor": "transparent",
+      "x": 40,
+      "y": 120,
+      "width": 220,
+      "height": 90,
+      "backgroundColor": "#a5d8ff",
       "strokeColor": "#1971c2",
+      "strokeWidth": 2,
+      "roughness": 0,
+      "roundness": {
+        "type": 3
+      },
+      "createdAt": "2026-03-04T20:17:14.431Z",
+      "updatedAt": "2026-03-04T20:17:14.431Z",
+      "version": 1
+    },
+    {
+      "id": "d3-agents-name",
+      "type": "text",
+      "x": 60,
+      "y": 130,
+      "strokeColor": "#1971c2",
+      "text": "KNOWN_AGENTS",
+      "fontSize": 18,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T20:17:14.431Z",
+      "updatedAt": "2026-03-04T20:17:14.431Z",
+      "version": 1
+    },
+    {
+      "id": "d3-agents-desc",
+      "type": "text",
+      "x": 55,
+      "y": 160,
+      "strokeColor": "#868e96",
+      "text": "[Registry] Static list of\n11 agent entries with\nskillsDir paths",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T20:17:14.431Z",
+      "updatedAt": "2026-03-04T20:17:14.431Z",
+      "version": 1
+    },
+    {
+      "id": "d3-scan",
+      "type": "rectangle",
+      "x": 340,
+      "y": 120,
+      "width": 200,
+      "height": 90,
+      "backgroundColor": "#a5d8ff",
+      "strokeColor": "#1971c2",
+      "strokeWidth": 2,
+      "roughness": 0,
+      "roundness": {
+        "type": 3
+      },
+      "createdAt": "2026-03-04T20:17:14.431Z",
+      "updatedAt": "2026-03-04T20:17:14.431Z",
+      "version": 1
+    },
+    {
+      "id": "d3-scan-name",
+      "type": "text",
+      "x": 355,
+      "y": 130,
+      "strokeColor": "#1971c2",
+      "text": "SkillScanner.scan()",
+      "fontSize": 18,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T20:17:14.431Z",
+      "updatedAt": "2026-03-04T20:17:14.431Z",
+      "version": 1
+    },
+    {
+      "id": "d3-scan-desc",
+      "type": "text",
+      "x": 355,
+      "y": 160,
+      "strokeColor": "#868e96",
+      "text": "[Function] Iterates all\nagents at global +\nproject scope",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T20:17:14.431Z",
+      "updatedAt": "2026-03-04T20:17:14.431Z",
+      "version": 1
+    },
+    {
+      "id": "d3-isdir",
+      "type": "rectangle",
+      "x": 620,
+      "y": 120,
+      "width": 240,
+      "height": 90,
+      "backgroundColor": "#ffd8a8",
+      "strokeColor": "#e8590c",
+      "strokeWidth": 2,
+      "roughness": 0,
+      "roundness": {
+        "type": 3
+      },
+      "createdAt": "2026-03-04T20:17:14.431Z",
+      "updatedAt": "2026-03-04T20:17:14.431Z",
+      "version": 1
+    },
+    {
+      "id": "d3-isdir-name",
+      "type": "text",
+      "x": 640,
+      "y": 130,
+      "strokeColor": "#e8590c",
+      "text": "isDirectoryEntry()",
+      "fontSize": 18,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T20:17:14.431Z",
+      "updatedAt": "2026-03-04T20:17:14.431Z",
+      "version": 1
+    },
+    {
+      "id": "d3-isdir-desc",
+      "type": "text",
+      "x": 635,
+      "y": 160,
+      "strokeColor": "#868e96",
+      "text": "[Helper] Resolves symlinks:\nisSymbolicLink() +\nfs.statSync()",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T20:17:14.431Z",
+      "updatedAt": "2026-03-04T20:17:14.431Z",
+      "version": 1
+    },
+    {
+      "id": "d3-parse",
+      "type": "rectangle",
+      "x": 40,
+      "y": 300,
+      "width": 240,
+      "height": 80,
+      "backgroundColor": "#a5d8ff",
+      "strokeColor": "#1971c2",
+      "strokeWidth": 2,
+      "roughness": 0,
+      "roundness": {
+        "type": 3
+      },
+      "createdAt": "2026-03-04T20:17:14.431Z",
+      "updatedAt": "2026-03-04T20:17:14.431Z",
+      "version": 1
+    },
+    {
+      "id": "d3-parse-name",
+      "type": "text",
+      "x": 55,
+      "y": 310,
+      "strokeColor": "#1971c2",
+      "text": "parseSkillMdAsync()",
+      "fontSize": 18,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T20:17:14.431Z",
+      "updatedAt": "2026-03-04T20:17:14.431Z",
+      "version": 1
+    },
+    {
+      "id": "d3-parse-desc",
+      "type": "text",
+      "x": 55,
+      "y": 340,
+      "strokeColor": "#868e96",
+      "text": "[Parser] Reads SKILL.md,\nextracts name + description",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T20:17:14.431Z",
+      "updatedAt": "2026-03-04T20:17:14.431Z",
+      "version": 1
+    },
+    {
+      "id": "d3-lock",
+      "type": "rectangle",
+      "x": 360,
+      "y": 300,
+      "width": 220,
+      "height": 80,
+      "backgroundColor": "#ffd8a8",
+      "strokeColor": "#e8590c",
+      "strokeWidth": 2,
+      "roughness": 0,
+      "roundness": {
+        "type": 3
+      },
+      "createdAt": "2026-03-04T20:17:14.431Z",
+      "updatedAt": "2026-03-04T20:17:14.431Z",
+      "version": 1
+    },
+    {
+      "id": "d3-lock-name",
+      "type": "text",
+      "x": 390,
+      "y": 310,
+      "strokeColor": "#e8590c",
+      "text": "findLockEntry()",
+      "fontSize": 18,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T20:17:14.431Z",
+      "updatedAt": "2026-03-04T20:17:14.431Z",
+      "version": 1
+    },
+    {
+      "id": "d3-lock-desc",
+      "type": "text",
+      "x": 375,
+      "y": 340,
+      "strokeColor": "#868e96",
+      "text": "[Lookup] Matches folder →\nlock file (source, hash)",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T20:17:14.431Z",
+      "updatedAt": "2026-03-04T20:17:14.431Z",
+      "version": 1
+    },
+    {
+      "id": "d3-dedup",
+      "type": "rectangle",
+      "x": 660,
+      "y": 300,
+      "width": 280,
+      "height": 80,
+      "backgroundColor": "#a5d8ff",
+      "strokeColor": "#1971c2",
+      "strokeWidth": 2,
+      "roughness": 0,
+      "roundness": {
+        "type": 3
+      },
+      "createdAt": "2026-03-04T20:17:14.431Z",
+      "updatedAt": "2026-03-04T20:17:14.431Z",
+      "version": 1
+    },
+    {
+      "id": "d3-dedup-name",
+      "type": "text",
+      "x": 670,
+      "y": 310,
+      "strokeColor": "#1971c2",
+      "text": "deduplicateAcrossAgents()",
+      "fontSize": 18,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T20:17:14.431Z",
+      "updatedAt": "2026-03-04T20:17:14.431Z",
+      "version": 1
+    },
+    {
+      "id": "d3-dedup-desc",
+      "type": "text",
+      "x": 670,
+      "y": 340,
+      "strokeColor": "#868e96",
+      "text": "[Algorithm] Groups by folderName,\nmerges agents[], prefers canonical",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T20:17:14.431Z",
+      "updatedAt": "2026-03-04T20:17:14.431Z",
+      "version": 1
+    },
+    {
+      "id": "d3-canonical",
+      "type": "rectangle",
+      "x": 120,
+      "y": 470,
+      "width": 280,
+      "height": 70,
+      "backgroundColor": "#ffd8a8",
+      "strokeColor": "#e8590c",
+      "strokeWidth": 2,
+      "roughness": 0,
+      "roundness": {
+        "type": 3
+      },
+      "createdAt": "2026-03-04T20:17:14.431Z",
+      "updatedAt": "2026-03-04T20:17:14.431Z",
+      "version": 1
+    },
+    {
+      "id": "d3-canonical-name",
+      "type": "text",
+      "x": 140,
+      "y": 480,
+      "strokeColor": "#e8590c",
+      "text": "~/.agents/skills/",
+      "fontSize": 18,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T20:17:14.431Z",
+      "updatedAt": "2026-03-04T20:17:14.431Z",
+      "version": 1
+    },
+    {
+      "id": "d3-canonical-desc",
+      "type": "text",
+      "x": 140,
+      "y": 508,
+      "strokeColor": "#868e96",
+      "text": "[Canonical Dir] Real skill\ncontent lives here",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T20:17:14.431Z",
+      "updatedAt": "2026-03-04T20:17:14.431Z",
+      "version": 1
+    },
+    {
+      "id": "d3-symlinks",
+      "type": "rectangle",
+      "x": 480,
+      "y": 470,
+      "width": 360,
+      "height": 70,
+      "backgroundColor": "#ffd8a8",
+      "strokeColor": "#e8590c",
+      "strokeWidth": 2,
+      "roughness": 0,
+      "roundness": {
+        "type": 3
+      },
+      "createdAt": "2026-03-04T20:17:14.431Z",
+      "updatedAt": "2026-03-04T20:17:14.431Z",
+      "version": 1
+    },
+    {
+      "id": "d3-symlinks-name",
+      "type": "text",
+      "x": 495,
+      "y": 480,
+      "strokeColor": "#e8590c",
+      "text": "~/.claude/skills/, ~/.cursor/skills/, ...",
+      "fontSize": 18,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T20:17:14.431Z",
+      "updatedAt": "2026-03-04T20:17:14.431Z",
+      "version": 1
+    },
+    {
+      "id": "d3-symlinks-desc",
+      "type": "text",
+      "x": 495,
+      "y": 508,
+      "strokeColor": "#868e96",
+      "text": "[Symlinks] 10 agent dirs → canonical",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T20:17:14.431Z",
+      "updatedAt": "2026-03-04T20:17:14.431Z",
+      "version": 1
+    },
+    {
+      "id": "d3-arr1",
+      "type": "arrow",
+      "x": 268,
+      "y": 165,
+      "width": 70,
+      "height": 0,
+      "strokeColor": "#1971c2",
+      "strokeWidth": 2,
+      "roughness": 0,
+      "label": {
+        "text": "11 agent entries"
+      },
+      "fontSize": 14,
+      "fontFamily": 5,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          64,
+          0
+        ]
+      ],
+      "endArrowhead": "arrow",
+      "createdAt": "2026-03-04T20:17:41.521Z",
+      "updatedAt": "2026-03-04T20:17:41.521Z",
+      "version": 1,
+      "startBinding": {
+        "elementId": "d3-agents",
+        "focus": 0,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "d3-scan",
+        "focus": 0,
+        "gap": 8
+      }
+    },
+    {
+      "id": "d3-arr2",
+      "type": "arrow",
+      "x": 548,
+      "y": 165,
+      "width": 70,
+      "height": 0,
+      "strokeColor": "#e8590c",
+      "strokeWidth": 2,
+      "roughness": 0,
+      "label": {
+        "text": "For each dir entry:\nreal dir or symlink?"
+      },
+      "fontSize": 14,
+      "fontFamily": 5,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          64,
+          2.842170943040401e-14
+        ]
+      ],
+      "endArrowhead": "arrow",
+      "createdAt": "2026-03-04T20:17:41.521Z",
+      "updatedAt": "2026-03-04T20:17:41.521Z",
+      "version": 1,
+      "startBinding": {
+        "elementId": "d3-scan",
+        "focus": 0,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "d3-isdir",
+        "focus": 0,
+        "gap": 8
+      }
+    },
+    {
+      "id": "d3-arr3",
+      "type": "arrow",
+      "x": 612.3410337302458,
+      "y": 203.51779154690857,
+      "width": 580,
+      "height": 80,
+      "strokeColor": "#1971c2",
+      "strokeWidth": 2,
+      "roughness": 0,
+      "label": {
+        "text": "If directory:\nread SKILL.md"
+      },
+      "fontSize": 14,
+      "fontFamily": 5,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -324.6820674604917,
+          97.96441690618289
+        ]
+      ],
+      "endArrowhead": "arrow",
+      "createdAt": "2026-03-04T20:17:41.521Z",
+      "updatedAt": "2026-03-04T20:17:41.521Z",
+      "version": 1,
+      "startBinding": {
+        "elementId": "d3-isdir",
+        "focus": 0,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "d3-parse",
+        "focus": 0,
+        "gap": 8
+      }
+    },
+    {
+      "id": "d3-arr4",
+      "type": "arrow",
+      "x": 288,
+      "y": 340,
+      "width": 70,
+      "height": 0,
+      "strokeColor": "#e8590c",
+      "strokeWidth": 2,
+      "roughness": 0,
+      "label": {
+        "text": "Enrich with source\n+ hash from lock file"
+      },
+      "fontSize": 14,
+      "fontFamily": 5,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          64,
+          0
+        ]
+      ],
+      "endArrowhead": "arrow",
+      "createdAt": "2026-03-04T20:17:41.521Z",
+      "updatedAt": "2026-03-04T20:17:41.521Z",
+      "version": 1,
+      "startBinding": {
+        "elementId": "d3-parse",
+        "focus": 0,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "d3-lock",
+        "focus": 0,
+        "gap": 8
+      }
+    },
+    {
+      "id": "d3-arr5",
+      "type": "arrow",
+      "x": 588,
+      "y": 340,
+      "width": 70,
+      "height": 0,
+      "strokeColor": "#1971c2",
+      "strokeWidth": 2,
+      "roughness": 0,
+      "label": {
+        "text": "Enriched entries\nflow into dedup"
+      },
+      "fontSize": 14,
+      "fontFamily": 5,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          64,
+          0
+        ]
+      ],
+      "endArrowhead": "arrow",
+      "createdAt": "2026-03-04T20:17:41.521Z",
+      "updatedAt": "2026-03-04T20:17:41.521Z",
+      "version": 1,
+      "startBinding": {
+        "elementId": "d3-lock",
+        "focus": 0,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "d3-dedup",
+        "focus": 0,
+        "gap": 8
+      }
+    },
+    {
+      "id": "d3-output",
+      "type": "text",
+      "x": 960,
+      "y": 320,
+      "strokeColor": "#1971c2",
+      "text": "→ InstalledSkill[]\nwith merged\nagents[] arrays",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T20:17:41.521Z",
+      "updatedAt": "2026-03-04T20:17:41.521Z",
+      "version": 1
+    },
+    {
+      "id": "d3-arr-symlink",
+      "type": "arrow",
+      "x": 472,
+      "y": 505,
+      "width": 80,
+      "height": 0,
+      "strokeColor": "#e8590c",
       "strokeWidth": 2,
       "strokeStyle": "dashed",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [],
-      "locked": false,
-      "roundness": {
-        "type": 3
+      "roughness": 0,
+      "label": {
+        "text": "symlinks point to\ncanonical (created by\nnpx skills add)"
       },
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:35.062Z",
-      "version": 1
+      "fontSize": 14,
+      "fontFamily": 5,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -64,
+          0
+        ]
+      ],
+      "endArrowhead": "arrow",
+      "createdAt": "2026-03-04T20:17:41.521Z",
+      "updatedAt": "2026-03-04T20:17:41.521Z",
+      "version": 1,
+      "startBinding": {
+        "elementId": "d3-symlinks",
+        "focus": 0,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "d3-canonical",
+        "focus": 0,
+        "gap": 8
+      }
     },
     {
-      "id": "scanner-label",
-      "type": "text",
-      "x": 7.930158730158723,
-      "y": 294.8968253968254,
-      "width": 120,
-      "height": 25,
-      "backgroundColor": "transparent",
-      "strokeColor": "#1971c2",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "SkillScanner",
-      "fontSize": 22,
-      "fontFamily": 2,
-      "groupIds": [],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:50.025Z",
-      "version": 2
-    },
-    {
-      "id": "step-foreach",
+      "id": "d3-callout1-bg",
       "type": "rectangle",
-      "x": 40.43015873015872,
-      "y": 358.0218253968254,
-      "width": 180,
-      "height": 80,
-      "backgroundColor": "#d0ebff",
-      "strokeColor": "#1971c2",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [
-        "grp-38"
-      ],
-      "locked": false,
-      "roundness": {
-        "type": 3
-      },
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:35.062Z",
-      "version": 1
-    },
-    {
-      "id": "step-foreach-text",
-      "type": "text",
-      "x": 50.43015873015872,
-      "y": 378.0218253968254,
-      "width": 160,
-      "height": 40,
-      "backgroundColor": "transparent",
-      "strokeColor": "#1971c2",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "For each of\n11 agent dirs",
-      "fontSize": 16,
-      "fontFamily": 2,
-      "groupIds": [
-        "grp-38"
-      ],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:54.308Z",
-      "version": 2
-    },
-    {
-      "id": "arrow-foreach-to-isdir",
-      "type": "arrow",
-      "x": 250.43015873015872,
-      "y": 398.0218253968254,
-      "width": 60,
-      "height": 0,
-      "backgroundColor": "transparent",
-      "strokeColor": "#1971c2",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [],
-      "locked": false,
-      "roundness": {
-        "type": 2
-      },
-      "fillStyle": "solid",
-      "points": [
-        [
-          0,
-          0
-        ],
-        [
-          60,
-          0
-        ]
-      ],
-      "startArrowhead": null,
-      "endArrowhead": "arrow",
-      "elbowed": false,
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:35.062Z",
-      "version": 1
-    },
-    {
-      "id": "step-isdir",
-      "type": "diamond",
-      "x": 342.9301587301587,
-      "y": 348.0218253968254,
-      "width": 200,
-      "height": 100,
-      "backgroundColor": "#d0ebff",
-      "strokeColor": "#1971c2",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [],
-      "locked": false,
-      "roundness": {
-        "type": 2
-      },
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:35.062Z",
-      "version": 1
-    },
-    {
-      "id": "step-isdir-text",
-      "type": "text",
-      "x": 372.9301587301587,
-      "y": 381.7718253968254,
-      "width": 140,
-      "height": 20,
-      "backgroundColor": "transparent",
-      "strokeColor": "#1971c2",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "isDirectoryEntry()",
-      "fontSize": 16,
-      "fontFamily": 2,
-      "groupIds": [],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:54.746Z",
-      "version": 2
-    },
-    {
-      "id": "arrow-isdir-to-parse",
-      "type": "arrow",
-      "x": 575.4301587301587,
-      "y": 398.0218253968254,
-      "width": 60,
-      "height": 0,
-      "backgroundColor": "transparent",
-      "strokeColor": "#1971c2",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [],
-      "locked": false,
-      "roundness": {
-        "type": 2
-      },
-      "fillStyle": "solid",
-      "points": [
-        [
-          0,
-          0
-        ],
-        [
-          60,
-          0
-        ]
-      ],
-      "startArrowhead": null,
-      "endArrowhead": "arrow",
-      "elbowed": false,
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:35.062Z",
-      "version": 1
-    },
-    {
-      "id": "step-parse",
-      "type": "rectangle",
-      "x": 662.9301587301587,
-      "y": 358.0218253968254,
-      "width": 160,
-      "height": 80,
-      "backgroundColor": "#d0ebff",
-      "strokeColor": "#1971c2",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [
-        "grp-39"
-      ],
-      "locked": false,
-      "roundness": {
-        "type": 3
-      },
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.062Z",
-      "updatedAt": "2026-03-04T08:36:35.062Z",
-      "version": 1
-    },
-    {
-      "id": "step-parse-text",
-      "type": "text",
-      "x": 682.9301587301587,
-      "y": 378.0218253968254,
-      "width": 120,
-      "height": 40,
-      "backgroundColor": "transparent",
-      "strokeColor": "#1971c2",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "Parse\nSKILL.md",
-      "fontSize": 16,
-      "fontFamily": 2,
-      "groupIds": [
-        "grp-39"
-      ],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.063Z",
-      "updatedAt": "2026-03-04T08:36:55.150Z",
-      "version": 2
-    },
-    {
-      "id": "arrow-parse-to-lock",
-      "type": "arrow",
-      "x": 849.1801587301587,
-      "y": 398.0218253968254,
-      "width": 50,
-      "height": 0,
-      "backgroundColor": "transparent",
-      "strokeColor": "#1971c2",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [],
-      "locked": false,
-      "roundness": {
-        "type": 2
-      },
-      "fillStyle": "solid",
-      "points": [
-        [
-          0,
-          0
-        ],
-        [
-          50,
-          0
-        ]
-      ],
-      "startArrowhead": null,
-      "endArrowhead": "arrow",
-      "elbowed": false,
-      "createdAt": "2026-03-04T08:36:35.063Z",
-      "updatedAt": "2026-03-04T08:36:35.063Z",
-      "version": 1
-    },
-    {
-      "id": "step-lock",
-      "type": "rectangle",
-      "x": 925.4301587301587,
-      "y": 358.0218253968254,
-      "width": 160,
-      "height": 80,
-      "backgroundColor": "#ffe8cc",
-      "strokeColor": "#e8590c",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [
-        "grp-40"
-      ],
-      "locked": false,
-      "roundness": {
-        "type": 3
-      },
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.063Z",
-      "updatedAt": "2026-03-04T08:36:35.063Z",
-      "version": 1
-    },
-    {
-      "id": "step-lock-text",
-      "type": "text",
-      "x": 945.4301587301587,
-      "y": 378.0218253968254,
-      "width": 120,
-      "height": 40,
-      "backgroundColor": "transparent",
-      "strokeColor": "#e8590c",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "Lock file\nlookup",
-      "fontSize": 16,
-      "fontFamily": 2,
-      "groupIds": [
-        "grp-40"
-      ],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.063Z",
-      "updatedAt": "2026-03-04T08:36:55.693Z",
-      "version": 2
-    },
-    {
-      "id": "arrow-lock-to-symlink",
-      "type": "arrow",
-      "x": 1112.9301587301588,
-      "y": 398.0218253968254,
-      "width": 60,
-      "height": 0,
-      "backgroundColor": "transparent",
-      "strokeColor": "#1971c2",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [],
-      "locked": false,
-      "roundness": {
-        "type": 2
-      },
-      "fillStyle": "solid",
-      "points": [
-        [
-          0,
-          0
-        ],
-        [
-          60,
-          0
-        ]
-      ],
-      "startArrowhead": null,
-      "endArrowhead": "arrow",
-      "elbowed": false,
-      "createdAt": "2026-03-04T08:36:35.063Z",
-      "updatedAt": "2026-03-04T08:36:35.063Z",
-      "version": 1
-    },
-    {
-      "id": "step-symlink",
-      "type": "diamond",
-      "x": 1200.4301587301588,
-      "y": 348.0218253968254,
-      "width": 160,
-      "height": 100,
-      "backgroundColor": "#d0ebff",
-      "strokeColor": "#1971c2",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [],
-      "locked": false,
-      "roundness": {
-        "type": 2
-      },
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.063Z",
-      "updatedAt": "2026-03-04T08:36:35.063Z",
-      "version": 1
-    },
-    {
-      "id": "step-symlink-text",
-      "type": "text",
-      "x": 1240.4301587301588,
-      "y": 388.0218253968254,
-      "width": 80,
-      "height": 20,
-      "backgroundColor": "transparent",
-      "strokeColor": "#1971c2",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "isSymlink?",
-      "fontSize": 16,
-      "fontFamily": 2,
-      "groupIds": [],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.063Z",
-      "updatedAt": "2026-03-04T08:36:56.089Z",
-      "version": 2
-    },
-    {
-      "id": "isdir-annotation",
-      "type": "text",
-      "x": 302.9301587301587,
-      "y": 1063.1468253968255,
+      "x": 40,
+      "y": 600,
       "width": 280,
-      "height": 55,
-      "backgroundColor": "transparent",
+      "height": 80,
+      "backgroundColor": "#fff3bf",
+      "strokeColor": "#e8590c",
+      "strokeWidth": 1,
+      "roughness": 0,
+      "roundness": {
+        "type": 3
+      },
+      "createdAt": "2026-03-04T20:17:41.521Z",
+      "updatedAt": "2026-03-04T20:17:41.521Z",
+      "version": 1
+    },
+    {
+      "id": "d3-callout1-text",
+      "type": "text",
+      "x": 52,
+      "y": 608,
       "strokeColor": "#495057",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "Dirent.isDirectory() returns false\nfor symlinks on Windows!\nMust use isSymbolicLink() + statSync()",
-      "fontSize": 16,
-      "fontFamily": 2,
-      "groupIds": [
-        "grp-28"
-      ],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.063Z",
-      "updatedAt": "2026-03-04T08:37:02.204Z",
-      "version": 2
+      "text": "The Windows symlink gotcha:\nNode.js isDirectory() returns false\nfor symlinks. Must check\nisSymbolicLink() first, then\nfs.statSync() to follow.",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T20:17:41.521Z",
+      "updatedAt": "2026-03-04T20:17:41.521Z",
+      "version": 1
     },
     {
-      "id": "symlink-yes",
-      "type": "text",
-      "x": 1200.4301587301588,
-      "y": 591.3968253968254,
-      "width": 160,
-      "height": 35,
-      "backgroundColor": "transparent",
-      "strokeColor": "#2f9e44",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "yes → marketplace\ninstall",
-      "fontSize": 16,
-      "fontFamily": 2,
-      "groupIds": [
-        "grp-29"
-      ],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.063Z",
-      "updatedAt": "2026-03-04T08:36:56.583Z",
-      "version": 2
-    },
-    {
-      "id": "symlink-no",
-      "type": "text",
-      "x": 1200.4301587301588,
-      "y": 641.3968253968254,
-      "width": 160,
-      "height": 35,
-      "backgroundColor": "transparent",
-      "strokeColor": "#e8590c",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "no → user-created\ncustom skill",
-      "fontSize": 16,
-      "fontFamily": 2,
-      "groupIds": [
-        "grp-29",
-        "grp-30"
-      ],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.063Z",
-      "updatedAt": "2026-03-04T08:36:57.028Z",
-      "version": 2
-    },
-    {
-      "id": "dedup-label",
-      "type": "text",
-      "x": 2.9301587301587233,
-      "y": 701.5218253968254,
-      "width": 180,
-      "height": 28,
-      "backgroundColor": "transparent",
-      "strokeColor": "#1971c2",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "Deduplication",
-      "fontSize": 22,
-      "fontFamily": 2,
-      "groupIds": [],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.063Z",
-      "updatedAt": "2026-03-04T08:36:57.941Z",
-      "version": 2
-    },
-    {
-      "id": "input-agents",
+      "id": "d3-callout2-bg",
       "type": "rectangle",
-      "x": -19.569841269841277,
-      "y": 769.2718253968254,
-      "width": 200,
+      "x": 360,
+      "y": 600,
+      "width": 280,
       "height": 70,
-      "backgroundColor": "#ffe8cc",
+      "backgroundColor": "#fff3bf",
       "strokeColor": "#e8590c",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [
-        "grp-41"
-      ],
-      "locked": false,
+      "strokeWidth": 1,
+      "roughness": 0,
       "roundness": {
         "type": 3
       },
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.063Z",
-      "updatedAt": "2026-03-04T08:36:35.063Z",
+      "createdAt": "2026-03-04T20:17:41.521Z",
+      "updatedAt": "2026-03-04T20:17:41.521Z",
       "version": 1
     },
     {
-      "id": "input-agents-text",
+      "id": "d3-callout2-text",
       "type": "text",
-      "x": 0.4301587301587233,
-      "y": 784.2718253968254,
-      "width": 160,
-      "height": 40,
-      "backgroundColor": "transparent",
-      "strokeColor": "#e8590c",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "react-email\n(~/.agents/)",
-      "fontSize": 16,
-      "fontFamily": 2,
-      "groupIds": [
-        "grp-41"
-      ],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.063Z",
-      "updatedAt": "2026-03-04T08:36:58.420Z",
-      "version": 2
-    },
-    {
-      "id": "input-claude",
-      "type": "rectangle",
-      "x": -19.569841269841277,
-      "y": 881.7718253968254,
-      "width": 200,
-      "height": 70,
-      "backgroundColor": "#ffe8cc",
-      "strokeColor": "#e8590c",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [
-        "grp-42"
-      ],
-      "locked": false,
-      "roundness": {
-        "type": 3
-      },
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.063Z",
-      "updatedAt": "2026-03-04T08:36:35.063Z",
-      "version": 1
-    },
-    {
-      "id": "input-claude-text",
-      "type": "text",
-      "x": 0.4301587301587233,
-      "y": 896.7718253968254,
-      "width": 160,
-      "height": 40,
-      "backgroundColor": "transparent",
-      "strokeColor": "#e8590c",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "react-email\n(~/.claude/)",
-      "fontSize": 16,
-      "fontFamily": 2,
-      "groupIds": [
-        "grp-42"
-      ],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.063Z",
-      "updatedAt": "2026-03-04T08:36:58.865Z",
-      "version": 2
-    },
-    {
-      "id": "input-cursor",
-      "type": "rectangle",
-      "x": -19.569841269841277,
-      "y": 994.2718253968254,
-      "width": 200,
-      "height": 70,
-      "backgroundColor": "#ffe8cc",
-      "strokeColor": "#e8590c",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [
-        "grp-43"
-      ],
-      "locked": false,
-      "roundness": {
-        "type": 3
-      },
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.063Z",
-      "updatedAt": "2026-03-04T08:36:35.063Z",
-      "version": 1
-    },
-    {
-      "id": "input-cursor-text",
-      "type": "text",
-      "x": 0.4301587301587233,
-      "y": 1009.2718253968254,
-      "width": 160,
-      "height": 40,
-      "backgroundColor": "transparent",
-      "strokeColor": "#e8590c",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "react-email\n(~/.cursor/)",
-      "fontSize": 16,
-      "fontFamily": 2,
-      "groupIds": [
-        "grp-43"
-      ],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.063Z",
-      "updatedAt": "2026-03-04T08:36:59.307Z",
-      "version": 2
-    },
-    {
-      "id": "arrow-agents-to-map",
-      "type": "arrow",
-      "x": 217.93015873015872,
-      "y": 815.5218253968254,
-      "width": 100,
-      "height": 90,
-      "backgroundColor": "transparent",
-      "strokeColor": "#1971c2",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [],
-      "locked": false,
-      "roundness": {
-        "type": 2
-      },
-      "fillStyle": "solid",
-      "points": [
-        [
-          0,
-          0
-        ],
-        [
-          100,
-          90
-        ]
-      ],
-      "startArrowhead": null,
-      "endArrowhead": "arrow",
-      "elbowed": false,
-      "createdAt": "2026-03-04T08:36:35.063Z",
-      "updatedAt": "2026-03-04T08:36:35.063Z",
-      "version": 1
-    },
-    {
-      "id": "arrow-claude-to-map",
-      "type": "arrow",
-      "x": 217.93015873015872,
-      "y": 916.7718253968254,
-      "width": 100,
-      "height": 0,
-      "backgroundColor": "transparent",
-      "strokeColor": "#1971c2",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [],
-      "locked": false,
-      "roundness": {
-        "type": 2
-      },
-      "fillStyle": "solid",
-      "points": [
-        [
-          0,
-          0
-        ],
-        [
-          100,
-          0
-        ]
-      ],
-      "startArrowhead": null,
-      "endArrowhead": "arrow",
-      "elbowed": false,
-      "createdAt": "2026-03-04T08:36:35.063Z",
-      "updatedAt": "2026-03-04T08:36:35.063Z",
-      "version": 1
-    },
-    {
-      "id": "arrow-cursor-to-map",
-      "type": "arrow",
-      "x": 217.93015873015872,
-      "y": 1018.0218253968254,
-      "width": 100,
-      "height": -90,
-      "backgroundColor": "transparent",
-      "strokeColor": "#1971c2",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [],
-      "locked": false,
-      "roundness": {
-        "type": 2
-      },
-      "fillStyle": "solid",
-      "points": [
-        [
-          0,
-          0
-        ],
-        [
-          100,
-          -90
-        ]
-      ],
-      "startArrowhead": null,
-      "endArrowhead": "arrow",
-      "elbowed": false,
-      "createdAt": "2026-03-04T08:36:35.063Z",
-      "updatedAt": "2026-03-04T08:36:35.063Z",
-      "version": 1
-    },
-    {
-      "id": "dedup-map",
-      "type": "rectangle",
-      "x": 352.9301587301587,
-      "y": 881.7718253968254,
-      "width": 180,
-      "height": 70,
-      "backgroundColor": "#d0ebff",
-      "strokeColor": "#1971c2",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [
-        "grp-44"
-      ],
-      "locked": false,
-      "roundness": {
-        "type": 3
-      },
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.063Z",
-      "updatedAt": "2026-03-04T08:36:35.063Z",
-      "version": 1
-    },
-    {
-      "id": "dedup-map-text",
-      "type": "text",
-      "x": 382.9301587301587,
-      "y": 896.7718253968254,
-      "width": 120,
-      "height": 40,
-      "backgroundColor": "transparent",
-      "strokeColor": "#1971c2",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "Map by\nfolderName",
-      "fontSize": 16,
-      "fontFamily": 2,
-      "groupIds": [
-        "grp-44"
-      ],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.063Z",
-      "updatedAt": "2026-03-04T08:36:59.849Z",
-      "version": 2
-    },
-    {
-      "id": "arrow-map-to-result",
-      "type": "arrow",
-      "x": 566.6801587301587,
-      "y": 916.7718253968254,
-      "width": 90,
-      "height": 0,
-      "backgroundColor": "transparent",
-      "strokeColor": "#1971c2",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [],
-      "locked": false,
-      "roundness": {
-        "type": 2
-      },
-      "fillStyle": "solid",
-      "points": [
-        [
-          0,
-          0
-        ],
-        [
-          90,
-          0
-        ]
-      ],
-      "startArrowhead": null,
-      "endArrowhead": "arrow",
-      "elbowed": false,
-      "createdAt": "2026-03-04T08:36:35.063Z",
-      "updatedAt": "2026-03-04T08:36:35.063Z",
-      "version": 1
-    },
-    {
-      "id": "dedup-result",
-      "type": "rectangle",
-      "x": 711.6801587301587,
-      "y": 829.2718253968254,
-      "width": 350,
-      "height": 150,
-      "backgroundColor": "#d0ebff",
-      "strokeColor": "#1971c2",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [],
-      "locked": false,
-      "roundness": {
-        "type": 3
-      },
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.063Z",
-      "updatedAt": "2026-03-04T08:36:35.063Z",
-      "version": 1
-    },
-    {
-      "id": "dedup-result-title",
-      "type": "text",
-      "x": 707.9301587301587,
-      "y": 826.1468253968254,
-      "width": 120,
-      "height": 25,
-      "backgroundColor": "transparent",
-      "strokeColor": "#1971c2",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "react-email",
-      "fontSize": 20,
-      "fontFamily": 2,
-      "groupIds": [],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.063Z",
-      "updatedAt": "2026-03-04T08:37:00.692Z",
-      "version": 2
-    },
-    {
-      "id": "dedup-result-body",
-      "type": "text",
-      "x": 731.6801587301587,
-      "y": 870,
-      "width": 310,
-      "height": 90,
-      "backgroundColor": "transparent",
-      "strokeColor": "#343a40",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "agents: [\"skills.sh\", \"Claude Code\", \"Cursor\"]\nsource: vercel-labs/agent-skills\npath: ~/.agents/skills/react-email",
-      "fontSize": 16,
-      "fontFamily": 2,
-      "groupIds": [
-        "grp-31"
-      ],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.063Z",
-      "updatedAt": "2026-03-04T08:37:01.251Z",
-      "version": 2
-    },
-    {
-      "id": "dedup-annotation",
-      "type": "text",
-      "x": 705,
-      "y": 1012,
-      "width": 300,
-      "height": 55,
-      "backgroundColor": "transparent",
+      "x": 372,
+      "y": 608,
       "strokeColor": "#495057",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "text": "Canonical entry (~/.agents/skills/)\nwins for metadata — that's where\nlock file tracks source + hash",
+      "text": "Why deduplicate? Same skill\nappears in up to 11 agent dirs.\nGroup by folderName, merge agent\nnames into agents[] array.",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T20:17:41.521Z",
+      "updatedAt": "2026-03-04T20:17:41.521Z",
+      "version": 1
+    },
+    {
+      "id": "d3-callout3-bg",
+      "type": "rectangle",
+      "x": 680,
+      "y": 600,
+      "width": 280,
+      "height": 70,
+      "backgroundColor": "#fff3bf",
+      "strokeColor": "#e8590c",
+      "strokeWidth": 1,
+      "roughness": 0,
+      "roundness": {
+        "type": 3
+      },
+      "createdAt": "2026-03-04T20:17:41.521Z",
+      "updatedAt": "2026-03-04T20:17:41.521Z",
+      "version": 1
+    },
+    {
+      "id": "d3-callout3-text",
+      "type": "text",
+      "x": 692,
+      "y": 608,
+      "strokeColor": "#495057",
+      "text": "Lock file = source of truth.\nFilesystem says WHAT is installed.\nLock file says WHERE it came\nfrom (GitHub repo + hash).",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T20:17:41.521Z",
+      "updatedAt": "2026-03-04T20:17:41.521Z",
+      "version": 1
+    },
+    {
+      "id": "d3-legend-bg",
+      "type": "rectangle",
+      "x": 40,
+      "y": 720,
+      "width": 240,
+      "height": 160,
+      "backgroundColor": "#ffffff",
+      "strokeColor": "#868e96",
+      "strokeWidth": 1,
+      "roughness": 0,
+      "roundness": {
+        "type": 3
+      },
+      "createdAt": "2026-03-04T20:17:41.521Z",
+      "updatedAt": "2026-03-04T20:17:41.521Z",
+      "version": 1
+    },
+    {
+      "id": "d3-legend-title",
+      "type": "text",
+      "x": 130,
+      "y": 728,
+      "strokeColor": "#1e1e1e",
+      "text": "Legend",
       "fontSize": 16,
-      "fontFamily": 2,
-      "groupIds": [
-        "grp-32"
-      ],
-      "locked": false,
-      "roundness": null,
-      "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:36:35.063Z",
-      "updatedAt": "2026-03-04T08:37:01.734Z",
-      "version": 2
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T20:17:41.521Z",
+      "updatedAt": "2026-03-04T20:17:41.521Z",
+      "version": 1
+    },
+    {
+      "id": "d3-leg-blue",
+      "type": "rectangle",
+      "x": 55,
+      "y": 755,
+      "width": 16,
+      "height": 12,
+      "backgroundColor": "#a5d8ff",
+      "strokeColor": "#1971c2",
+      "strokeWidth": 1,
+      "roughness": 0,
+      "createdAt": "2026-03-04T20:17:41.521Z",
+      "updatedAt": "2026-03-04T20:17:41.521Z",
+      "version": 1
+    },
+    {
+      "id": "d3-leg-blue-t",
+      "type": "text",
+      "x": 78,
+      "y": 752,
+      "strokeColor": "#495057",
+      "text": "Extension internals",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T20:17:41.521Z",
+      "updatedAt": "2026-03-04T20:17:41.521Z",
+      "version": 1
+    },
+    {
+      "id": "d3-leg-orange",
+      "type": "rectangle",
+      "x": 55,
+      "y": 775,
+      "width": 16,
+      "height": 12,
+      "backgroundColor": "#ffd8a8",
+      "strokeColor": "#e8590c",
+      "strokeWidth": 1,
+      "roughness": 0,
+      "createdAt": "2026-03-04T20:17:41.521Z",
+      "updatedAt": "2026-03-04T20:17:41.521Z",
+      "version": 1
+    },
+    {
+      "id": "d3-leg-orange-t",
+      "type": "text",
+      "x": 78,
+      "y": 772,
+      "strokeColor": "#495057",
+      "text": "Filesystem / local",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T20:17:41.521Z",
+      "updatedAt": "2026-03-04T20:17:41.521Z",
+      "version": 1
+    },
+    {
+      "id": "d3-leg-yellow",
+      "type": "rectangle",
+      "x": 55,
+      "y": 795,
+      "width": 16,
+      "height": 12,
+      "backgroundColor": "#fff3bf",
+      "strokeColor": "#e8590c",
+      "strokeWidth": 1,
+      "roughness": 0,
+      "createdAt": "2026-03-04T20:17:41.521Z",
+      "updatedAt": "2026-03-04T20:17:41.521Z",
+      "version": 1
+    },
+    {
+      "id": "d3-leg-yellow-t",
+      "type": "text",
+      "x": 78,
+      "y": 792,
+      "strokeColor": "#495057",
+      "text": "Decision annotation",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T20:17:41.521Z",
+      "updatedAt": "2026-03-04T20:17:41.521Z",
+      "version": 1
     }
   ],
   "appState": {
