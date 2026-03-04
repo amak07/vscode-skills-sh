@@ -1,6 +1,6 @@
 # Architecture
 
-> Diagrams use the [Excalidraw](https://excalidraw.com) style. Source files are in this directory — editable with the [VS Code Excalidraw extension](https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor). CI auto-exports `.excalidraw` to `.svg` on push.
+> Diagrams use the [Excalidraw](https://excalidraw.com) style. Source files are in this directory — editable with the [VS Code Excalidraw extension](https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor). SVGs are exported locally and committed alongside the source files.
 
 ## How to Read These Diagrams
 

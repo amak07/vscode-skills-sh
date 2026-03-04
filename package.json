@@ -468,8 +468,7 @@
     "lint": "eslint src/",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
-    "export-diagrams": "npx -y excalidraw_export --embed-fonts docs/architecture/*.excalidraw"
+    "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",

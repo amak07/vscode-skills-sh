@@ -100,7 +100,7 @@ Both secrets are configured at: https://github.com/amak07/vscode-skills-sh/setti
 
 ## Architecture Diagrams
 
-Excalidraw source files live in `docs/architecture/`. The rendered documentation is in [`docs/architecture/architecture.md`](docs/architecture/architecture.md). CI auto-exports `.excalidraw` → `.svg` on push to master.
+Excalidraw source files live in `docs/architecture/`. The rendered documentation is in [`docs/architecture/architecture.md`](docs/architecture/architecture.md). SVGs are exported locally via the Excalidraw MCP and committed alongside source files.
 
 ### Current Diagrams (4)
 | # | Title | Question |
@@ -141,19 +141,21 @@ Diagrams are edited via the Excalidraw MCP server (registered at user scope). Wo
 - Arrows: always bind with `startElementId` / `endElementId` for auto-routing
 - Arrow labels: set as the arrow's `text` property (bound, not floating)
 
-### SVG Export Pipeline
+### SVG Export (Local Only)
 
-**CI (automatic):** `.github/workflows/export-diagrams.yml` runs on push to master when `.excalidraw` files change. Uses `excalidraw_export --embed-fonts`.
+SVGs are exported locally via the Excalidraw MCP and committed alongside the `.excalidraw` source files. There is no CI export — this keeps the process simple and avoids CI permission / tooling issues on Windows.
 
-**Local (manual):** `npm.cmd run export-diagrams` or use the MCP's `export_to_image` tool.
+**How to export:** For each modified `.excalidraw` file:
+1. `import_scene` — load the `.excalidraw` file
+2. `export_to_image(format: "svg", filePath: "docs/architecture/NN-name.svg")` — export SVG
 
-**Important:** The SVGs must be committed alongside the `.excalidraw` source files. `architecture.md` references SVGs with relative paths (`01-system-context.svg`). The README links to `architecture.md`.
+**Important:** `architecture.md` references SVGs with relative paths (`01-system-context.svg`). Always commit updated SVGs with the source files.
 
 ### Adding a New Diagram
 1. Create `docs/architecture/NN-name.excalidraw`
 2. Follow the color coding and font conventions above
 3. Add 2-3 decision annotations (italic callouts explaining trade-offs)
-4. Export SVG via MCP (`export_to_image`) or push and let CI handle it
+4. Export SVG via MCP (`import_scene` + `export_to_image`)
 5. Add a section to `docs/architecture/architecture.md` with `![Name](NN-name.svg)`
 
 ## Beads Task Management
@@ -190,7 +192,14 @@ npm.cmd test          # Unit tests
 npm.cmd run build     # Build
 ```
 
-### 2. Commit, push, and open PR
+### 2. Export architecture SVGs (if diagrams changed)
+
+If any `.excalidraw` files were modified, re-export their SVGs via the Excalidraw MCP before committing:
+1. `import_scene` each modified `.excalidraw` file
+2. `export_to_image(format: "svg", filePath: "docs/architecture/NN-name.svg")`
+3. Include the updated `.svg` files in the commit
+
+### 3. Commit, push, and open PR
 
 ```bash
 git add <files>
@@ -199,13 +208,13 @@ git push -u origin <branch>
 gh pr create --title "..." --body "..."
 ```
 
-### 3. Monitor PR until merged
+### 4. Monitor PR until merged
 
 1. Wait for CI, then check: `gh pr checks <pr-number>`
 2. If CI fails: investigate, fix, push again, repeat
 3. Report status to the user — never leave a PR in limbo
 
-### 4. Release (if publishing a new version)
+### 5. Release (if publishing a new version)
 
 1. Update `CHANGELOG.md`: rename `[Unreleased]` → `[x.y.z] - YYYY-MM-DD`
 2. Bump version and create tag:
