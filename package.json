@@ -469,7 +469,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "export-diagrams": "for f in docs/architecture/*.excalidraw; do [ -f \"$f\" ] && npx -y excalidraw-to-svg \"$f\" docs/architecture/; done"
+    "export-diagrams": "npx -y excalidraw_export --embed-fonts docs/architecture/*.excalidraw"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",

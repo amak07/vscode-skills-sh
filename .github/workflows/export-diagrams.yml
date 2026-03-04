@@ -18,12 +18,12 @@ jobs:
         with:
           node-version: 20
 
+      - name: Install export tool
+        run: npm install -g excalidraw_export
+
       - name: Export Excalidraw to SVG
         run: |
-          for f in docs/architecture/*.excalidraw; do
-            [ -f "$f" ] || continue
-            npx -y excalidraw-to-svg "$f" docs/architecture/
-          done
+          excalidraw_export --embed-fonts docs/architecture/*.excalidraw
 
       - name: Check for changes
         id: diff
