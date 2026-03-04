@@ -25,9 +25,9 @@
         "type": 3
       },
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.218Z",
-      "updatedAt": "2026-03-04T08:05:27.947Z",
-      "version": 2
+      "createdAt": "2026-03-04T08:35:22.853Z",
+      "updatedAt": "2026-03-04T08:35:22.853Z",
+      "version": 1
     },
     {
       "id": "title-text",
@@ -43,16 +43,16 @@
       "roughness": 1,
       "opacity": 100,
       "text": "System Context",
-      "fontSize": 48.06084432740078,
-      "fontFamily": 1,
+      "fontSize": 36,
+      "fontFamily": 2,
       "groupIds": [
         "2-4csibXSizB_lrWHjK4A"
       ],
       "locked": false,
       "roundness": null,
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.218Z",
-      "updatedAt": "2026-03-04T08:05:23.534Z",
+      "createdAt": "2026-03-04T08:35:22.853Z",
+      "updatedAt": "2026-03-04T08:35:30.610Z",
       "version": 2
     },
     {
@@ -69,8 +69,8 @@
       "roughness": 1,
       "opacity": 100,
       "text": "What does this thing do?",
-      "fontSize": 22.06071542897085,
-      "fontFamily": 1,
+      "fontSize": 20,
+      "fontFamily": 2,
       "groupIds": [
         "2-4csibXSizB_lrWHjK4A",
         "grp-1"
@@ -78,8 +78,8 @@
       "locked": false,
       "roundness": null,
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.218Z",
-      "updatedAt": "2026-03-04T08:05:32.139Z",
+      "createdAt": "2026-03-04T08:35:22.853Z",
+      "updatedAt": "2026-03-04T08:35:31.053Z",
       "version": 2
     },
     {
@@ -103,8 +103,8 @@
         "type": 3
       },
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.218Z",
-      "updatedAt": "2026-03-04T08:04:54.218Z",
+      "createdAt": "2026-03-04T08:35:22.853Z",
+      "updatedAt": "2026-03-04T08:35:22.853Z",
       "version": 1
     },
     {
@@ -122,16 +122,16 @@
       "opacity": 100,
       "text": "VS Code Extension",
       "fontSize": 24,
-      "fontFamily": 1,
+      "fontFamily": 2,
       "groupIds": [
         "grp-5"
       ],
       "locked": false,
       "roundness": null,
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.218Z",
-      "updatedAt": "2026-03-04T08:04:54.218Z",
-      "version": 1
+      "createdAt": "2026-03-04T08:35:22.853Z",
+      "updatedAt": "2026-03-04T08:35:33.724Z",
+      "version": 2
     },
     {
       "id": "ext-sublabel-tree",
@@ -147,15 +147,15 @@
       "roughness": 1,
       "opacity": 100,
       "text": "TreeView Sidebar",
-      "fontSize": 16,
-      "fontFamily": 1,
+      "fontSize": 18,
+      "fontFamily": 2,
       "groupIds": [],
       "locked": false,
       "roundness": null,
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.218Z",
-      "updatedAt": "2026-03-04T08:04:54.218Z",
-      "version": 1
+      "createdAt": "2026-03-04T08:35:22.853Z",
+      "updatedAt": "2026-03-04T08:35:35.948Z",
+      "version": 2
     },
     {
       "id": "ext-sublabel-webview",
@@ -171,15 +171,15 @@
       "roughness": 1,
       "opacity": 100,
       "text": "Marketplace Webview",
-      "fontSize": 16,
-      "fontFamily": 1,
+      "fontSize": 18,
+      "fontFamily": 2,
       "groupIds": [],
       "locked": false,
       "roundness": null,
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.218Z",
-      "updatedAt": "2026-03-04T08:04:54.218Z",
-      "version": 1
+      "createdAt": "2026-03-04T08:35:22.853Z",
+      "updatedAt": "2026-03-04T08:35:36.831Z",
+      "version": 2
     },
     {
       "id": "user-box",
@@ -202,8 +202,8 @@
         "type": 3
       },
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.218Z",
-      "updatedAt": "2026-03-04T08:04:54.218Z",
+      "createdAt": "2026-03-04T08:35:22.853Z",
+      "updatedAt": "2026-03-04T08:35:22.853Z",
       "version": 1
     },
     {
@@ -221,16 +221,16 @@
       "opacity": 100,
       "text": "Developer",
       "fontSize": 20,
-      "fontFamily": 1,
+      "fontFamily": 2,
       "groupIds": [
         "grp-6"
       ],
       "locked": false,
       "roundness": null,
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.218Z",
-      "updatedAt": "2026-03-04T08:04:54.218Z",
-      "version": 1
+      "createdAt": "2026-03-04T08:35:22.853Z",
+      "updatedAt": "2026-03-04T08:35:34.168Z",
+      "version": 2
     },
     {
       "id": "arrow-user-to-ext",
@@ -264,8 +264,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "createdAt": "2026-03-04T08:04:54.218Z",
-      "updatedAt": "2026-03-04T08:04:54.218Z",
+      "createdAt": "2026-03-04T08:35:22.853Z",
+      "updatedAt": "2026-03-04T08:35:22.853Z",
       "version": 1
     },
     {
@@ -282,15 +282,15 @@
       "roughness": 1,
       "opacity": 100,
       "text": "Browse, Install, Update",
-      "fontSize": 23.956043956044013,
-      "fontFamily": 1,
+      "fontSize": 16,
+      "fontFamily": 2,
       "groupIds": [],
       "locked": false,
       "roundness": null,
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.218Z",
-      "updatedAt": "2026-03-04T08:04:54.218Z",
-      "version": 1
+      "createdAt": "2026-03-04T08:35:22.853Z",
+      "updatedAt": "2026-03-04T08:35:44.820Z",
+      "version": 2
     },
     {
       "id": "skillsapi-box",
@@ -313,8 +313,8 @@
         "type": 3
       },
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.219Z",
-      "updatedAt": "2026-03-04T08:04:54.219Z",
+      "createdAt": "2026-03-04T08:35:22.853Z",
+      "updatedAt": "2026-03-04T08:35:22.853Z",
       "version": 1
     },
     {
@@ -332,16 +332,16 @@
       "opacity": 100,
       "text": "skills.sh API",
       "fontSize": 20,
-      "fontFamily": 1,
+      "fontFamily": 2,
       "groupIds": [
         "grp-7"
       ],
       "locked": false,
       "roundness": null,
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.219Z",
-      "updatedAt": "2026-03-04T08:04:54.219Z",
-      "version": 1
+      "createdAt": "2026-03-04T08:35:22.853Z",
+      "updatedAt": "2026-03-04T08:35:32.386Z",
+      "version": 2
     },
     {
       "id": "arrow-ext-to-skillsapi",
@@ -375,8 +375,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "createdAt": "2026-03-04T08:04:54.219Z",
-      "updatedAt": "2026-03-04T08:04:54.219Z",
+      "createdAt": "2026-03-04T08:35:22.853Z",
+      "updatedAt": "2026-03-04T08:35:22.853Z",
       "version": 1
     },
     {
@@ -393,15 +393,15 @@
       "roughness": 1,
       "opacity": 100,
       "text": "REST: search, leaderboards",
-      "fontSize": 18,
-      "fontFamily": 1,
+      "fontSize": 16,
+      "fontFamily": 2,
       "groupIds": [],
       "locked": false,
       "roundness": null,
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.219Z",
-      "updatedAt": "2026-03-04T08:04:54.219Z",
-      "version": 1
+      "createdAt": "2026-03-04T08:35:22.853Z",
+      "updatedAt": "2026-03-04T08:35:43.510Z",
+      "version": 2
     },
     {
       "id": "githubapi-box",
@@ -424,8 +424,8 @@
         "type": 3
       },
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.219Z",
-      "updatedAt": "2026-03-04T08:04:54.219Z",
+      "createdAt": "2026-03-04T08:35:22.853Z",
+      "updatedAt": "2026-03-04T08:35:22.853Z",
       "version": 1
     },
     {
@@ -443,16 +443,16 @@
       "opacity": 100,
       "text": "GitHub API",
       "fontSize": 20,
-      "fontFamily": 1,
+      "fontFamily": 2,
       "groupIds": [
         "grp-8"
       ],
       "locked": false,
       "roundness": null,
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.219Z",
-      "updatedAt": "2026-03-04T08:04:54.219Z",
-      "version": 1
+      "createdAt": "2026-03-04T08:35:22.853Z",
+      "updatedAt": "2026-03-04T08:35:32.842Z",
+      "version": 2
     },
     {
       "id": "arrow-ext-to-githubapi",
@@ -486,8 +486,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "createdAt": "2026-03-04T08:04:54.219Z",
-      "updatedAt": "2026-03-04T08:04:54.219Z",
+      "createdAt": "2026-03-04T08:35:22.853Z",
+      "updatedAt": "2026-03-04T08:35:22.853Z",
       "version": 1
     },
     {
@@ -505,14 +505,14 @@
       "opacity": 100,
       "text": "Trees API: update checking",
       "fontSize": 16,
-      "fontFamily": 1,
+      "fontFamily": 2,
       "groupIds": [],
       "locked": false,
       "roundness": null,
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.219Z",
-      "updatedAt": "2026-03-04T08:04:54.219Z",
-      "version": 1
+      "createdAt": "2026-03-04T08:35:22.853Z",
+      "updatedAt": "2026-03-04T08:35:43.963Z",
+      "version": 2
     },
     {
       "id": "skillsweb-box",
@@ -535,8 +535,8 @@
         "type": 3
       },
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.219Z",
-      "updatedAt": "2026-03-04T08:04:54.219Z",
+      "createdAt": "2026-03-04T08:35:22.853Z",
+      "updatedAt": "2026-03-04T08:35:22.853Z",
       "version": 1
     },
     {
@@ -554,16 +554,16 @@
       "opacity": 100,
       "text": "skills.sh Website",
       "fontSize": 20,
-      "fontFamily": 1,
+      "fontFamily": 2,
       "groupIds": [
         "grp-9"
       ],
       "locked": false,
       "roundness": null,
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.219Z",
-      "updatedAt": "2026-03-04T08:04:54.219Z",
-      "version": 1
+      "createdAt": "2026-03-04T08:35:22.853Z",
+      "updatedAt": "2026-03-04T08:35:34.643Z",
+      "version": 2
     },
     {
       "id": "arrow-ext-to-skillsweb",
@@ -597,8 +597,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "createdAt": "2026-03-04T08:04:54.219Z",
-      "updatedAt": "2026-03-04T08:04:54.219Z",
+      "createdAt": "2026-03-04T08:35:22.853Z",
+      "updatedAt": "2026-03-04T08:35:22.853Z",
       "version": 1
     },
     {
@@ -616,14 +616,14 @@
       "opacity": 100,
       "text": "HTML scrape: details, audits",
       "fontSize": 16,
-      "fontFamily": 1,
+      "fontFamily": 2,
       "groupIds": [],
       "locked": false,
       "roundness": null,
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.220Z",
-      "updatedAt": "2026-03-04T08:04:54.220Z",
-      "version": 1
+      "createdAt": "2026-03-04T08:35:22.854Z",
+      "updatedAt": "2026-03-04T08:35:45.303Z",
+      "version": 2
     },
     {
       "id": "fs-box",
@@ -646,8 +646,8 @@
         "type": 3
       },
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.220Z",
-      "updatedAt": "2026-03-04T08:04:54.220Z",
+      "createdAt": "2026-03-04T08:35:22.854Z",
+      "updatedAt": "2026-03-04T08:35:22.854Z",
       "version": 1
     },
     {
@@ -664,17 +664,17 @@
       "roughness": 1,
       "opacity": 100,
       "text": "Local Filesystem",
-      "fontSize": 20,
-      "fontFamily": 1,
+      "fontSize": 22,
+      "fontFamily": 2,
       "groupIds": [
         "f7dwyP4DGMZRyivosBa0t"
       ],
       "locked": false,
       "roundness": null,
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.220Z",
-      "updatedAt": "2026-03-04T08:04:54.220Z",
-      "version": 1
+      "createdAt": "2026-03-04T08:35:22.854Z",
+      "updatedAt": "2026-03-04T08:35:35.476Z",
+      "version": 2
     },
     {
       "id": "fs-label-dirs",
@@ -691,16 +691,16 @@
       "opacity": 100,
       "text": "~/.claude/skills/ · ~/.cursor/skills/ · ... (11 agent dirs)",
       "fontSize": 16,
-      "fontFamily": 1,
+      "fontFamily": 2,
       "groupIds": [
         "f7dwyP4DGMZRyivosBa0t"
       ],
       "locked": false,
       "roundness": null,
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.220Z",
-      "updatedAt": "2026-03-04T08:04:54.220Z",
-      "version": 1
+      "createdAt": "2026-03-04T08:35:22.854Z",
+      "updatedAt": "2026-03-04T08:35:37.278Z",
+      "version": 2
     },
     {
       "id": "fs-label-lock",
@@ -717,16 +717,16 @@
       "opacity": 100,
       "text": "~/.agents/.skill-lock.json (lock file)",
       "fontSize": 16,
-      "fontFamily": 1,
+      "fontFamily": 2,
       "groupIds": [
         "f7dwyP4DGMZRyivosBa0t"
       ],
       "locked": false,
       "roundness": null,
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.220Z",
-      "updatedAt": "2026-03-04T08:04:54.220Z",
-      "version": 1
+      "createdAt": "2026-03-04T08:35:22.854Z",
+      "updatedAt": "2026-03-04T08:35:37.726Z",
+      "version": 2
     },
     {
       "id": "fs-label-manifest",
@@ -743,16 +743,16 @@
       "opacity": 100,
       "text": "skills.json (team manifest)",
       "fontSize": 16,
-      "fontFamily": 1,
+      "fontFamily": 2,
       "groupIds": [
         "f7dwyP4DGMZRyivosBa0t"
       ],
       "locked": false,
       "roundness": null,
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.220Z",
-      "updatedAt": "2026-03-04T08:04:54.220Z",
-      "version": 1
+      "createdAt": "2026-03-04T08:35:22.854Z",
+      "updatedAt": "2026-03-04T08:35:38.176Z",
+      "version": 2
     },
     {
       "id": "arrow-ext-to-fs",
@@ -786,8 +786,8 @@
       "startArrowhead": "arrow",
       "endArrowhead": "arrow",
       "elbowed": false,
-      "createdAt": "2026-03-04T08:04:54.220Z",
-      "updatedAt": "2026-03-04T08:04:54.220Z",
+      "createdAt": "2026-03-04T08:35:22.854Z",
+      "updatedAt": "2026-03-04T08:35:22.854Z",
       "version": 1
     },
     {
@@ -811,8 +811,8 @@
         "type": 3
       },
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.220Z",
-      "updatedAt": "2026-03-04T08:04:54.220Z",
+      "createdAt": "2026-03-04T08:35:22.854Z",
+      "updatedAt": "2026-03-04T08:35:22.854Z",
       "version": 1
     },
     {
@@ -829,17 +829,17 @@
       "roughness": 1,
       "opacity": 100,
       "text": "Terminal: npx skills add/remove",
-      "fontSize": 18,
-      "fontFamily": 1,
+      "fontSize": 20,
+      "fontFamily": 2,
       "groupIds": [
         "grp-4"
       ],
       "locked": false,
       "roundness": null,
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.220Z",
-      "updatedAt": "2026-03-04T08:04:54.220Z",
-      "version": 1
+      "createdAt": "2026-03-04T08:35:22.854Z",
+      "updatedAt": "2026-03-04T08:35:31.960Z",
+      "version": 2
     },
     {
       "id": "arrow-ext-to-terminal",
@@ -873,8 +873,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "createdAt": "2026-03-04T08:04:54.220Z",
-      "updatedAt": "2026-03-04T08:04:54.220Z",
+      "createdAt": "2026-03-04T08:35:22.854Z",
+      "updatedAt": "2026-03-04T08:35:22.854Z",
       "version": 1
     },
     {
@@ -899,8 +899,8 @@
         "type": 3
       },
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.220Z",
-      "updatedAt": "2026-03-04T08:04:54.220Z",
+      "createdAt": "2026-03-04T08:35:22.854Z",
+      "updatedAt": "2026-03-04T08:35:22.854Z",
       "version": 1
     },
     {
@@ -918,7 +918,7 @@
       "opacity": 100,
       "text": "No API for detail pages —\nscrapes RSC-rendered HTML",
       "fontSize": 16,
-      "fontFamily": 1,
+      "fontFamily": 2,
       "groupIds": [
         "bu7RQlBmt4HOAH0XrmXMC",
         "grp-2"
@@ -926,9 +926,9 @@
       "locked": false,
       "roundness": null,
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.220Z",
-      "updatedAt": "2026-03-04T08:04:54.220Z",
-      "version": 1
+      "createdAt": "2026-03-04T08:35:22.854Z",
+      "updatedAt": "2026-03-04T08:35:46.299Z",
+      "version": 2
     },
     {
       "id": "callout-bg-90009",
@@ -952,9 +952,9 @@
         "type": 3
       },
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.220Z",
-      "updatedAt": "2026-03-04T08:05:36.026Z",
-      "version": 2
+      "createdAt": "2026-03-04T08:35:22.854Z",
+      "updatedAt": "2026-03-04T08:35:22.854Z",
+      "version": 1
     },
     {
       "id": "annotation-github",
@@ -971,7 +971,7 @@
       "opacity": 100,
       "text": "Bypassed skills.sh check-updates\nAPI due to branch mismatch bug",
       "fontSize": 16,
-      "fontFamily": 1,
+      "fontFamily": 2,
       "groupIds": [
         "jleysm9ibOL2kO6tS9fmL",
         "grp-3"
@@ -979,8 +979,8 @@
       "locked": false,
       "roundness": null,
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.220Z",
-      "updatedAt": "2026-03-04T08:05:39.226Z",
+      "createdAt": "2026-03-04T08:35:22.854Z",
+      "updatedAt": "2026-03-04T08:35:46.462Z",
       "version": 2
     },
     {
@@ -997,17 +997,17 @@
       "roughness": 1,
       "opacity": 100,
       "text": "Never writes symlinks itself —\ndelegates to CLI for correctness",
-      "fontSize": 25.94293135897181,
-      "fontFamily": 1,
+      "fontSize": 16,
+      "fontFamily": 2,
       "groupIds": [
         "grp-4"
       ],
       "locked": false,
       "roundness": null,
       "fillStyle": "solid",
-      "createdAt": "2026-03-04T08:04:54.220Z",
-      "updatedAt": "2026-03-04T08:04:54.220Z",
-      "version": 1
+      "createdAt": "2026-03-04T08:35:22.854Z",
+      "updatedAt": "2026-03-04T08:35:42.703Z",
+      "version": 2
     }
   ],
   "appState": {
