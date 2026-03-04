@@ -4,6 +4,238 @@
   "source": "https://excalidraw.com",
   "elements": [
     {
+      "id": "callout-bg-90012",
+      "type": "rectangle",
+      "x": 748,
+      "y": 558,
+      "width": 164.8,
+      "height": 64,
+      "angle": 0,
+      "strokeColor": "#ced4da",
+      "backgroundColor": "#fff9db",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 90013,
+      "version": 1,
+      "versionNonce": 90014,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1709000000000,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "callout-bg-90015",
+      "type": "rectangle",
+      "x": 748,
+      "y": 600,
+      "width": 164.8,
+      "height": 64,
+      "angle": 0,
+      "strokeColor": "#ced4da",
+      "backgroundColor": "#fff9db",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 90016,
+      "version": 1,
+      "versionNonce": 90017,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1709000000000,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "callout-bg-90018",
+      "type": "rectangle",
+      "x": 998,
+      "y": 558,
+      "width": 191.20000000000002,
+      "height": 64,
+      "angle": 0,
+      "strokeColor": "#ced4da",
+      "backgroundColor": "#fff9db",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 90019,
+      "version": 1,
+      "versionNonce": 90020,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1709000000000,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "callout-bg-90021",
+      "type": "rectangle",
+      "x": 998,
+      "y": 600,
+      "width": 279.20000000000005,
+      "height": 64,
+      "angle": 0,
+      "strokeColor": "#ced4da",
+      "backgroundColor": "#fff9db",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 90022,
+      "version": 1,
+      "versionNonce": 90023,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1709000000000,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "callout-bg-90024",
+      "type": "rectangle",
+      "x": 1308,
+      "y": 558,
+      "width": 112,
+      "height": 44,
+      "angle": 0,
+      "strokeColor": "#ced4da",
+      "backgroundColor": "#fff9db",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 90025,
+      "version": 1,
+      "versionNonce": 90026,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1709000000000,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "callout-bg-90027",
+      "type": "rectangle",
+      "x": 1258,
+      "y": 583,
+      "width": 217.60000000000002,
+      "height": 64,
+      "angle": 0,
+      "strokeColor": "#ced4da",
+      "backgroundColor": "#fff9db",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 90028,
+      "version": 1,
+      "versionNonce": 90029,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1709000000000,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "callout-bg-90030",
+      "type": "rectangle",
+      "x": 738,
+      "y": 848,
+      "width": 543.2,
+      "height": 84,
+      "angle": 0,
+      "strokeColor": "#ced4da",
+      "backgroundColor": "#fff9db",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 90031,
+      "version": 1,
+      "versionNonce": 90032,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1709000000000,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "callout-bg-90033",
+      "type": "rectangle",
+      "x": 1188,
+      "y": 808,
+      "width": 323.20000000000005,
+      "height": 64,
+      "angle": 0,
+      "strokeColor": "#ced4da",
+      "backgroundColor": "#fff9db",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 90034,
+      "version": 1,
+      "versionNonce": 90035,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1709000000000,
+      "link": null,
+      "locked": false
+    },
+    {
       "id": "title-main",
       "type": "text",
       "x": 20,
@@ -91,14 +323,22 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 2003,
       "version": 1,
       "versionNonce": 3003,
       "isDeleted": false,
       "boundElements": [
-        { "id": "step1-text", "type": "text" },
-        { "id": "arrow-1-2", "type": "arrow" }
+        {
+          "id": "step1-text",
+          "type": "text"
+        },
+        {
+          "id": "arrow-1-2",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -157,7 +397,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 2005,
       "version": 1,
       "versionNonce": 3005,
@@ -167,9 +409,26 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [55, 0]],
-      "startBinding": { "elementId": "step1-box", "focus": 0, "gap": 5 },
-      "endBinding": { "elementId": "step2-box", "focus": 0, "gap": 5 },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          55,
+          0
+        ]
+      ],
+      "startBinding": {
+        "elementId": "step1-box",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "step2-box",
+        "focus": 0,
+        "gap": 5
+      },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "lastCommittedPoint": null,
@@ -191,15 +450,26 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 2006,
       "version": 1,
       "versionNonce": 3006,
       "isDeleted": false,
       "boundElements": [
-        { "id": "step2-text", "type": "text" },
-        { "id": "arrow-1-2", "type": "arrow" },
-        { "id": "arrow-2-3", "type": "arrow" }
+        {
+          "id": "step2-text",
+          "type": "text"
+        },
+        {
+          "id": "arrow-1-2",
+          "type": "arrow"
+        },
+        {
+          "id": "arrow-2-3",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -269,7 +539,7 @@
       "locked": false,
       "frameId": null,
       "text": "VS Code sandboxes webviews in iframes",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
@@ -294,7 +564,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 2009,
       "version": 1,
       "versionNonce": 3009,
@@ -304,9 +576,26 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [55, 0]],
-      "startBinding": { "elementId": "step2-box", "focus": 0, "gap": 5 },
-      "endBinding": { "elementId": "step3-box", "focus": 0, "gap": 5 },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          55,
+          0
+        ]
+      ],
+      "startBinding": {
+        "elementId": "step2-box",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "step3-box",
+        "focus": 0,
+        "gap": 5
+      },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "lastCommittedPoint": null,
@@ -328,15 +617,26 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 2010,
       "version": 1,
       "versionNonce": 3010,
       "isDeleted": false,
       "boundElements": [
-        { "id": "step3-text", "type": "text" },
-        { "id": "arrow-2-3", "type": "arrow" },
-        { "id": "arrow-3-4", "type": "arrow" }
+        {
+          "id": "step3-text",
+          "type": "text"
+        },
+        {
+          "id": "arrow-2-3",
+          "type": "arrow"
+        },
+        {
+          "id": "arrow-3-4",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -395,7 +695,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 2012,
       "version": 1,
       "versionNonce": 3012,
@@ -405,9 +707,26 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [55, 0]],
-      "startBinding": { "elementId": "step3-box", "focus": 0, "gap": 5 },
-      "endBinding": { "elementId": "step4-box", "focus": 0, "gap": 5 },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          55,
+          0
+        ]
+      ],
+      "startBinding": {
+        "elementId": "step3-box",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "step4-box",
+        "focus": 0,
+        "gap": 5
+      },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "lastCommittedPoint": null,
@@ -429,15 +748,26 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 2013,
       "version": 1,
       "versionNonce": 3013,
       "isDeleted": false,
       "boundElements": [
-        { "id": "step4-text", "type": "text" },
-        { "id": "arrow-3-4", "type": "arrow" },
-        { "id": "arrow-4-5", "type": "arrow" }
+        {
+          "id": "step4-text",
+          "type": "text"
+        },
+        {
+          "id": "arrow-3-4",
+          "type": "arrow"
+        },
+        {
+          "id": "arrow-4-5",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -496,7 +826,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 2015,
       "version": 1,
       "versionNonce": 3015,
@@ -506,9 +838,26 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [55, 0]],
-      "startBinding": { "elementId": "step4-box", "focus": 0, "gap": 5 },
-      "endBinding": { "elementId": "step5-box", "focus": 0, "gap": 5 },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          55,
+          0
+        ]
+      ],
+      "startBinding": {
+        "elementId": "step4-box",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "step5-box",
+        "focus": 0,
+        "gap": 5
+      },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "lastCommittedPoint": null,
@@ -530,17 +879,34 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 2016,
       "version": 1,
       "versionNonce": 3016,
       "isDeleted": false,
       "boundElements": [
-        { "id": "step5-text", "type": "text" },
-        { "id": "arrow-4-5", "type": "arrow" },
-        { "id": "arrow-5-pathA", "type": "arrow" },
-        { "id": "arrow-5-pathB", "type": "arrow" },
-        { "id": "arrow-5-pathC", "type": "arrow" }
+        {
+          "id": "step5-text",
+          "type": "text"
+        },
+        {
+          "id": "arrow-4-5",
+          "type": "arrow"
+        },
+        {
+          "id": "arrow-5-pathA",
+          "type": "arrow"
+        },
+        {
+          "id": "arrow-5-pathB",
+          "type": "arrow"
+        },
+        {
+          "id": "arrow-5-pathC",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -635,7 +1001,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 2019,
       "version": 1,
       "versionNonce": 3019,
@@ -645,9 +1013,26 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [-170, 110]],
-      "startBinding": { "elementId": "step5-box", "focus": 0, "gap": 5 },
-      "endBinding": { "elementId": "pathA-box", "focus": 0, "gap": 5 },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -170,
+          110
+        ]
+      ],
+      "startBinding": {
+        "elementId": "step5-box",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "pathA-box",
+        "focus": 0,
+        "gap": 5
+      },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "lastCommittedPoint": null,
@@ -669,7 +1054,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 2020,
       "version": 1,
       "versionNonce": 3020,
@@ -679,9 +1066,26 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [30, 110]],
-      "startBinding": { "elementId": "step5-box", "focus": 0, "gap": 5 },
-      "endBinding": { "elementId": "pathB-box", "focus": 0, "gap": 5 },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          30,
+          110
+        ]
+      ],
+      "startBinding": {
+        "elementId": "step5-box",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "pathB-box",
+        "focus": 0,
+        "gap": 5
+      },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "lastCommittedPoint": null,
@@ -703,7 +1107,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 2021,
       "version": 1,
       "versionNonce": 3021,
@@ -713,9 +1119,26 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [220, 110]],
-      "startBinding": { "elementId": "step5-box", "focus": 0, "gap": 5 },
-      "endBinding": { "elementId": "pathC-box", "focus": 0, "gap": 5 },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          220,
+          110
+        ]
+      ],
+      "startBinding": {
+        "elementId": "step5-box",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "pathC-box",
+        "focus": 0,
+        "gap": 5
+      },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "lastCommittedPoint": null,
@@ -737,15 +1160,26 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 2022,
       "version": 1,
       "versionNonce": 3022,
       "isDeleted": false,
       "boundElements": [
-        { "id": "pathA-label", "type": "text" },
-        { "id": "arrow-5-pathA", "type": "arrow" },
-        { "id": "arrow-pathA-diamond", "type": "arrow" }
+        {
+          "id": "pathA-label",
+          "type": "text"
+        },
+        {
+          "id": "arrow-5-pathA",
+          "type": "arrow"
+        },
+        {
+          "id": "arrow-pathA-diamond",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -815,7 +1249,7 @@
       "locked": false,
       "frameId": null,
       "text": "onDidEndTerminal\nShellExecution",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
@@ -851,7 +1285,7 @@
       "locked": false,
       "frameId": null,
       "text": "Most reliable on\nmacOS/Linux",
-      "fontSize": 13,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
@@ -876,15 +1310,26 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 2026,
       "version": 1,
       "versionNonce": 3026,
       "isDeleted": false,
       "boundElements": [
-        { "id": "pathB-label", "type": "text" },
-        { "id": "arrow-5-pathB", "type": "arrow" },
-        { "id": "arrow-pathB-diamond", "type": "arrow" }
+        {
+          "id": "pathB-label",
+          "type": "text"
+        },
+        {
+          "id": "arrow-5-pathB",
+          "type": "arrow"
+        },
+        {
+          "id": "arrow-pathB-diamond",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -954,7 +1399,7 @@
       "locked": false,
       "frameId": null,
       "text": "Watches lock file +\nskill directories",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
@@ -989,13 +1434,13 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "text": "Lock file is a regular file \u2014\nworks through symlinks",
-      "fontSize": 13,
+      "text": "Lock file is a regular file —\nworks through symlinks",
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "Lock file is a regular file \u2014\nworks through symlinks",
+      "originalText": "Lock file is a regular file —\nworks through symlinks",
       "autoResize": true,
       "lineHeight": 1.25
     },
@@ -1015,15 +1460,26 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 2030,
       "version": 1,
       "versionNonce": 3030,
       "isDeleted": false,
       "boundElements": [
-        { "id": "pathC-label", "type": "text" },
-        { "id": "arrow-5-pathC", "type": "arrow" },
-        { "id": "arrow-pathC-diamond", "type": "arrow" }
+        {
+          "id": "pathC-label",
+          "type": "text"
+        },
+        {
+          "id": "arrow-5-pathC",
+          "type": "arrow"
+        },
+        {
+          "id": "arrow-pathC-diamond",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -1093,7 +1549,7 @@
       "locked": false,
       "frameId": null,
       "text": "Safety net",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
@@ -1129,7 +1585,7 @@
       "locked": false,
       "frameId": null,
       "text": "Windows watcher\nmisses symlink changes",
-      "fontSize": 13,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
@@ -1154,7 +1610,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 2034,
       "version": 1,
       "versionNonce": 3034,
@@ -1164,9 +1622,26 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [170, 155]],
-      "startBinding": { "elementId": "pathA-box", "focus": 0, "gap": 5 },
-      "endBinding": { "elementId": "converge-diamond", "focus": 0, "gap": 5 },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          170,
+          155
+        ]
+      ],
+      "startBinding": {
+        "elementId": "pathA-box",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "converge-diamond",
+        "focus": 0,
+        "gap": 5
+      },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "lastCommittedPoint": null,
@@ -1188,7 +1663,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 2035,
       "version": 1,
       "versionNonce": 3035,
@@ -1198,9 +1675,26 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [-90, 155]],
-      "startBinding": { "elementId": "pathB-box", "focus": 0, "gap": 5 },
-      "endBinding": { "elementId": "converge-diamond", "focus": 0, "gap": 5 },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -90,
+          155
+        ]
+      ],
+      "startBinding": {
+        "elementId": "pathB-box",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "converge-diamond",
+        "focus": 0,
+        "gap": 5
+      },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "lastCommittedPoint": null,
@@ -1222,7 +1716,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 2036,
       "version": 1,
       "versionNonce": 3036,
@@ -1232,9 +1728,26 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [-340, 155]],
-      "startBinding": { "elementId": "pathC-box", "focus": 0, "gap": 5 },
-      "endBinding": { "elementId": "converge-diamond", "focus": 0, "gap": 5 },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -340,
+          155
+        ]
+      ],
+      "startBinding": {
+        "elementId": "pathC-box",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "converge-diamond",
+        "focus": 0,
+        "gap": 5
+      },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "lastCommittedPoint": null,
@@ -1256,17 +1769,34 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 2037,
       "version": 1,
       "versionNonce": 3037,
       "isDeleted": false,
       "boundElements": [
-        { "id": "converge-text", "type": "text" },
-        { "id": "arrow-pathA-diamond", "type": "arrow" },
-        { "id": "arrow-pathB-diamond", "type": "arrow" },
-        { "id": "arrow-pathC-diamond", "type": "arrow" },
-        { "id": "arrow-diamond-resolution", "type": "arrow" }
+        {
+          "id": "converge-text",
+          "type": "text"
+        },
+        {
+          "id": "arrow-pathA-diamond",
+          "type": "arrow"
+        },
+        {
+          "id": "arrow-pathB-diamond",
+          "type": "arrow"
+        },
+        {
+          "id": "arrow-pathC-diamond",
+          "type": "arrow"
+        },
+        {
+          "id": "arrow-diamond-resolution",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -1299,13 +1829,13 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "text": "First fires \u2192\nresolved flag",
+      "text": "First fires →\nresolved flag",
       "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "center",
       "verticalAlign": "middle",
       "containerId": "converge-diamond",
-      "originalText": "First fires \u2192\nresolved flag",
+      "originalText": "First fires →\nresolved flag",
       "autoResize": true,
       "lineHeight": 1.25
     },
@@ -1325,7 +1855,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 2039,
       "version": 1,
       "versionNonce": 3039,
@@ -1335,9 +1867,26 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [75, 0]],
-      "startBinding": { "elementId": "converge-diamond", "focus": 0, "gap": 5 },
-      "endBinding": { "elementId": "resolution-box", "focus": 0, "gap": 5 },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          75,
+          0
+        ]
+      ],
+      "startBinding": {
+        "elementId": "converge-diamond",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "resolution-box",
+        "focus": 0,
+        "gap": 5
+      },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "lastCommittedPoint": null,
@@ -1359,14 +1908,22 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 2040,
       "version": 1,
       "versionNonce": 3040,
       "isDeleted": false,
       "boundElements": [
-        { "id": "resolution-text", "type": "text" },
-        { "id": "arrow-diamond-resolution", "type": "arrow" }
+        {
+          "id": "resolution-text",
+          "type": "text"
+        },
+        {
+          "id": "arrow-diamond-resolution",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -1436,7 +1993,7 @@
       "locked": false,
       "frameId": null,
       "text": "Why three? Windows FileSystemWatcher doesn't reliably\ndetect changes through symlinks. Shell integration requires\nVS Code 1.93+. Timeout catches all remaining edge cases.",
-      "fontSize": 15,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
@@ -1471,13 +2028,13 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "text": "Promise.all([minDelay, detection])\nensures notification shows \u22652s",
-      "fontSize": 14,
+      "text": "Promise.all([minDelay, detection])\nensures notification shows ≥2s",
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "Promise.all([minDelay, detection])\nensures notification shows \u22652s",
+      "originalText": "Promise.all([minDelay, detection])\nensures notification shows ≥2s",
       "autoResize": true,
       "lineHeight": 1.25
     }

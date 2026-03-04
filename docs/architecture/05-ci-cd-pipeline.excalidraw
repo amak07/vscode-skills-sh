@@ -4,6 +4,93 @@
   "source": "https://excalidraw.com",
   "elements": [
     {
+      "id": "callout-bg-90090",
+      "type": "rectangle",
+      "x": 648,
+      "y": 608,
+      "width": 314.40000000000003,
+      "height": 64,
+      "angle": 0,
+      "strokeColor": "#ced4da",
+      "backgroundColor": "#fff9db",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 90091,
+      "version": 1,
+      "versionNonce": 90092,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1709000000000,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "callout-bg-90093",
+      "type": "rectangle",
+      "x": 688,
+      "y": 438,
+      "width": 191.20000000000002,
+      "height": 64,
+      "angle": 0,
+      "strokeColor": "#ced4da",
+      "backgroundColor": "#fff9db",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 90094,
+      "version": 1,
+      "versionNonce": 90095,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1709000000000,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "callout-bg-90096",
+      "type": "rectangle",
+      "x": 858,
+      "y": 578,
+      "width": 235.20000000000002,
+      "height": 64,
+      "angle": 0,
+      "strokeColor": "#ced4da",
+      "backgroundColor": "#fff9db",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 90097,
+      "version": 1,
+      "versionNonce": 90098,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1709000000000,
+      "link": null,
+      "locked": false
+    },
+    {
       "id": "cicd-title",
       "type": "text",
       "x": 20,
@@ -91,14 +178,22 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 3003,
       "version": 1,
       "versionNonce": 4003,
       "isDeleted": false,
       "boundElements": [
-        { "id": "trigger-ci-label", "type": "text" },
-        { "id": "arrow-trigger-ci-to-ciworkflow", "type": "arrow" }
+        {
+          "id": "trigger-ci-label",
+          "type": "text"
+        },
+        {
+          "id": "arrow-trigger-ci-to-ciworkflow",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -157,14 +252,22 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 3005,
       "version": 1,
       "versionNonce": 4005,
       "isDeleted": false,
       "boundElements": [
-        { "id": "trigger-publish-label", "type": "text" },
-        { "id": "arrow-trigger-pub-to-buildjob", "type": "arrow" }
+        {
+          "id": "trigger-publish-label",
+          "type": "text"
+        },
+        {
+          "id": "arrow-trigger-pub-to-buildjob",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -223,15 +326,26 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 3007,
       "version": 1,
       "versionNonce": 4007,
       "isDeleted": false,
       "boundElements": [
-        { "id": "ci-workflow-label", "type": "text" },
-        { "id": "arrow-trigger-ci-to-ciworkflow", "type": "arrow" },
-        { "id": "arrow-ciworkflow-to-matrix", "type": "arrow" }
+        {
+          "id": "ci-workflow-label",
+          "type": "text"
+        },
+        {
+          "id": "arrow-trigger-ci-to-ciworkflow",
+          "type": "arrow"
+        },
+        {
+          "id": "arrow-ciworkflow-to-matrix",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -290,7 +404,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 3009,
       "version": 1,
       "versionNonce": 4009,
@@ -300,9 +416,26 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [0, 50]],
-      "startBinding": { "elementId": "trigger-ci", "focus": 0, "gap": 5 },
-      "endBinding": { "elementId": "ci-workflow-box", "focus": 0, "gap": 5 },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          50
+        ]
+      ],
+      "startBinding": {
+        "elementId": "trigger-ci",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "ci-workflow-box",
+        "focus": 0,
+        "gap": 5
+      },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "lastCommittedPoint": null,
@@ -324,15 +457,26 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 3010,
       "version": 1,
       "versionNonce": 4010,
       "isDeleted": false,
       "boundElements": [
-        { "id": "ci-matrix-label", "type": "text" },
-        { "id": "arrow-ciworkflow-to-matrix", "type": "arrow" },
-        { "id": "arrow-matrix-to-npmci", "type": "arrow" }
+        {
+          "id": "ci-matrix-label",
+          "type": "text"
+        },
+        {
+          "id": "arrow-ciworkflow-to-matrix",
+          "type": "arrow"
+        },
+        {
+          "id": "arrow-matrix-to-npmci",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -391,7 +535,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 3012,
       "version": 1,
       "versionNonce": 4012,
@@ -401,9 +547,26 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [0, 30]],
-      "startBinding": { "elementId": "ci-workflow-box", "focus": 0, "gap": 5 },
-      "endBinding": { "elementId": "ci-matrix-box", "focus": 0, "gap": 5 },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          30
+        ]
+      ],
+      "startBinding": {
+        "elementId": "ci-workflow-box",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "ci-matrix-box",
+        "focus": 0,
+        "gap": 5
+      },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "lastCommittedPoint": null,
@@ -425,15 +588,26 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 3013,
       "version": 1,
       "versionNonce": 4013,
       "isDeleted": false,
       "boundElements": [
-        { "id": "ci-step-npmci-label", "type": "text" },
-        { "id": "arrow-matrix-to-npmci", "type": "arrow" },
-        { "id": "arrow-npmci-to-npmtest", "type": "arrow" }
+        {
+          "id": "ci-step-npmci-label",
+          "type": "text"
+        },
+        {
+          "id": "arrow-matrix-to-npmci",
+          "type": "arrow"
+        },
+        {
+          "id": "arrow-npmci-to-npmtest",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -492,7 +666,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 3015,
       "version": 1,
       "versionNonce": 4015,
@@ -502,9 +678,26 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [0, 30]],
-      "startBinding": { "elementId": "ci-matrix-box", "focus": 0, "gap": 5 },
-      "endBinding": { "elementId": "ci-step-npmci", "focus": 0, "gap": 5 },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          30
+        ]
+      ],
+      "startBinding": {
+        "elementId": "ci-matrix-box",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "ci-step-npmci",
+        "focus": 0,
+        "gap": 5
+      },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "lastCommittedPoint": null,
@@ -526,15 +719,26 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 3016,
       "version": 1,
       "versionNonce": 4016,
       "isDeleted": false,
       "boundElements": [
-        { "id": "ci-step-npmtest-label", "type": "text" },
-        { "id": "arrow-npmci-to-npmtest", "type": "arrow" },
-        { "id": "arrow-npmtest-to-npmbuild", "type": "arrow" }
+        {
+          "id": "ci-step-npmtest-label",
+          "type": "text"
+        },
+        {
+          "id": "arrow-npmci-to-npmtest",
+          "type": "arrow"
+        },
+        {
+          "id": "arrow-npmtest-to-npmbuild",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -593,7 +797,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 3018,
       "version": 1,
       "versionNonce": 4018,
@@ -603,9 +809,26 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [0, 10]],
-      "startBinding": { "elementId": "ci-step-npmci", "focus": 0, "gap": 5 },
-      "endBinding": { "elementId": "ci-step-npmtest", "focus": 0, "gap": 5 },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          10
+        ]
+      ],
+      "startBinding": {
+        "elementId": "ci-step-npmci",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "ci-step-npmtest",
+        "focus": 0,
+        "gap": 5
+      },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "lastCommittedPoint": null,
@@ -627,15 +850,26 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 3019,
       "version": 1,
       "versionNonce": 4019,
       "isDeleted": false,
       "boundElements": [
-        { "id": "ci-step-npmbuild-label", "type": "text" },
-        { "id": "arrow-npmtest-to-npmbuild", "type": "arrow" },
-        { "id": "arrow-npmbuild-to-ciartifact", "type": "arrow" }
+        {
+          "id": "ci-step-npmbuild-label",
+          "type": "text"
+        },
+        {
+          "id": "arrow-npmtest-to-npmbuild",
+          "type": "arrow"
+        },
+        {
+          "id": "arrow-npmbuild-to-ciartifact",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -694,7 +928,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 3021,
       "version": 1,
       "versionNonce": 4021,
@@ -704,9 +940,26 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [0, 10]],
-      "startBinding": { "elementId": "ci-step-npmtest", "focus": 0, "gap": 5 },
-      "endBinding": { "elementId": "ci-step-npmbuild", "focus": 0, "gap": 5 },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          10
+        ]
+      ],
+      "startBinding": {
+        "elementId": "ci-step-npmtest",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "ci-step-npmbuild",
+        "focus": 0,
+        "gap": 5
+      },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "lastCommittedPoint": null,
@@ -728,14 +981,22 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 3022,
       "version": 1,
       "versionNonce": 4022,
       "isDeleted": false,
       "boundElements": [
-        { "id": "ci-artifact-label", "type": "text" },
-        { "id": "arrow-npmbuild-to-ciartifact", "type": "arrow" }
+        {
+          "id": "ci-artifact-label",
+          "type": "text"
+        },
+        {
+          "id": "arrow-npmbuild-to-ciartifact",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -794,7 +1055,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 3024,
       "version": 1,
       "versionNonce": 4024,
@@ -804,9 +1067,26 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [0, 30]],
-      "startBinding": { "elementId": "ci-step-npmbuild", "focus": 0, "gap": 5 },
-      "endBinding": { "elementId": "ci-artifact-box", "focus": 0, "gap": 5 },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          30
+        ]
+      ],
+      "startBinding": {
+        "elementId": "ci-step-npmbuild",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "ci-artifact-box",
+        "focus": 0,
+        "gap": 5
+      },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "lastCommittedPoint": null,
@@ -828,15 +1108,26 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 3025,
       "version": 1,
       "versionNonce": 4025,
       "isDeleted": false,
       "boundElements": [
-        { "id": "pub-buildjob-label", "type": "text" },
-        { "id": "arrow-trigger-pub-to-buildjob", "type": "arrow" },
-        { "id": "arrow-buildjob-to-pubartifact", "type": "arrow" }
+        {
+          "id": "pub-buildjob-label",
+          "type": "text"
+        },
+        {
+          "id": "arrow-trigger-pub-to-buildjob",
+          "type": "arrow"
+        },
+        {
+          "id": "arrow-buildjob-to-pubartifact",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -895,7 +1186,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 3027,
       "version": 1,
       "versionNonce": 4027,
@@ -905,9 +1198,26 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [0, 50]],
-      "startBinding": { "elementId": "trigger-publish", "focus": 0, "gap": 5 },
-      "endBinding": { "elementId": "pub-buildjob-box", "focus": 0, "gap": 5 },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          50
+        ]
+      ],
+      "startBinding": {
+        "elementId": "trigger-publish",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "pub-buildjob-box",
+        "focus": 0,
+        "gap": 5
+      },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "lastCommittedPoint": null,
@@ -929,16 +1239,30 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 3028,
       "version": 1,
       "versionNonce": 4028,
       "isDeleted": false,
       "boundElements": [
-        { "id": "pub-artifact-label", "type": "text" },
-        { "id": "arrow-buildjob-to-pubartifact", "type": "arrow" },
-        { "id": "arrow-pubartifact-to-vscode", "type": "arrow" },
-        { "id": "arrow-pubartifact-to-openvsx", "type": "arrow" }
+        {
+          "id": "pub-artifact-label",
+          "type": "text"
+        },
+        {
+          "id": "arrow-buildjob-to-pubartifact",
+          "type": "arrow"
+        },
+        {
+          "id": "arrow-pubartifact-to-vscode",
+          "type": "arrow"
+        },
+        {
+          "id": "arrow-pubartifact-to-openvsx",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -997,7 +1321,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 3030,
       "version": 1,
       "versionNonce": 4030,
@@ -1007,9 +1333,26 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [0, 40]],
-      "startBinding": { "elementId": "pub-buildjob-box", "focus": 0, "gap": 5 },
-      "endBinding": { "elementId": "pub-artifact-box", "focus": 0, "gap": 5 },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          40
+        ]
+      ],
+      "startBinding": {
+        "elementId": "pub-buildjob-box",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "pub-artifact-box",
+        "focus": 0,
+        "gap": 5
+      },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "lastCommittedPoint": null,
@@ -1031,14 +1374,22 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 3031,
       "version": 1,
       "versionNonce": 4031,
       "isDeleted": false,
       "boundElements": [
-        { "id": "pub-vscode-label", "type": "text" },
-        { "id": "arrow-pubartifact-to-vscode", "type": "arrow" }
+        {
+          "id": "pub-vscode-label",
+          "type": "text"
+        },
+        {
+          "id": "arrow-pubartifact-to-vscode",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -1097,7 +1448,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 3033,
       "version": 1,
       "versionNonce": 4033,
@@ -1107,9 +1460,26 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [-135, 60]],
-      "startBinding": { "elementId": "pub-artifact-box", "focus": 0, "gap": 5 },
-      "endBinding": { "elementId": "pub-vscode-box", "focus": 0, "gap": 5 },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -135,
+          60
+        ]
+      ],
+      "startBinding": {
+        "elementId": "pub-artifact-box",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "pub-vscode-box",
+        "focus": 0,
+        "gap": 5
+      },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "lastCommittedPoint": null,
@@ -1131,14 +1501,22 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 3034,
       "version": 1,
       "versionNonce": 4034,
       "isDeleted": false,
       "boundElements": [
-        { "id": "pub-openvsx-label", "type": "text" },
-        { "id": "arrow-pubartifact-to-openvsx", "type": "arrow" }
+        {
+          "id": "pub-openvsx-label",
+          "type": "text"
+        },
+        {
+          "id": "arrow-pubartifact-to-openvsx",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -1197,7 +1575,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 3036,
       "version": 1,
       "versionNonce": 4036,
@@ -1207,9 +1587,26 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [35, 60]],
-      "startBinding": { "elementId": "pub-artifact-box", "focus": 0, "gap": 5 },
-      "endBinding": { "elementId": "pub-openvsx-box", "focus": 0, "gap": 5 },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          35,
+          60
+        ]
+      ],
+      "startBinding": {
+        "elementId": "pub-artifact-box",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "pub-openvsx-box",
+        "focus": 0,
+        "gap": 5
+      },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "lastCommittedPoint": null,
@@ -1242,7 +1639,7 @@
       "locked": false,
       "frameId": null,
       "text": "VSCE_PAT secret",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "center",
       "verticalAlign": "top",
@@ -1278,7 +1675,7 @@
       "locked": false,
       "frameId": null,
       "text": "OVSX_PAT secret",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "center",
       "verticalAlign": "top",
@@ -1303,13 +1700,18 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 3039,
       "version": 1,
       "versionNonce": 4039,
       "isDeleted": false,
       "boundElements": [
-        { "id": "release-content-label", "type": "text" }
+        {
+          "id": "release-content-label",
+          "type": "text"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -1342,13 +1744,13 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "text": "npm version patch \u2192 git tag \u2192 git push --tags",
+      "text": "npm version patch → git tag → git push --tags",
       "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "center",
       "verticalAlign": "middle",
       "containerId": "release-box",
-      "originalText": "npm version patch \u2192 git tag \u2192 git push --tags",
+      "originalText": "npm version patch → git tag → git push --tags",
       "autoResize": true,
       "lineHeight": 1.25
     },
@@ -1379,7 +1781,7 @@
       "locked": false,
       "frameId": null,
       "text": "Release Trigger",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "center",
       "verticalAlign": "top",
@@ -1414,13 +1816,13 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "text": "Parallel, independent jobs \u2014\nif one fails, the other completes",
-      "fontSize": 14,
+      "text": "Parallel, independent jobs —\nif one fails, the other completes",
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "Parallel, independent jobs \u2014\nif one fails, the other completes",
+      "originalText": "Parallel, independent jobs —\nif one fails, the other completes",
       "autoResize": true,
       "lineHeight": 1.25
     },
@@ -1451,7 +1853,7 @@
       "locked": false,
       "frameId": null,
       "text": "Same binary on both\nmarketplaces",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
@@ -1487,7 +1889,7 @@
       "locked": false,
       "frameId": null,
       "text": "Serves Cursor, Windsurf,\nVSCodium users",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",

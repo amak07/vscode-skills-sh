@@ -4,6 +4,180 @@
   "source": "https://excalidraw.com",
   "elements": [
     {
+      "id": "callout-bg-90036",
+      "type": "rectangle",
+      "x": 43,
+      "y": 193,
+      "width": 120.80000000000001,
+      "height": 44,
+      "angle": 0,
+      "strokeColor": "#ced4da",
+      "backgroundColor": "#fff9db",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 90037,
+      "version": 1,
+      "versionNonce": 90038,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1709000000000,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "callout-bg-90039",
+      "type": "rectangle",
+      "x": 318,
+      "y": 468,
+      "width": 358.40000000000003,
+      "height": 84,
+      "angle": 0,
+      "strokeColor": "#ced4da",
+      "backgroundColor": "#fff9db",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 90040,
+      "version": 1,
+      "versionNonce": 90041,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1709000000000,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "callout-bg-90042",
+      "type": "rectangle",
+      "x": 1048,
+      "y": 458,
+      "width": 173.60000000000002,
+      "height": 64,
+      "angle": 0,
+      "strokeColor": "#ced4da",
+      "backgroundColor": "#fff9db",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 90043,
+      "version": 1,
+      "versionNonce": 90044,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1709000000000,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "callout-bg-90045",
+      "type": "rectangle",
+      "x": 1048,
+      "y": 498,
+      "width": 173.60000000000002,
+      "height": 64,
+      "angle": 0,
+      "strokeColor": "#ced4da",
+      "backgroundColor": "#fff9db",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 90046,
+      "version": 1,
+      "versionNonce": 90047,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1709000000000,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "callout-bg-90048",
+      "type": "rectangle",
+      "x": 658,
+      "y": 773,
+      "width": 428.8,
+      "height": 84,
+      "angle": 0,
+      "strokeColor": "#ced4da",
+      "backgroundColor": "#fff9db",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 90049,
+      "version": 1,
+      "versionNonce": 90050,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1709000000000,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "callout-bg-90051",
+      "type": "rectangle",
+      "x": 638,
+      "y": 898,
+      "width": 332,
+      "height": 84,
+      "angle": 0,
+      "strokeColor": "#ced4da",
+      "backgroundColor": "#fff9db",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 90052,
+      "version": 1,
+      "versionNonce": 90053,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1709000000000,
+      "link": null,
+      "locked": false
+    },
+    {
       "id": "title-main",
       "type": "text",
       "x": 20,
@@ -91,13 +265,18 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 3003,
       "version": 1,
       "versionNonce": 3003,
       "isDeleted": false,
       "boundElements": [
-        { "id": "dir-agents-text", "type": "text" }
+        {
+          "id": "dir-agents-text",
+          "type": "text"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -167,7 +346,7 @@
       "locked": false,
       "frameId": null,
       "text": "★ canonical",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "center",
       "verticalAlign": "top",
@@ -203,7 +382,7 @@
       "locked": false,
       "frameId": null,
       "text": "react-email/",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "center",
       "verticalAlign": "top",
@@ -228,13 +407,18 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 3007,
       "version": 1,
       "versionNonce": 3007,
       "isDeleted": false,
       "boundElements": [
-        { "id": "dir-claude-text", "type": "text" }
+        {
+          "id": "dir-claude-text",
+          "type": "text"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -304,7 +488,7 @@
       "locked": false,
       "frameId": null,
       "text": "Claude Code",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "center",
       "verticalAlign": "top",
@@ -340,7 +524,7 @@
       "locked": false,
       "frameId": null,
       "text": "react-email/",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "center",
       "verticalAlign": "top",
@@ -365,13 +549,18 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 3011,
       "version": 1,
       "versionNonce": 3011,
       "isDeleted": false,
       "boundElements": [
-        { "id": "dir-cursor-text", "type": "text" }
+        {
+          "id": "dir-cursor-text",
+          "type": "text"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -441,7 +630,7 @@
       "locked": false,
       "frameId": null,
       "text": "Cursor",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "center",
       "verticalAlign": "top",
@@ -477,7 +666,7 @@
       "locked": false,
       "frameId": null,
       "text": "react-email/",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "center",
       "verticalAlign": "top",
@@ -502,13 +691,18 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 3015,
       "version": 1,
       "versionNonce": 3015,
       "isDeleted": false,
       "boundElements": [
-        { "id": "dir-copilot-text", "type": "text" }
+        {
+          "id": "dir-copilot-text",
+          "type": "text"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -578,7 +772,7 @@
       "locked": false,
       "frameId": null,
       "text": "GitHub Copilot",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "center",
       "verticalAlign": "top",
@@ -603,13 +797,18 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 3018,
       "version": 1,
       "versionNonce": 3018,
       "isDeleted": false,
       "boundElements": [
-        { "id": "dir-windsurf-text", "type": "text" }
+        {
+          "id": "dir-windsurf-text",
+          "type": "text"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -679,7 +878,7 @@
       "locked": false,
       "frameId": null,
       "text": "Windsurf",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "center",
       "verticalAlign": "top",
@@ -740,7 +939,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 3022,
       "version": 1,
       "versionNonce": 3022,
@@ -803,14 +1004,22 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 3024,
       "version": 1,
       "versionNonce": 3024,
       "isDeleted": false,
       "boundElements": [
-        { "id": "step-foreach-text", "type": "text" },
-        { "id": "arrow-foreach-to-isdir", "type": "arrow" }
+        {
+          "id": "step-foreach-text",
+          "type": "text"
+        },
+        {
+          "id": "arrow-foreach-to-isdir",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -869,7 +1078,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 3026,
       "version": 1,
       "versionNonce": 3026,
@@ -879,9 +1090,26 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [60, 0]],
-      "startBinding": { "elementId": "step-foreach", "focus": 0, "gap": 5 },
-      "endBinding": { "elementId": "step-isdir", "focus": 0, "gap": 5 },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          60,
+          0
+        ]
+      ],
+      "startBinding": {
+        "elementId": "step-foreach",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "step-isdir",
+        "focus": 0,
+        "gap": 5
+      },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "lastCommittedPoint": null,
@@ -903,15 +1131,26 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 3027,
       "version": 1,
       "versionNonce": 3027,
       "isDeleted": false,
       "boundElements": [
-        { "id": "step-isdir-text", "type": "text" },
-        { "id": "arrow-foreach-to-isdir", "type": "arrow" },
-        { "id": "arrow-isdir-to-parse", "type": "arrow" }
+        {
+          "id": "step-isdir-text",
+          "type": "text"
+        },
+        {
+          "id": "arrow-foreach-to-isdir",
+          "type": "arrow"
+        },
+        {
+          "id": "arrow-isdir-to-parse",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -945,7 +1184,7 @@
       "locked": false,
       "frameId": null,
       "text": "isDirectoryEntry()",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "center",
       "verticalAlign": "middle",
@@ -970,7 +1209,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 3029,
       "version": 1,
       "versionNonce": 3029,
@@ -980,9 +1221,26 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [60, 0]],
-      "startBinding": { "elementId": "step-isdir", "focus": 0, "gap": 5 },
-      "endBinding": { "elementId": "step-parse", "focus": 0, "gap": 5 },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          60,
+          0
+        ]
+      ],
+      "startBinding": {
+        "elementId": "step-isdir",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "step-parse",
+        "focus": 0,
+        "gap": 5
+      },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "lastCommittedPoint": null,
@@ -1004,15 +1262,26 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 3030,
       "version": 1,
       "versionNonce": 3030,
       "isDeleted": false,
       "boundElements": [
-        { "id": "step-parse-text", "type": "text" },
-        { "id": "arrow-isdir-to-parse", "type": "arrow" },
-        { "id": "arrow-parse-to-lock", "type": "arrow" }
+        {
+          "id": "step-parse-text",
+          "type": "text"
+        },
+        {
+          "id": "arrow-isdir-to-parse",
+          "type": "arrow"
+        },
+        {
+          "id": "arrow-parse-to-lock",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -1071,7 +1340,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 3032,
       "version": 1,
       "versionNonce": 3032,
@@ -1081,9 +1352,26 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [50, 0]],
-      "startBinding": { "elementId": "step-parse", "focus": 0, "gap": 5 },
-      "endBinding": { "elementId": "step-lock", "focus": 0, "gap": 5 },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          50,
+          0
+        ]
+      ],
+      "startBinding": {
+        "elementId": "step-parse",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "step-lock",
+        "focus": 0,
+        "gap": 5
+      },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "lastCommittedPoint": null,
@@ -1105,15 +1393,26 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 3033,
       "version": 1,
       "versionNonce": 3033,
       "isDeleted": false,
       "boundElements": [
-        { "id": "step-lock-text", "type": "text" },
-        { "id": "arrow-parse-to-lock", "type": "arrow" },
-        { "id": "arrow-lock-to-symlink", "type": "arrow" }
+        {
+          "id": "step-lock-text",
+          "type": "text"
+        },
+        {
+          "id": "arrow-parse-to-lock",
+          "type": "arrow"
+        },
+        {
+          "id": "arrow-lock-to-symlink",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -1172,7 +1471,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 3035,
       "version": 1,
       "versionNonce": 3035,
@@ -1182,9 +1483,26 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [60, 0]],
-      "startBinding": { "elementId": "step-lock", "focus": 0, "gap": 5 },
-      "endBinding": { "elementId": "step-symlink", "focus": 0, "gap": 5 },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          60,
+          0
+        ]
+      ],
+      "startBinding": {
+        "elementId": "step-lock",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "step-symlink",
+        "focus": 0,
+        "gap": 5
+      },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "lastCommittedPoint": null,
@@ -1206,14 +1524,22 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 3036,
       "version": 1,
       "versionNonce": 3036,
       "isDeleted": false,
       "boundElements": [
-        { "id": "step-symlink-text", "type": "text" },
-        { "id": "arrow-lock-to-symlink", "type": "arrow" }
+        {
+          "id": "step-symlink-text",
+          "type": "text"
+        },
+        {
+          "id": "arrow-lock-to-symlink",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -1247,7 +1573,7 @@
       "locked": false,
       "frameId": null,
       "text": "isSymlink?",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "center",
       "verticalAlign": "middle",
@@ -1283,7 +1609,7 @@
       "locked": false,
       "frameId": null,
       "text": "Dirent.isDirectory() returns false\nfor symlinks on Windows!\nMust use isSymbolicLink() + statSync()",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
@@ -1319,7 +1645,7 @@
       "locked": false,
       "frameId": null,
       "text": "yes → marketplace\ninstall",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
@@ -1355,7 +1681,7 @@
       "locked": false,
       "frameId": null,
       "text": "no → user-created\ncustom skill",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
@@ -1416,14 +1742,22 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 3042,
       "version": 1,
       "versionNonce": 3042,
       "isDeleted": false,
       "boundElements": [
-        { "id": "input-agents-text", "type": "text" },
-        { "id": "arrow-agents-to-map", "type": "arrow" }
+        {
+          "id": "input-agents-text",
+          "type": "text"
+        },
+        {
+          "id": "arrow-agents-to-map",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -1457,7 +1791,7 @@
       "locked": false,
       "frameId": null,
       "text": "react-email\n(~/.agents/)",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "center",
       "verticalAlign": "middle",
@@ -1482,14 +1816,22 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 3044,
       "version": 1,
       "versionNonce": 3044,
       "isDeleted": false,
       "boundElements": [
-        { "id": "input-claude-text", "type": "text" },
-        { "id": "arrow-claude-to-map", "type": "arrow" }
+        {
+          "id": "input-claude-text",
+          "type": "text"
+        },
+        {
+          "id": "arrow-claude-to-map",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -1523,7 +1865,7 @@
       "locked": false,
       "frameId": null,
       "text": "react-email\n(~/.claude/)",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "center",
       "verticalAlign": "middle",
@@ -1548,14 +1890,22 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 3046,
       "version": 1,
       "versionNonce": 3046,
       "isDeleted": false,
       "boundElements": [
-        { "id": "input-cursor-text", "type": "text" },
-        { "id": "arrow-cursor-to-map", "type": "arrow" }
+        {
+          "id": "input-cursor-text",
+          "type": "text"
+        },
+        {
+          "id": "arrow-cursor-to-map",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -1589,7 +1939,7 @@
       "locked": false,
       "frameId": null,
       "text": "react-email\n(~/.cursor/)",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "center",
       "verticalAlign": "middle",
@@ -1614,7 +1964,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 3048,
       "version": 1,
       "versionNonce": 3048,
@@ -1624,9 +1976,26 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [100, 90]],
-      "startBinding": { "elementId": "input-agents", "focus": 0, "gap": 5 },
-      "endBinding": { "elementId": "dedup-map", "focus": 0, "gap": 5 },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          100,
+          90
+        ]
+      ],
+      "startBinding": {
+        "elementId": "input-agents",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "dedup-map",
+        "focus": 0,
+        "gap": 5
+      },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "lastCommittedPoint": null,
@@ -1648,7 +2017,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 3049,
       "version": 1,
       "versionNonce": 3049,
@@ -1658,9 +2029,26 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [100, 0]],
-      "startBinding": { "elementId": "input-claude", "focus": 0, "gap": 5 },
-      "endBinding": { "elementId": "dedup-map", "focus": 0, "gap": 5 },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          100,
+          0
+        ]
+      ],
+      "startBinding": {
+        "elementId": "input-claude",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "dedup-map",
+        "focus": 0,
+        "gap": 5
+      },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "lastCommittedPoint": null,
@@ -1682,7 +2070,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 3050,
       "version": 1,
       "versionNonce": 3050,
@@ -1692,9 +2082,26 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [100, -90]],
-      "startBinding": { "elementId": "input-cursor", "focus": 0, "gap": 5 },
-      "endBinding": { "elementId": "dedup-map", "focus": 0, "gap": 5 },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          100,
+          -90
+        ]
+      ],
+      "startBinding": {
+        "elementId": "input-cursor",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "dedup-map",
+        "focus": 0,
+        "gap": 5
+      },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "lastCommittedPoint": null,
@@ -1716,17 +2123,34 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 3051,
       "version": 1,
       "versionNonce": 3051,
       "isDeleted": false,
       "boundElements": [
-        { "id": "dedup-map-text", "type": "text" },
-        { "id": "arrow-agents-to-map", "type": "arrow" },
-        { "id": "arrow-claude-to-map", "type": "arrow" },
-        { "id": "arrow-cursor-to-map", "type": "arrow" },
-        { "id": "arrow-map-to-result", "type": "arrow" }
+        {
+          "id": "dedup-map-text",
+          "type": "text"
+        },
+        {
+          "id": "arrow-agents-to-map",
+          "type": "arrow"
+        },
+        {
+          "id": "arrow-claude-to-map",
+          "type": "arrow"
+        },
+        {
+          "id": "arrow-cursor-to-map",
+          "type": "arrow"
+        },
+        {
+          "id": "arrow-map-to-result",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -1785,7 +2209,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 3053,
       "version": 1,
       "versionNonce": 3053,
@@ -1795,9 +2221,26 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [90, 0]],
-      "startBinding": { "elementId": "dedup-map", "focus": 0, "gap": 5 },
-      "endBinding": { "elementId": "dedup-result", "focus": 0, "gap": 5 },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          90,
+          0
+        ]
+      ],
+      "startBinding": {
+        "elementId": "dedup-map",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "dedup-result",
+        "focus": 0,
+        "gap": 5
+      },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "lastCommittedPoint": null,
@@ -1819,13 +2262,18 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 3054,
       "version": 1,
       "versionNonce": 3054,
       "isDeleted": false,
       "boundElements": [
-        { "id": "arrow-map-to-result", "type": "arrow" }
+        {
+          "id": "arrow-map-to-result",
+          "type": "arrow"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -1895,7 +2343,7 @@
       "locked": false,
       "frameId": null,
       "text": "agents: [\"skills.sh\", \"Claude Code\", \"Cursor\"]\nsource: vercel-labs/agent-skills\npath: ~/.agents/skills/react-email",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
@@ -1931,7 +2379,7 @@
       "locked": false,
       "frameId": null,
       "text": "Canonical entry (~/.agents/skills/)\nwins for metadata — that's where\nlock file tracks source + hash",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",

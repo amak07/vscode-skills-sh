@@ -4,6 +4,354 @@
   "source": "https://excalidraw.com",
   "elements": [
     {
+      "id": "callout-bg-90054",
+      "type": "rectangle",
+      "x": 298,
+      "y": 183,
+      "width": 173.60000000000002,
+      "height": 124,
+      "angle": 0,
+      "strokeColor": "#ced4da",
+      "backgroundColor": "#fff9db",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 90055,
+      "version": 1,
+      "versionNonce": 90056,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1709000000000,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "callout-bg-90057",
+      "type": "rectangle",
+      "x": 288,
+      "y": 448,
+      "width": 244.00000000000003,
+      "height": 64,
+      "angle": 0,
+      "strokeColor": "#ced4da",
+      "backgroundColor": "#fff9db",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 90058,
+      "version": 1,
+      "versionNonce": 90059,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1709000000000,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "callout-bg-90060",
+      "type": "rectangle",
+      "x": 58,
+      "y": 373,
+      "width": 173.60000000000002,
+      "height": 84,
+      "angle": 0,
+      "strokeColor": "#ced4da",
+      "backgroundColor": "#fff9db",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 90061,
+      "version": 1,
+      "versionNonce": 90062,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1709000000000,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "callout-bg-90063",
+      "type": "rectangle",
+      "x": 828,
+      "y": 378,
+      "width": 349.6,
+      "height": 64,
+      "angle": 0,
+      "strokeColor": "#ced4da",
+      "backgroundColor": "#fff9db",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 90064,
+      "version": 1,
+      "versionNonce": 90065,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1709000000000,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "callout-bg-90066",
+      "type": "rectangle",
+      "x": 608,
+      "y": 193,
+      "width": 296.8,
+      "height": 64,
+      "angle": 0,
+      "strokeColor": "#ced4da",
+      "backgroundColor": "#fff9db",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 90067,
+      "version": 1,
+      "versionNonce": 90068,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1709000000000,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "callout-bg-90069",
+      "type": "rectangle",
+      "x": 608,
+      "y": 343,
+      "width": 261.6,
+      "height": 64,
+      "angle": 0,
+      "strokeColor": "#ced4da",
+      "backgroundColor": "#fff9db",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 90070,
+      "version": 1,
+      "versionNonce": 90071,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1709000000000,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "callout-bg-90072",
+      "type": "rectangle",
+      "x": 608,
+      "y": 583,
+      "width": 305.6,
+      "height": 64,
+      "angle": 0,
+      "strokeColor": "#ced4da",
+      "backgroundColor": "#fff9db",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 90073,
+      "version": 1,
+      "versionNonce": 90074,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1709000000000,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "callout-bg-90075",
+      "type": "rectangle",
+      "x": 488,
+      "y": 658,
+      "width": 472.8,
+      "height": 64,
+      "angle": 0,
+      "strokeColor": "#ced4da",
+      "backgroundColor": "#fff9db",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 90076,
+      "version": 1,
+      "versionNonce": 90077,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1709000000000,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "callout-bg-90078",
+      "type": "rectangle",
+      "x": 818,
+      "y": 468,
+      "width": 235.20000000000002,
+      "height": 64,
+      "angle": 0,
+      "strokeColor": "#ced4da",
+      "backgroundColor": "#fff9db",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 90079,
+      "version": 1,
+      "versionNonce": 90080,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1709000000000,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "callout-bg-90081",
+      "type": "rectangle",
+      "x": 818,
+      "y": 513,
+      "width": 367.20000000000005,
+      "height": 64,
+      "angle": 0,
+      "strokeColor": "#ced4da",
+      "backgroundColor": "#fff9db",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 90082,
+      "version": 1,
+      "versionNonce": 90083,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1709000000000,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "callout-bg-90084",
+      "type": "rectangle",
+      "x": 583,
+      "y": 243,
+      "width": 147.20000000000002,
+      "height": 44,
+      "angle": 0,
+      "strokeColor": "#ced4da",
+      "backgroundColor": "#fff9db",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 90085,
+      "version": 1,
+      "versionNonce": 90086,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1709000000000,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "callout-bg-90087",
+      "type": "rectangle",
+      "x": 588,
+      "y": 278,
+      "width": 147.20000000000002,
+      "height": 44,
+      "angle": 0,
+      "strokeColor": "#ced4da",
+      "backgroundColor": "#fff9db",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 90088,
+      "version": 1,
+      "versionNonce": 90089,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1709000000000,
+      "link": null,
+      "locked": false
+    },
+    {
       "id": "wv-title-main",
       "type": "text",
       "x": 20,
@@ -91,7 +439,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 4003,
       "version": 1,
       "versionNonce": 4003,
@@ -154,13 +504,18 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 4005,
       "version": 1,
       "versionNonce": 4005,
       "isDeleted": false,
       "boundElements": [
-        { "id": "host-provider-text", "type": "text" }
+        {
+          "id": "host-provider-text",
+          "type": "text"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -230,7 +585,7 @@
       "locked": false,
       "frameId": null,
       "text": "Message Router",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
@@ -255,13 +610,18 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 4008,
       "version": 1,
       "versionNonce": 4008,
       "isDeleted": false,
       "boundElements": [
-        { "id": "host-installer-text", "type": "text" }
+        {
+          "id": "host-installer-text",
+          "type": "text"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -320,7 +680,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 4010,
       "version": 1,
       "versionNonce": 4010,
@@ -394,7 +756,7 @@
       "locked": false,
       "frameId": null,
       "text": "search.ts\ngithub.ts\ndetail-scraper.ts\naudits-scraper.ts\ndocs-scraper.ts",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
@@ -419,13 +781,18 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 4013,
       "version": 1,
       "versionNonce": 4013,
       "isDeleted": false,
       "boundElements": [
-        { "id": "host-cache-text", "type": "text" }
+        {
+          "id": "host-cache-text",
+          "type": "text"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -495,7 +862,7 @@
       "locked": false,
       "frameId": null,
       "text": "Generic TTL-based cache\nshared by all API modules",
-      "fontSize": 13,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
@@ -520,7 +887,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 4016,
       "version": 1,
       "versionNonce": 4016,
@@ -594,7 +963,7 @@
       "locked": false,
       "frameId": null,
       "text": "installedNames[]\nupdatableNames[]\ninstalledSkills[]",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
@@ -619,7 +988,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 4019,
       "version": 1,
       "versionNonce": 4019,
@@ -682,13 +1053,18 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 4021,
       "version": 1,
       "versionNonce": 4021,
       "isDeleted": false,
       "boundElements": [
-        { "id": "wv-script-text", "type": "text" }
+        {
+          "id": "wv-script-text",
+          "type": "text"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -758,7 +1134,7 @@
       "locked": false,
       "frameId": null,
       "text": "Client-side JS",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
@@ -783,13 +1159,18 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 4024,
       "version": 1,
       "versionNonce": 4024,
       "isDeleted": false,
       "boundElements": [
-        { "id": "wv-templates-text", "type": "text" }
+        {
+          "id": "wv-templates-text",
+          "type": "text"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -859,7 +1240,7 @@
       "locked": false,
       "frameId": null,
       "text": "HTML Generators",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
@@ -884,13 +1265,18 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 4027,
       "version": 1,
       "versionNonce": 4027,
       "isDeleted": false,
       "boundElements": [
-        { "id": "wv-styles-text", "type": "text" }
+        {
+          "id": "wv-styles-text",
+          "type": "text"
+        }
       ],
       "updated": 1709000000000,
       "link": null,
@@ -960,7 +1346,7 @@
       "locked": false,
       "frameId": null,
       "text": "CSS (nonce)",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
@@ -985,7 +1371,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 4030,
       "version": 1,
       "versionNonce": 4030,
@@ -1059,7 +1447,7 @@
       "locked": false,
       "frameId": null,
       "text": "leaderboard | search-results | detail\n| installed | audits | docs",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
@@ -1084,7 +1472,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 4033,
       "version": 1,
       "versionNonce": 4033,
@@ -1094,7 +1484,16 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [220, 0]],
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          220,
+          0
+        ]
+      ],
       "startBinding": null,
       "endBinding": null,
       "startArrowhead": null,
@@ -1129,7 +1528,7 @@
       "locked": false,
       "frameId": null,
       "text": "17 commands:",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
@@ -1165,7 +1564,7 @@
       "locked": false,
       "frameId": null,
       "text": "search, leaderboard, detail,\ninstall, update, uninstall, ...",
-      "fontSize": 13,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
@@ -1190,7 +1589,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 2 },
+      "roundness": {
+        "type": 2
+      },
       "seed": 4036,
       "version": 1,
       "versionNonce": 4036,
@@ -1200,7 +1601,16 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [-220, 0]],
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -220,
+          0
+        ]
+      ],
       "startBinding": null,
       "endBinding": null,
       "startArrowhead": null,
@@ -1235,7 +1645,7 @@
       "locked": false,
       "frameId": null,
       "text": "Responses:",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
@@ -1271,7 +1681,7 @@
       "locked": false,
       "frameId": null,
       "text": "searchResult, detailResult,\nupdateButtonStates, ...",
-      "fontSize": 13,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
@@ -1306,7 +1716,16 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [0, 320]],
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          320
+        ]
+      ],
       "startBinding": null,
       "endBinding": null,
       "startArrowhead": null,
@@ -1366,7 +1785,9 @@
       "roughness": 1,
       "opacity": 100,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 4041,
       "version": 1,
       "versionNonce": 4041,
@@ -1440,7 +1861,7 @@
       "locked": false,
       "frameId": null,
       "text": "detailRequestId counter\nStale responses silently dropped",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "center",
       "verticalAlign": "top",
@@ -1476,7 +1897,7 @@
       "locked": false,
       "frameId": null,
       "text": "User clicks Skill A, then B before A loads —\nonly B's response renders (prevents race condition)",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
@@ -1512,7 +1933,7 @@
       "locked": false,
       "frameId": null,
       "text": "CSP: default-src 'none';\nscript-src 'nonce-...'",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
@@ -1548,7 +1969,7 @@
       "locked": false,
       "frameId": null,
       "text": "Webview cannot fetch() externally —\nall API calls go through extension host",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
@@ -1573,7 +1994,9 @@
       "roughness": 1,
       "opacity": 50,
       "groupIds": [],
-      "roundness": { "type": 3 },
+      "roundness": {
+        "type": 3
+      },
       "seed": 4047,
       "version": 1,
       "versionNonce": 4047,
@@ -1611,7 +2034,7 @@
       "locked": false,
       "frameId": null,
       "text": "webview → host",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "center",
       "verticalAlign": "top",
@@ -1647,7 +2070,7 @@
       "locked": false,
       "frameId": null,
       "text": "host → webview",
-      "fontSize": 14,
+      "fontSize": 16,
       "fontFamily": 1,
       "textAlign": "center",
       "verticalAlign": "top",
@@ -1682,7 +2105,16 @@
       "link": null,
       "locked": false,
       "frameId": null,
-      "points": [[0, 0], [330, 0]],
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          330,
+          0
+        ]
+      ],
       "startBinding": null,
       "endBinding": null,
       "startArrowhead": null,
