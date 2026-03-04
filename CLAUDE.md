@@ -140,6 +140,7 @@ Diagrams are edited via the Excalidraw MCP server (registered at user scope). Wo
 - Rectangles: `roundness: { type: 3 }` (rounded corners)
 - Arrows: always bind with `startElementId` / `endElementId` for auto-routing
 - Arrow labels: set as the arrow's `text` property (bound, not floating)
+- **Text in shapes:** Rectangles/ellipses do NOT have a `text` property. To label a shape, create a separate `text` element centered inside it. Only arrows support inline `text`. Every rectangle must have a companion text element or it renders as a blank colored box.
 
 ### SVG Export (Local Only)
 

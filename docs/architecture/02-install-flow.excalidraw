@@ -4,32 +4,6 @@
   "source": "mcp-excalidraw-server",
   "elements": [
     {
-      "id": "d2-title",
-      "type": "text",
-      "x": 40,
-      "y": 20,
-      "strokeColor": "#1e1e1e",
-      "text": "Install Flow",
-      "fontSize": 28,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:15:16.751Z",
-      "updatedAt": "2026-03-04T20:15:16.751Z",
-      "version": 1
-    },
-    {
-      "id": "d2-subtitle",
-      "type": "text",
-      "x": 40,
-      "y": 58,
-      "strokeColor": "#868e96",
-      "text": "How does the extension know when a terminal install finishes?",
-      "fontSize": 18,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:15:16.751Z",
-      "updatedAt": "2026-03-04T20:15:16.751Z",
-      "version": 1
-    },
-    {
       "id": "d2-webview",
       "type": "rectangle",
       "x": 60,
@@ -39,38 +13,17 @@
       "backgroundColor": "#a5d8ff",
       "strokeColor": "#1971c2",
       "strokeWidth": 2,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
       "roundness": {
         "type": 3
       },
-      "createdAt": "2026-03-04T20:15:16.751Z",
-      "updatedAt": "2026-03-04T20:15:16.751Z",
-      "version": 1
-    },
-    {
-      "id": "d2-webview-name",
-      "type": "text",
-      "x": 95,
-      "y": 142,
-      "strokeColor": "#1971c2",
-      "text": "Webview",
-      "fontSize": 18,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:15:16.751Z",
-      "updatedAt": "2026-03-04T20:15:16.751Z",
-      "version": 1
-    },
-    {
-      "id": "d2-webview-desc",
-      "type": "text",
-      "x": 80,
-      "y": 170,
-      "strokeColor": "#868e96",
-      "text": "[UI] Marketplace\niframe",
-      "fontSize": 14,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:15:16.751Z",
-      "updatedAt": "2026-03-04T20:15:16.751Z",
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:03:14.120Z",
+      "updatedAt": "2026-03-04T21:03:14.120Z",
       "version": 1
     },
     {
@@ -83,38 +36,17 @@
       "backgroundColor": "#a5d8ff",
       "strokeColor": "#1971c2",
       "strokeWidth": 2,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
       "roundness": {
         "type": 3
       },
-      "createdAt": "2026-03-04T20:15:16.751Z",
-      "updatedAt": "2026-03-04T20:15:16.751Z",
-      "version": 1
-    },
-    {
-      "id": "d2-host-name",
-      "type": "text",
-      "x": 325,
-      "y": 142,
-      "strokeColor": "#1971c2",
-      "text": "Extension Host",
-      "fontSize": 18,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:15:16.751Z",
-      "updatedAt": "2026-03-04T20:15:16.751Z",
-      "version": 1
-    },
-    {
-      "id": "d2-host-desc",
-      "type": "text",
-      "x": 315,
-      "y": 170,
-      "strokeColor": "#868e96",
-      "text": "[Controller]\nprovider.ts",
-      "fontSize": 14,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:15:16.751Z",
-      "updatedAt": "2026-03-04T20:15:16.751Z",
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:03:14.120Z",
+      "updatedAt": "2026-03-04T21:03:14.120Z",
       "version": 1
     },
     {
@@ -127,38 +59,17 @@
       "backgroundColor": "#a5d8ff",
       "strokeColor": "#1971c2",
       "strokeWidth": 2,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
       "roundness": {
         "type": 3
       },
-      "createdAt": "2026-03-04T20:15:16.751Z",
-      "updatedAt": "2026-03-04T20:15:16.751Z",
-      "version": 1
-    },
-    {
-      "id": "d2-installer-name",
-      "type": "text",
-      "x": 620,
-      "y": 132,
-      "strokeColor": "#1971c2",
-      "text": "installer.ts",
-      "fontSize": 20,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:15:16.752Z",
-      "updatedAt": "2026-03-04T20:15:16.752Z",
-      "version": 1
-    },
-    {
-      "id": "d2-installer-desc",
-      "type": "text",
-      "x": 595,
-      "y": 165,
-      "strokeColor": "#868e96",
-      "text": "[Module] Spawns\nterminal, starts\nPromise.race",
-      "fontSize": 14,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:15:16.752Z",
-      "updatedAt": "2026-03-04T20:15:16.752Z",
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:03:14.120Z",
+      "updatedAt": "2026-03-04T21:03:14.120Z",
       "version": 1
     },
     {
@@ -171,51 +82,17 @@
       "backgroundColor": "#eebefa",
       "strokeColor": "#7048e8",
       "strokeWidth": 2,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
       "roundness": {
         "type": 3
       },
-      "createdAt": "2026-03-04T20:15:16.752Z",
-      "updatedAt": "2026-03-04T20:15:16.752Z",
-      "version": 1
-    },
-    {
-      "id": "d2-terminal-name",
-      "type": "text",
-      "x": 900,
-      "y": 142,
-      "strokeColor": "#7048e8",
-      "text": "VS Code Terminal",
-      "fontSize": 18,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:15:16.752Z",
-      "updatedAt": "2026-03-04T20:15:16.752Z",
-      "version": 1
-    },
-    {
-      "id": "d2-terminal-desc",
-      "type": "text",
-      "x": 895,
-      "y": 170,
-      "strokeColor": "#868e96",
-      "text": "[Runtime] npx skills\nadd <source> -g -y",
-      "fontSize": 14,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:15:16.752Z",
-      "updatedAt": "2026-03-04T20:15:16.752Z",
-      "version": 1
-    },
-    {
-      "id": "d2-race-label",
-      "type": "text",
-      "x": 410,
-      "y": 290,
-      "strokeColor": "#495057",
-      "text": "Promise.race — all three run concurrently, first to fire wins",
-      "fontSize": 16,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:15:16.752Z",
-      "updatedAt": "2026-03-04T20:15:16.752Z",
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:03:14.120Z",
+      "updatedAt": "2026-03-04T21:03:14.120Z",
       "version": 1
     },
     {
@@ -228,38 +105,17 @@
       "backgroundColor": "#eebefa",
       "strokeColor": "#7048e8",
       "strokeWidth": 2,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
       "roundness": {
         "type": 3
       },
-      "createdAt": "2026-03-04T20:15:16.752Z",
-      "updatedAt": "2026-03-04T20:15:16.752Z",
-      "version": 1
-    },
-    {
-      "id": "d2-shell-name",
-      "type": "text",
-      "x": 140,
-      "y": 350,
-      "strokeColor": "#7048e8",
-      "text": "Shell Integration",
-      "fontSize": 18,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:15:16.752Z",
-      "updatedAt": "2026-03-04T20:15:16.752Z",
-      "version": 1
-    },
-    {
-      "id": "d2-shell-desc",
-      "type": "text",
-      "x": 135,
-      "y": 380,
-      "strokeColor": "#868e96",
-      "text": "[Detection] VS Code 1.93+\nonDidEndTerminalShell\nExecution event",
-      "fontSize": 14,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:15:16.752Z",
-      "updatedAt": "2026-03-04T20:15:16.752Z",
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:03:14.120Z",
+      "updatedAt": "2026-03-04T21:03:14.120Z",
       "version": 1
     },
     {
@@ -272,38 +128,17 @@
       "backgroundColor": "#ffd8a8",
       "strokeColor": "#e8590c",
       "strokeWidth": 2,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
       "roundness": {
         "type": 3
       },
-      "createdAt": "2026-03-04T20:15:16.752Z",
-      "updatedAt": "2026-03-04T20:15:16.752Z",
-      "version": 1
-    },
-    {
-      "id": "d2-fswatcher-name",
-      "type": "text",
-      "x": 440,
-      "y": 350,
-      "strokeColor": "#e8590c",
-      "text": "FileSystemWatcher",
-      "fontSize": 18,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:15:16.752Z",
-      "updatedAt": "2026-03-04T20:15:16.752Z",
-      "version": 1
-    },
-    {
-      "id": "d2-fswatcher-desc",
-      "type": "text",
-      "x": 435,
-      "y": 380,
-      "strokeColor": "#868e96",
-      "text": "[Detection] Watches\n~/.agents/.skill-lock.json\nfor modifications",
-      "fontSize": 14,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:15:16.752Z",
-      "updatedAt": "2026-03-04T20:15:16.752Z",
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:03:14.120Z",
+      "updatedAt": "2026-03-04T21:03:14.120Z",
       "version": 1
     },
     {
@@ -316,38 +151,17 @@
       "backgroundColor": "#ffc9c9",
       "strokeColor": "#e03131",
       "strokeWidth": 2,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
       "roundness": {
         "type": 3
       },
-      "createdAt": "2026-03-04T20:15:16.752Z",
-      "updatedAt": "2026-03-04T20:15:16.752Z",
-      "version": 1
-    },
-    {
-      "id": "d2-timeout-name",
-      "type": "text",
-      "x": 775,
-      "y": 350,
-      "strokeColor": "#e03131",
-      "text": "30s Timeout",
-      "fontSize": 18,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:15:16.752Z",
-      "updatedAt": "2026-03-04T20:15:16.752Z",
-      "version": 1
-    },
-    {
-      "id": "d2-timeout-desc",
-      "type": "text",
-      "x": 755,
-      "y": 380,
-      "strokeColor": "#868e96",
-      "text": "[Detection] Safety net\nfallback — catches\nkilled terminal, errors",
-      "fontSize": 14,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:15:16.752Z",
-      "updatedAt": "2026-03-04T20:15:16.752Z",
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:03:14.120Z",
+      "updatedAt": "2026-03-04T21:03:14.120Z",
       "version": 1
     },
     {
@@ -355,16 +169,23 @@
       "type": "arrow",
       "x": 228,
       "y": 170,
-      "width": 70,
+      "width": 64,
       "height": 0,
+      "backgroundColor": "transparent",
       "strokeColor": "#1971c2",
       "strokeWidth": 2,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
       "label": {
         "text": "① postMessage:\n{command: 'install'}"
       },
       "fontSize": 16,
       "fontFamily": 5,
+      "groupIds": [],
+      "locked": false,
+      "roundness": null,
+      "fillStyle": "solid",
       "points": [
         [
           0,
@@ -375,36 +196,34 @@
           0
         ]
       ],
+      "startArrowhead": null,
       "endArrowhead": "arrow",
-      "createdAt": "2026-03-04T20:15:46.270Z",
-      "updatedAt": "2026-03-04T20:15:46.270Z",
-      "version": 1,
-      "startBinding": {
-        "elementId": "d2-webview",
-        "focus": 0,
-        "gap": 8
-      },
-      "endBinding": {
-        "elementId": "d2-host",
-        "focus": 0,
-        "gap": 8
-      }
+      "createdAt": "2026-03-04T21:03:14.120Z",
+      "updatedAt": "2026-03-04T21:03:14.120Z",
+      "version": 1
     },
     {
       "id": "d2-arr2",
       "type": "arrow",
       "x": 508,
       "y": 170,
-      "width": 70,
+      "width": 64,
       "height": 0,
+      "backgroundColor": "transparent",
       "strokeColor": "#1971c2",
       "strokeWidth": 2,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
       "label": {
         "text": "② installSkill\n(source)"
       },
       "fontSize": 16,
       "fontFamily": 5,
+      "groupIds": [],
+      "locked": false,
+      "roundness": null,
+      "fillStyle": "solid",
       "points": [
         [
           0,
@@ -415,36 +234,34 @@
           0
         ]
       ],
+      "startArrowhead": null,
       "endArrowhead": "arrow",
-      "createdAt": "2026-03-04T20:15:46.270Z",
-      "updatedAt": "2026-03-04T20:15:46.270Z",
-      "version": 1,
-      "startBinding": {
-        "elementId": "d2-host",
-        "focus": 0,
-        "gap": 8
-      },
-      "endBinding": {
-        "elementId": "d2-installer",
-        "focus": 0,
-        "gap": 8
-      }
+      "createdAt": "2026-03-04T21:03:14.120Z",
+      "updatedAt": "2026-03-04T21:03:14.120Z",
+      "version": 1
     },
     {
       "id": "d2-arr3",
       "type": "arrow",
       "x": 788,
       "y": 170,
-      "width": 90,
+      "width": 84,
       "height": 0,
+      "backgroundColor": "transparent",
       "strokeColor": "#7048e8",
       "strokeWidth": 2,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
       "label": {
         "text": "③ sendText('npx\nskills add ...')"
       },
       "fontSize": 16,
       "fontFamily": 5,
+      "groupIds": [],
+      "locked": false,
+      "roundness": null,
+      "fillStyle": "solid",
       "points": [
         [
           0,
@@ -455,37 +272,34 @@
           0
         ]
       ],
+      "startArrowhead": null,
       "endArrowhead": "arrow",
-      "createdAt": "2026-03-04T20:15:46.270Z",
-      "updatedAt": "2026-03-04T20:15:46.270Z",
-      "version": 1,
-      "startBinding": {
-        "elementId": "d2-installer",
-        "focus": 0,
-        "gap": 8
-      },
-      "endBinding": {
-        "elementId": "d2-terminal",
-        "focus": 0,
-        "gap": 8
-      }
+      "createdAt": "2026-03-04T21:03:14.120Z",
+      "updatedAt": "2026-03-04T21:03:14.120Z",
+      "version": 1
     },
     {
       "id": "d2-arr4a",
       "type": "arrow",
       "x": 572.8122090611778,
       "y": 222.37585239056085,
-      "width": 380,
-      "height": 110,
+      "width": 233.53139486654163,
+      "height": 114.11193158251467,
+      "backgroundColor": "transparent",
       "strokeColor": "#7048e8",
       "strokeWidth": 2,
       "strokeStyle": "dashed",
       "roughness": 0,
+      "opacity": 100,
       "label": {
         "text": "④a Shell event"
       },
       "fontSize": 14,
       "fontFamily": 5,
+      "groupIds": [],
+      "locked": false,
+      "roundness": null,
+      "fillStyle": "solid",
       "points": [
         [
           0,
@@ -496,37 +310,34 @@
           114.11193158251467
         ]
       ],
+      "startArrowhead": null,
       "endArrowhead": "arrow",
-      "createdAt": "2026-03-04T20:15:46.270Z",
-      "updatedAt": "2026-03-04T20:15:46.270Z",
-      "version": 1,
-      "startBinding": {
-        "elementId": "d2-installer",
-        "focus": 0,
-        "gap": 8
-      },
-      "endBinding": {
-        "elementId": "d2-shell",
-        "focus": 0,
-        "gap": 8
-      }
+      "createdAt": "2026-03-04T21:03:14.120Z",
+      "updatedAt": "2026-03-04T21:03:14.120Z",
+      "version": 1
     },
     {
       "id": "d2-arr4b",
       "type": "arrow",
       "x": 645.6280871491916,
       "y": 226.84585586864472,
-      "width": 0,
-      "height": 110,
+      "width": 64.27943011233674,
+      "height": 106.30828826271056,
+      "backgroundColor": "transparent",
       "strokeColor": "#e8590c",
       "strokeWidth": 2,
       "strokeStyle": "dashed",
       "roughness": 0,
+      "opacity": 100,
       "label": {
         "text": "④b File watcher"
       },
       "fontSize": 14,
       "fontFamily": 5,
+      "groupIds": [],
+      "locked": false,
+      "roundness": null,
+      "fillStyle": "solid",
       "points": [
         [
           0,
@@ -537,37 +348,34 @@
           106.30828826271056
         ]
       ],
+      "startArrowhead": null,
       "endArrowhead": "arrow",
-      "createdAt": "2026-03-04T20:15:46.270Z",
-      "updatedAt": "2026-03-04T20:15:46.270Z",
-      "version": 1,
-      "startBinding": {
-        "elementId": "d2-installer",
-        "focus": 0,
-        "gap": 8
-      },
-      "endBinding": {
-        "elementId": "d2-fswatcher",
-        "focus": 0,
-        "gap": 8
-      }
+      "createdAt": "2026-03-04T21:03:14.120Z",
+      "updatedAt": "2026-03-04T21:03:14.120Z",
+      "version": 1
     },
     {
       "id": "d2-arr4c",
       "type": "arrow",
       "x": 723.2426433043682,
       "y": 226.34647460872222,
-      "width": 100,
-      "height": 110,
+      "width": 82.35192269358913,
+      "height": 107.30705078255554,
+      "backgroundColor": "transparent",
       "strokeColor": "#e03131",
       "strokeWidth": 2,
       "strokeStyle": "dashed",
       "roughness": 0,
+      "opacity": 100,
       "label": {
         "text": "④c Timer"
       },
       "fontSize": 14,
       "fontFamily": 5,
+      "groupIds": [],
+      "locked": false,
+      "roundness": null,
+      "fillStyle": "solid",
       "points": [
         [
           0,
@@ -578,32 +386,10 @@
           107.30705078255554
         ]
       ],
+      "startArrowhead": null,
       "endArrowhead": "arrow",
-      "createdAt": "2026-03-04T20:15:46.270Z",
-      "updatedAt": "2026-03-04T20:15:46.270Z",
-      "version": 1,
-      "startBinding": {
-        "elementId": "d2-installer",
-        "focus": 0,
-        "gap": 8
-      },
-      "endBinding": {
-        "elementId": "d2-timeout",
-        "focus": 0,
-        "gap": 8
-      }
-    },
-    {
-      "id": "d2-return-label",
-      "type": "text",
-      "x": 250,
-      "y": 470,
-      "strokeColor": "#1971c2",
-      "text": "⑤ First to resolve → cleanup() → dispose other listeners → rescan 22 dirs → push state to Webview",
-      "fontSize": 16,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:15:46.270Z",
-      "updatedAt": "2026-03-04T20:15:46.270Z",
+      "createdAt": "2026-03-04T21:03:14.120Z",
+      "updatedAt": "2026-03-04T21:03:14.120Z",
       "version": 1
     },
     {
@@ -616,25 +402,17 @@
       "backgroundColor": "#fff3bf",
       "strokeColor": "#e8590c",
       "strokeWidth": 1,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
       "roundness": {
         "type": 3
       },
-      "createdAt": "2026-03-04T20:15:46.270Z",
-      "updatedAt": "2026-03-04T20:15:46.270Z",
-      "version": 1
-    },
-    {
-      "id": "d2-callout1-text",
-      "type": "text",
-      "x": 72,
-      "y": 548,
-      "strokeColor": "#495057",
-      "text": "Why three? Shell Integration is best\non macOS/Linux. FileSystemWatcher is\nmost reliable on Windows. Timeout\ncatches everything else.",
-      "fontSize": 14,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:15:46.270Z",
-      "updatedAt": "2026-03-04T20:15:46.270Z",
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:03:14.120Z",
+      "updatedAt": "2026-03-04T21:03:14.120Z",
       "version": 1
     },
     {
@@ -647,25 +425,17 @@
       "backgroundColor": "#fff3bf",
       "strokeColor": "#e8590c",
       "strokeWidth": 1,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
       "roundness": {
         "type": 3
       },
-      "createdAt": "2026-03-04T20:15:46.270Z",
-      "updatedAt": "2026-03-04T20:15:46.270Z",
-      "version": 1
-    },
-    {
-      "id": "d2-callout2-text",
-      "type": "text",
-      "x": 432,
-      "y": 548,
-      "strokeColor": "#495057",
-      "text": "Minimum 2-second delay: Promise.all\n([minDelay, detection]) ensures the\nprogress toast is visible.",
-      "fontSize": 14,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:15:46.270Z",
-      "updatedAt": "2026-03-04T20:15:46.270Z",
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:03:14.120Z",
+      "updatedAt": "2026-03-04T21:03:14.120Z",
       "version": 1
     },
     {
@@ -678,25 +448,17 @@
       "backgroundColor": "#fff3bf",
       "strokeColor": "#e8590c",
       "strokeWidth": 1,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
       "roundness": {
         "type": 3
       },
-      "createdAt": "2026-03-04T20:15:46.270Z",
-      "updatedAt": "2026-03-04T20:15:46.270Z",
-      "version": 1
-    },
-    {
-      "id": "d2-callout3-text",
-      "type": "text",
-      "x": 772,
-      "y": 548,
-      "strokeColor": "#495057",
-      "text": "First wins: whichever channel fires\nfirst disposes the other two and\ntriggers a full rescan.",
-      "fontSize": 14,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:15:46.270Z",
-      "updatedAt": "2026-03-04T20:15:46.270Z",
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:03:14.120Z",
+      "updatedAt": "2026-03-04T21:03:14.120Z",
       "version": 1
     },
     {
@@ -709,25 +471,17 @@
       "backgroundColor": "#ffffff",
       "strokeColor": "#868e96",
       "strokeWidth": 1,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
       "roundness": {
         "type": 3
       },
-      "createdAt": "2026-03-04T20:16:00.808Z",
-      "updatedAt": "2026-03-04T20:16:00.808Z",
-      "version": 1
-    },
-    {
-      "id": "d2-legend-title",
-      "type": "text",
-      "x": 150,
-      "y": 658,
-      "strokeColor": "#1e1e1e",
-      "text": "Legend",
-      "fontSize": 16,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:16:00.808Z",
-      "updatedAt": "2026-03-04T20:16:00.808Z",
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:03:14.120Z",
+      "updatedAt": "2026-03-04T21:03:14.120Z",
       "version": 1
     },
     {
@@ -740,22 +494,15 @@
       "backgroundColor": "#a5d8ff",
       "strokeColor": "#1971c2",
       "strokeWidth": 1,
+      "strokeStyle": "solid",
       "roughness": 0,
-      "createdAt": "2026-03-04T20:16:00.808Z",
-      "updatedAt": "2026-03-04T20:16:00.808Z",
-      "version": 1
-    },
-    {
-      "id": "d2-leg-blue-t",
-      "type": "text",
-      "x": 98,
-      "y": 682,
-      "strokeColor": "#495057",
-      "text": "Extension internals",
-      "fontSize": 14,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:16:00.808Z",
-      "updatedAt": "2026-03-04T20:16:00.808Z",
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
+      "roundness": null,
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:03:14.120Z",
+      "updatedAt": "2026-03-04T21:03:14.120Z",
       "version": 1
     },
     {
@@ -768,22 +515,15 @@
       "backgroundColor": "#b2f2bb",
       "strokeColor": "#2f9e44",
       "strokeWidth": 1,
+      "strokeStyle": "solid",
       "roughness": 0,
-      "createdAt": "2026-03-04T20:16:00.808Z",
-      "updatedAt": "2026-03-04T20:16:00.808Z",
-      "version": 1
-    },
-    {
-      "id": "d2-leg-green-t",
-      "type": "text",
-      "x": 98,
-      "y": 702,
-      "strokeColor": "#495057",
-      "text": "External APIs",
-      "fontSize": 14,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:16:00.808Z",
-      "updatedAt": "2026-03-04T20:16:00.808Z",
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
+      "roundness": null,
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:03:14.120Z",
+      "updatedAt": "2026-03-04T21:03:14.120Z",
       "version": 1
     },
     {
@@ -796,22 +536,15 @@
       "backgroundColor": "#ffd8a8",
       "strokeColor": "#e8590c",
       "strokeWidth": 1,
+      "strokeStyle": "solid",
       "roughness": 0,
-      "createdAt": "2026-03-04T20:16:00.808Z",
-      "updatedAt": "2026-03-04T20:16:00.808Z",
-      "version": 1
-    },
-    {
-      "id": "d2-leg-orange-t",
-      "type": "text",
-      "x": 98,
-      "y": 722,
-      "strokeColor": "#495057",
-      "text": "Filesystem",
-      "fontSize": 14,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:16:00.808Z",
-      "updatedAt": "2026-03-04T20:16:00.808Z",
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
+      "roundness": null,
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:03:14.120Z",
+      "updatedAt": "2026-03-04T21:03:14.120Z",
       "version": 1
     },
     {
@@ -824,22 +557,15 @@
       "backgroundColor": "#eebefa",
       "strokeColor": "#7048e8",
       "strokeWidth": 1,
+      "strokeStyle": "solid",
       "roughness": 0,
-      "createdAt": "2026-03-04T20:16:00.808Z",
-      "updatedAt": "2026-03-04T20:16:00.808Z",
-      "version": 1
-    },
-    {
-      "id": "d2-leg-purple-t",
-      "type": "text",
-      "x": 98,
-      "y": 742,
-      "strokeColor": "#495057",
-      "text": "Terminal / CLI",
-      "fontSize": 14,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:16:00.808Z",
-      "updatedAt": "2026-03-04T20:16:00.808Z",
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
+      "roundness": null,
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:03:14.120Z",
+      "updatedAt": "2026-03-04T21:03:14.120Z",
       "version": 1
     },
     {
@@ -852,22 +578,15 @@
       "backgroundColor": "#ffc9c9",
       "strokeColor": "#e03131",
       "strokeWidth": 1,
+      "strokeStyle": "solid",
       "roughness": 0,
-      "createdAt": "2026-03-04T20:16:00.808Z",
-      "updatedAt": "2026-03-04T20:16:00.808Z",
-      "version": 1
-    },
-    {
-      "id": "d2-leg-red-t",
-      "type": "text",
-      "x": 98,
-      "y": 762,
-      "strokeColor": "#495057",
-      "text": "Error / security",
-      "fontSize": 14,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:16:00.808Z",
-      "updatedAt": "2026-03-04T20:16:00.808Z",
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
+      "roundness": null,
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:03:14.120Z",
+      "updatedAt": "2026-03-04T21:03:14.120Z",
       "version": 1
     },
     {
@@ -880,22 +599,366 @@
       "backgroundColor": "#fff3bf",
       "strokeColor": "#e8590c",
       "strokeWidth": 1,
+      "strokeStyle": "solid",
       "roughness": 0,
-      "createdAt": "2026-03-04T20:16:00.808Z",
-      "updatedAt": "2026-03-04T20:16:00.808Z",
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
+      "roundness": null,
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:03:14.120Z",
+      "updatedAt": "2026-03-04T21:03:14.120Z",
       "version": 1
     },
     {
-      "id": "d2-leg-yellow-t",
+      "id": "mmcixfy0k9n04gjumi",
       "type": "text",
-      "x": 98,
-      "y": 782,
+      "x": 60,
+      "y": 70,
+      "strokeColor": "#1e1e1e",
+      "text": "02 — Install Flow",
+      "fontSize": 28,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:03:29.018Z",
+      "updatedAt": "2026-03-04T21:03:29.018Z",
+      "version": 1
+    },
+    {
+      "id": "mmcixfy00rmjlkckqvum",
+      "type": "text",
+      "x": 60,
+      "y": 105,
+      "strokeColor": "#868e96",
+      "text": "How does the extension know when a terminal install finishes?",
+      "fontSize": 18,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:03:29.018Z",
+      "updatedAt": "2026-03-04T21:03:29.018Z",
+      "version": 1
+    },
+    {
+      "id": "mmcixfy0ska3qnyc39e",
+      "type": "text",
+      "x": 90,
+      "y": 148,
+      "strokeColor": "#1971c2",
+      "text": "Webview",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:03:29.018Z",
+      "updatedAt": "2026-03-04T21:03:29.018Z",
+      "version": 1
+    },
+    {
+      "id": "mmcixfy0tnj9vaivvyd",
+      "type": "text",
+      "x": 110,
+      "y": 175,
+      "strokeColor": "#868e96",
+      "text": "[UI]",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:03:29.018Z",
+      "updatedAt": "2026-03-04T21:03:29.018Z",
+      "version": 1
+    },
+    {
+      "id": "mmcixfy0fcsex38rc4f",
+      "type": "text",
+      "x": 325,
+      "y": 148,
+      "strokeColor": "#1971c2",
+      "text": "Extension Host",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:03:29.018Z",
+      "updatedAt": "2026-03-04T21:03:29.018Z",
+      "version": 1
+    },
+    {
+      "id": "mmcixfy0hj5biov2k8",
+      "type": "text",
+      "x": 345,
+      "y": 175,
+      "strokeColor": "#868e96",
+      "text": "[Controller]",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:03:29.018Z",
+      "updatedAt": "2026-03-04T21:03:29.018Z",
+      "version": 1
+    },
+    {
+      "id": "mmcixfy0gjluakfogxb",
+      "type": "text",
+      "x": 620,
+      "y": 140,
+      "strokeColor": "#1971c2",
+      "text": "installer.ts",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:03:29.018Z",
+      "updatedAt": "2026-03-04T21:03:29.018Z",
+      "version": 1
+    },
+    {
+      "id": "mmcixfy0xq7g0r433ja",
+      "type": "text",
+      "x": 630,
+      "y": 170,
+      "strokeColor": "#868e96",
+      "text": "[Module]",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:03:29.018Z",
+      "updatedAt": "2026-03-04T21:03:29.018Z",
+      "version": 1
+    },
+    {
+      "id": "mmcixfy0s2yv18nm9e",
+      "type": "text",
+      "x": 905,
+      "y": 148,
+      "strokeColor": "#7048e8",
+      "text": "VS Code Terminal",
+      "fontSize": 18,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:03:29.018Z",
+      "updatedAt": "2026-03-04T21:03:29.018Z",
+      "version": 1
+    },
+    {
+      "id": "mmcixfy0nlsgvit682g",
+      "type": "text",
+      "x": 940,
+      "y": 175,
+      "strokeColor": "#868e96",
+      "text": "[Runtime]",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:03:29.018Z",
+      "updatedAt": "2026-03-04T21:03:29.018Z",
+      "version": 1
+    },
+    {
+      "id": "mmcixfy0ojk1hc3u9i9",
+      "type": "text",
+      "x": 145,
+      "y": 360,
+      "strokeColor": "#7048e8",
+      "text": "Shell Integration",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:03:29.018Z",
+      "updatedAt": "2026-03-04T21:03:29.018Z",
+      "version": 1
+    },
+    {
+      "id": "mmcixfy027ukx8r3eje",
+      "type": "text",
+      "x": 170,
+      "y": 390,
+      "strokeColor": "#868e96",
+      "text": "[Detection]",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:03:29.018Z",
+      "updatedAt": "2026-03-04T21:03:29.018Z",
+      "version": 1
+    },
+    {
+      "id": "mmcixfy0axmnypsbpdl",
+      "type": "text",
+      "x": 445,
+      "y": 360,
+      "strokeColor": "#e8590c",
+      "text": "FileSystemWatcher",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:03:29.018Z",
+      "updatedAt": "2026-03-04T21:03:29.018Z",
+      "version": 1
+    },
+    {
+      "id": "mmcixfy0ny7c37mgjo",
+      "type": "text",
+      "x": 490,
+      "y": 390,
+      "strokeColor": "#868e96",
+      "text": "[Detection]",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:03:29.018Z",
+      "updatedAt": "2026-03-04T21:03:29.018Z",
+      "version": 1
+    },
+    {
+      "id": "mmcixfy08ogopglz19m",
+      "type": "text",
+      "x": 780,
+      "y": 360,
+      "strokeColor": "#e03131",
+      "text": "30s Timeout",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:03:29.018Z",
+      "updatedAt": "2026-03-04T21:03:29.018Z",
+      "version": 1
+    },
+    {
+      "id": "mmcixfy00oy0ksji4q0i",
+      "type": "text",
+      "x": 790,
+      "y": 390,
+      "strokeColor": "#868e96",
+      "text": "[Safety Net]",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:03:29.018Z",
+      "updatedAt": "2026-03-04T21:03:29.018Z",
+      "version": 1
+    },
+    {
+      "id": "mmcixp42ymb1iv598a9",
+      "type": "text",
+      "x": 120,
+      "y": 460,
+      "strokeColor": "#1971c2",
+      "text": "First to resolve → cleanup() → dispose other listeners → rescan 22 dirs → push state to Webview",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:03:40.901Z",
+      "updatedAt": "2026-03-04T21:03:40.901Z",
+      "version": 1
+    },
+    {
+      "id": "mmcixp42ueczowoqhw",
+      "type": "text",
+      "x": 68,
+      "y": 548,
       "strokeColor": "#495057",
-      "text": "Decision annotation",
+      "text": "Why three? Shell Integration\nis best on macOS/Linux but\nneeds VS Code 1.93+. FSWatcher\nis best on Windows.",
       "fontSize": 14,
       "fontFamily": 5,
-      "createdAt": "2026-03-04T20:16:00.808Z",
-      "updatedAt": "2026-03-04T20:16:00.808Z",
+      "createdAt": "2026-03-04T21:03:40.901Z",
+      "updatedAt": "2026-03-04T21:03:40.901Z",
+      "version": 1
+    },
+    {
+      "id": "mmcixp4272ct7yrg8rl",
+      "type": "text",
+      "x": 428,
+      "y": 548,
+      "strokeColor": "#495057",
+      "text": "Min 2s delay ensures the\nprogress toast is visible.",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:03:40.901Z",
+      "updatedAt": "2026-03-04T21:03:40.901Z",
+      "version": 1
+    },
+    {
+      "id": "mmcixp42hr2bnkani7",
+      "type": "text",
+      "x": 768,
+      "y": 548,
+      "strokeColor": "#495057",
+      "text": "First wins: whichever fires\nfirst disposes the other two.",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:03:40.901Z",
+      "updatedAt": "2026-03-04T21:03:40.901Z",
+      "version": 1
+    },
+    {
+      "id": "mmcixp426dlevq6hgn2",
+      "type": "text",
+      "x": 75,
+      "y": 658,
+      "strokeColor": "#1e1e1e",
+      "text": "Legend",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:03:40.901Z",
+      "updatedAt": "2026-03-04T21:03:40.901Z",
+      "version": 1
+    },
+    {
+      "id": "mmcixp42wabh4xz3d4o",
+      "type": "text",
+      "x": 98,
+      "y": 683,
+      "strokeColor": "#868e96",
+      "text": "Extension internals",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:03:40.901Z",
+      "updatedAt": "2026-03-04T21:03:40.901Z",
+      "version": 1
+    },
+    {
+      "id": "mmcixp42zmu8t093a",
+      "type": "text",
+      "x": 98,
+      "y": 703,
+      "strokeColor": "#868e96",
+      "text": "External APIs/services",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:03:40.901Z",
+      "updatedAt": "2026-03-04T21:03:40.901Z",
+      "version": 1
+    },
+    {
+      "id": "mmcixp42q0rn85xk9jc",
+      "type": "text",
+      "x": 98,
+      "y": 723,
+      "strokeColor": "#868e96",
+      "text": "Filesystem/local",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:03:40.901Z",
+      "updatedAt": "2026-03-04T21:03:40.901Z",
+      "version": 1
+    },
+    {
+      "id": "mmcixp427d03ne54hdk",
+      "type": "text",
+      "x": 98,
+      "y": 743,
+      "strokeColor": "#868e96",
+      "text": "Terminal/CLI",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:03:40.901Z",
+      "updatedAt": "2026-03-04T21:03:40.901Z",
+      "version": 1
+    },
+    {
+      "id": "mmcixp426vzu1syceft",
+      "type": "text",
+      "x": 98,
+      "y": 763,
+      "strokeColor": "#868e96",
+      "text": "Error paths / security",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:03:40.901Z",
+      "updatedAt": "2026-03-04T21:03:40.901Z",
+      "version": 1
+    },
+    {
+      "id": "mmcixp4259gmd8uuzh3",
+      "type": "text",
+      "x": 98,
+      "y": 783,
+      "strokeColor": "#868e96",
+      "text": "Decision annotations",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:03:40.901Z",
+      "updatedAt": "2026-03-04T21:03:40.901Z",
       "version": 1
     }
   ],

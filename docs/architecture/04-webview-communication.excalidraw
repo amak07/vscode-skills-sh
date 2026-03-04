@@ -4,32 +4,6 @@
   "source": "mcp-excalidraw-server",
   "elements": [
     {
-      "id": "d4-title",
-      "type": "text",
-      "x": 40,
-      "y": 20,
-      "strokeColor": "#1e1e1e",
-      "text": "Webview Communication",
-      "fontSize": 28,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:18:26.177Z",
-      "updatedAt": "2026-03-04T20:18:26.177Z",
-      "version": 1
-    },
-    {
-      "id": "d4-subtitle",
-      "type": "text",
-      "x": 40,
-      "y": 58,
-      "strokeColor": "#868e96",
-      "text": "How do two isolated JS contexts coordinate securely?",
-      "fontSize": 18,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:18:26.177Z",
-      "updatedAt": "2026-03-04T20:18:26.177Z",
-      "version": 1
-    },
-    {
       "id": "d4-zone-host",
       "type": "rectangle",
       "x": 40,
@@ -39,26 +13,17 @@
       "backgroundColor": "#dbe4ff",
       "strokeColor": "#1971c2",
       "strokeWidth": 2,
+      "strokeStyle": "solid",
       "roughness": 0,
       "opacity": 40,
+      "groupIds": [],
+      "locked": false,
       "roundness": {
         "type": 3
       },
-      "createdAt": "2026-03-04T20:18:26.177Z",
-      "updatedAt": "2026-03-04T20:18:26.177Z",
-      "version": 1
-    },
-    {
-      "id": "d4-zone-host-label",
-      "type": "text",
-      "x": 60,
-      "y": 140,
-      "strokeColor": "#1971c2",
-      "text": "Extension Host [Node.js]",
-      "fontSize": 16,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:18:26.177Z",
-      "updatedAt": "2026-03-04T20:18:26.177Z",
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:04:27.618Z",
+      "updatedAt": "2026-03-04T21:04:27.618Z",
       "version": 1
     },
     {
@@ -71,26 +36,17 @@
       "backgroundColor": "#dbe4ff",
       "strokeColor": "#1971c2",
       "strokeWidth": 2,
+      "strokeStyle": "solid",
       "roughness": 0,
       "opacity": 40,
+      "groupIds": [],
+      "locked": false,
       "roundness": {
         "type": 3
       },
-      "createdAt": "2026-03-04T20:18:26.177Z",
-      "updatedAt": "2026-03-04T20:18:26.177Z",
-      "version": 1
-    },
-    {
-      "id": "d4-zone-webview-label",
-      "type": "text",
-      "x": 580,
-      "y": 140,
-      "strokeColor": "#1971c2",
-      "text": "Webview Sandbox [Browser iframe]",
-      "fontSize": 16,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:18:26.177Z",
-      "updatedAt": "2026-03-04T20:18:26.177Z",
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:04:27.618Z",
+      "updatedAt": "2026-03-04T21:04:27.618Z",
       "version": 1
     },
     {
@@ -103,38 +59,17 @@
       "backgroundColor": "#a5d8ff",
       "strokeColor": "#1971c2",
       "strokeWidth": 2,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
       "roundness": {
         "type": 3
       },
-      "createdAt": "2026-03-04T20:18:26.177Z",
-      "updatedAt": "2026-03-04T20:18:26.177Z",
-      "version": 1
-    },
-    {
-      "id": "d4-provider-name",
-      "type": "text",
-      "x": 140,
-      "y": 182,
-      "strokeColor": "#1971c2",
-      "text": "provider.ts",
-      "fontSize": 20,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:18:26.177Z",
-      "updatedAt": "2026-03-04T20:18:26.177Z",
-      "version": 1
-    },
-    {
-      "id": "d4-provider-desc",
-      "type": "text",
-      "x": 75,
-      "y": 215,
-      "strokeColor": "#868e96",
-      "text": "[Controller] Handles messages,\nproxies all API calls to external services",
-      "fontSize": 14,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:18:26.177Z",
-      "updatedAt": "2026-03-04T20:18:26.177Z",
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:04:27.618Z",
+      "updatedAt": "2026-03-04T21:04:27.618Z",
       "version": 1
     },
     {
@@ -147,38 +82,17 @@
       "backgroundColor": "#a5d8ff",
       "strokeColor": "#1971c2",
       "strokeWidth": 2,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
       "roundness": {
         "type": 3
       },
-      "createdAt": "2026-03-04T20:18:26.177Z",
-      "updatedAt": "2026-03-04T20:18:26.177Z",
-      "version": 1
-    },
-    {
-      "id": "d4-script-name",
-      "type": "text",
-      "x": 610,
-      "y": 182,
-      "strokeColor": "#1971c2",
-      "text": "webview-script.ts",
-      "fontSize": 20,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:18:26.177Z",
-      "updatedAt": "2026-03-04T20:18:26.177Z",
-      "version": 1
-    },
-    {
-      "id": "d4-script-desc",
-      "type": "text",
-      "x": 592,
-      "y": 215,
-      "strokeColor": "#868e96",
-      "text": "[UI] Renders marketplace,\nsends 16 command types",
-      "fontSize": 14,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:18:26.177Z",
-      "updatedAt": "2026-03-04T20:18:26.177Z",
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:04:27.618Z",
+      "updatedAt": "2026-03-04T21:04:27.618Z",
       "version": 1
     },
     {
@@ -191,38 +105,17 @@
       "backgroundColor": "#ffc9c9",
       "strokeColor": "#e03131",
       "strokeWidth": 2,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
       "roundness": {
         "type": 3
       },
-      "createdAt": "2026-03-04T20:18:26.177Z",
-      "updatedAt": "2026-03-04T20:18:26.177Z",
-      "version": 1
-    },
-    {
-      "id": "d4-csp-name",
-      "type": "text",
-      "x": 446,
-      "y": 190,
-      "strokeColor": "#e03131",
-      "text": "CSP",
-      "fontSize": 18,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:18:26.177Z",
-      "updatedAt": "2026-03-04T20:18:26.177Z",
-      "version": 1
-    },
-    {
-      "id": "d4-csp-desc",
-      "type": "text",
-      "x": 428,
-      "y": 218,
-      "strokeColor": "#868e96",
-      "text": "default-src\n'none'",
-      "fontSize": 14,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:18:26.177Z",
-      "updatedAt": "2026-03-04T20:18:26.177Z",
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:04:27.618Z",
+      "updatedAt": "2026-03-04T21:04:27.618Z",
       "version": 1
     },
     {
@@ -235,38 +128,17 @@
       "backgroundColor": "#b2f2bb",
       "strokeColor": "#2f9e44",
       "strokeWidth": 2,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
       "roundness": {
         "type": 3
       },
-      "createdAt": "2026-03-04T20:18:26.177Z",
-      "updatedAt": "2026-03-04T20:18:26.177Z",
-      "version": 1
-    },
-    {
-      "id": "d4-api-name",
-      "type": "text",
-      "x": 72,
-      "y": 298,
-      "strokeColor": "#2f9e44",
-      "text": "skills.sh API",
-      "fontSize": 16,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:18:26.177Z",
-      "updatedAt": "2026-03-04T20:18:26.177Z",
-      "version": 1
-    },
-    {
-      "id": "d4-api-desc",
-      "type": "text",
-      "x": 70,
-      "y": 322,
-      "strokeColor": "#868e96",
-      "text": "Search, leaderboard",
-      "fontSize": 12,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:18:26.177Z",
-      "updatedAt": "2026-03-04T20:18:26.177Z",
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:04:27.618Z",
+      "updatedAt": "2026-03-04T21:04:27.618Z",
       "version": 1
     },
     {
@@ -279,38 +151,17 @@
       "backgroundColor": "#b2f2bb",
       "strokeColor": "#2f9e44",
       "strokeWidth": 2,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
       "roundness": {
         "type": 3
       },
-      "createdAt": "2026-03-04T20:18:26.177Z",
-      "updatedAt": "2026-03-04T20:18:26.177Z",
-      "version": 1
-    },
-    {
-      "id": "d4-website-name",
-      "type": "text",
-      "x": 227,
-      "y": 298,
-      "strokeColor": "#2f9e44",
-      "text": "skills.sh Website",
-      "fontSize": 16,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:18:26.177Z",
-      "updatedAt": "2026-03-04T20:18:26.177Z",
-      "version": 1
-    },
-    {
-      "id": "d4-website-desc",
-      "type": "text",
-      "x": 230,
-      "y": 322,
-      "strokeColor": "#868e96",
-      "text": "HTML scraping",
-      "fontSize": 12,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:18:26.177Z",
-      "updatedAt": "2026-03-04T20:18:26.177Z",
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:04:27.618Z",
+      "updatedAt": "2026-03-04T21:04:27.618Z",
       "version": 1
     },
     {
@@ -323,25 +174,17 @@
       "backgroundColor": "#b2f2bb",
       "strokeColor": "#2f9e44",
       "strokeWidth": 2,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
       "roundness": {
         "type": 3
       },
-      "createdAt": "2026-03-04T20:18:26.177Z",
-      "updatedAt": "2026-03-04T20:18:26.177Z",
-      "version": 1
-    },
-    {
-      "id": "d4-github-name",
-      "type": "text",
-      "x": 90,
-      "y": 382,
-      "strokeColor": "#2f9e44",
-      "text": "GitHub API",
-      "fontSize": 16,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:18:26.177Z",
-      "updatedAt": "2026-03-04T20:18:26.177Z",
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:04:27.618Z",
+      "updatedAt": "2026-03-04T21:04:27.618Z",
       "version": 1
     },
     {
@@ -354,25 +197,17 @@
       "backgroundColor": "#eebefa",
       "strokeColor": "#7048e8",
       "strokeWidth": 2,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
       "roundness": {
         "type": 3
       },
-      "createdAt": "2026-03-04T20:18:26.177Z",
-      "updatedAt": "2026-03-04T20:18:26.177Z",
-      "version": 1
-    },
-    {
-      "id": "d4-installer-name",
-      "type": "text",
-      "x": 245,
-      "y": 382,
-      "strokeColor": "#7048e8",
-      "text": "installer.ts",
-      "fontSize": 16,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:18:26.177Z",
-      "updatedAt": "2026-03-04T20:18:26.177Z",
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:04:27.618Z",
+      "updatedAt": "2026-03-04T21:04:27.618Z",
       "version": 1
     },
     {
@@ -380,16 +215,23 @@
       "type": "arrow",
       "x": 388,
       "y": 215,
-      "width": 140,
-      "height": 0,
+      "width": 184,
+      "height": 2.842170943040401e-14,
+      "backgroundColor": "transparent",
       "strokeColor": "#1971c2",
       "strokeWidth": 2,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
       "label": {
         "text": "postMessage: 10\nresponse types"
       },
       "fontSize": 14,
       "fontFamily": 5,
+      "groupIds": [],
+      "locked": false,
+      "roundness": null,
+      "fillStyle": "solid",
       "points": [
         [
           0,
@@ -400,36 +242,34 @@
           2.842170943040401e-14
         ]
       ],
+      "startArrowhead": null,
       "endArrowhead": "arrow",
-      "createdAt": "2026-03-04T20:18:53.644Z",
-      "updatedAt": "2026-03-04T20:18:53.644Z",
-      "version": 1,
-      "startBinding": {
-        "elementId": "d4-provider",
-        "focus": 0,
-        "gap": 8
-      },
-      "endBinding": {
-        "elementId": "d4-script",
-        "focus": 0,
-        "gap": 8
-      }
+      "createdAt": "2026-03-04T21:04:27.618Z",
+      "updatedAt": "2026-03-04T21:04:27.618Z",
+      "version": 1
     },
     {
       "id": "d4-arr-web-to-host",
       "type": "arrow",
       "x": 572,
       "y": 215.00000000000003,
-      "width": 140,
-      "height": 0,
+      "width": 184,
+      "height": 2.842170943040401e-14,
+      "backgroundColor": "transparent",
       "strokeColor": "#1971c2",
       "strokeWidth": 2,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
       "label": {
         "text": "postMessage: 16\ncommand types"
       },
       "fontSize": 14,
       "fontFamily": 5,
+      "groupIds": [],
+      "locked": false,
+      "roundness": null,
+      "fillStyle": "solid",
       "points": [
         [
           0,
@@ -440,36 +280,34 @@
           -2.842170943040401e-14
         ]
       ],
+      "startArrowhead": null,
       "endArrowhead": "arrow",
-      "createdAt": "2026-03-04T20:18:53.644Z",
-      "updatedAt": "2026-03-04T20:18:53.644Z",
-      "version": 1,
-      "startBinding": {
-        "elementId": "d4-script",
-        "focus": 0,
-        "gap": 8
-      },
-      "endBinding": {
-        "elementId": "d4-provider",
-        "focus": 0,
-        "gap": 8
-      }
+      "createdAt": "2026-03-04T21:04:27.618Z",
+      "updatedAt": "2026-03-04T21:04:27.618Z",
+      "version": 1
     },
     {
       "id": "d4-arr-api",
       "type": "arrow",
       "x": 176.22224044092368,
       "y": 266.0740528189224,
-      "width": 0,
-      "height": 20,
+      "width": 15.30162373899023,
+      "height": 17.851894362155235,
+      "backgroundColor": "transparent",
       "strokeColor": "#2f9e44",
       "strokeWidth": 2,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
       "label": {
         "text": "fetch()"
       },
       "fontSize": 14,
       "fontFamily": 5,
+      "groupIds": [],
+      "locked": false,
+      "roundness": null,
+      "fillStyle": "solid",
       "points": [
         [
           0,
@@ -480,36 +318,34 @@
           17.851894362155235
         ]
       ],
+      "startArrowhead": null,
       "endArrowhead": "arrow",
-      "createdAt": "2026-03-04T20:18:53.644Z",
-      "updatedAt": "2026-03-04T20:18:53.644Z",
-      "version": 1,
-      "startBinding": {
-        "elementId": "d4-provider",
-        "focus": 0,
-        "gap": 8
-      },
-      "endBinding": {
-        "elementId": "d4-api",
-        "focus": 0,
-        "gap": 8
-      }
+      "createdAt": "2026-03-04T21:04:27.618Z",
+      "updatedAt": "2026-03-04T21:04:27.618Z",
+      "version": 1
     },
     {
       "id": "d4-arr-website",
       "type": "arrow",
       "x": 256.7927626926099,
       "y": 266.5098677696539,
-      "width": 0,
-      "height": 20,
+      "width": 12.12876032906587,
+      "height": 16.980264460692183,
+      "backgroundColor": "transparent",
       "strokeColor": "#2f9e44",
       "strokeWidth": 2,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
       "label": {
         "text": "fetch() + regex"
       },
       "fontSize": 14,
       "fontFamily": 5,
+      "groupIds": [],
+      "locked": false,
+      "roundness": null,
+      "fillStyle": "solid",
       "points": [
         [
           0,
@@ -520,20 +356,11 @@
           16.980264460692183
         ]
       ],
+      "startArrowhead": null,
       "endArrowhead": "arrow",
-      "createdAt": "2026-03-04T20:18:53.644Z",
-      "updatedAt": "2026-03-04T20:18:53.644Z",
-      "version": 1,
-      "startBinding": {
-        "elementId": "d4-provider",
-        "focus": 0,
-        "gap": 8
-      },
-      "endBinding": {
-        "elementId": "d4-website",
-        "focus": 0,
-        "gap": 8
-      }
+      "createdAt": "2026-03-04T21:04:27.618Z",
+      "updatedAt": "2026-03-04T21:04:27.618Z",
+      "version": 1
     },
     {
       "id": "d4-arr-github",
@@ -541,15 +368,22 @@
       "x": 130,
       "y": 358,
       "width": 0,
-      "height": 10,
+      "height": 4,
+      "backgroundColor": "transparent",
       "strokeColor": "#2f9e44",
       "strokeWidth": 2,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
       "label": {
         "text": "fetch()"
       },
       "fontSize": 14,
       "fontFamily": 5,
+      "groupIds": [],
+      "locked": false,
+      "roundness": null,
+      "fillStyle": "solid",
       "points": [
         [
           0,
@@ -560,20 +394,11 @@
           4
         ]
       ],
+      "startArrowhead": null,
       "endArrowhead": "arrow",
-      "createdAt": "2026-03-04T20:18:53.644Z",
-      "updatedAt": "2026-03-04T20:18:53.644Z",
-      "version": 1,
-      "startBinding": {
-        "elementId": "d4-api",
-        "focus": 0,
-        "gap": 8
-      },
-      "endBinding": {
-        "elementId": "d4-github",
-        "focus": 0,
-        "gap": 8
-      }
+      "createdAt": "2026-03-04T21:04:27.618Z",
+      "updatedAt": "2026-03-04T21:04:27.618Z",
+      "version": 1
     },
     {
       "id": "d4-arr-installer",
@@ -581,15 +406,22 @@
       "x": 295,
       "y": 358,
       "width": 0,
-      "height": 10,
+      "height": 4,
+      "backgroundColor": "transparent",
       "strokeColor": "#7048e8",
       "strokeWidth": 2,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
       "label": {
         "text": "installSkill()"
       },
       "fontSize": 14,
       "fontFamily": 5,
+      "groupIds": [],
+      "locked": false,
+      "roundness": null,
+      "fillStyle": "solid",
       "points": [
         [
           0,
@@ -600,32 +432,10 @@
           4
         ]
       ],
+      "startArrowhead": null,
       "endArrowhead": "arrow",
-      "createdAt": "2026-03-04T20:18:53.644Z",
-      "updatedAt": "2026-03-04T20:18:53.644Z",
-      "version": 1,
-      "startBinding": {
-        "elementId": "d4-website",
-        "focus": 0,
-        "gap": 8
-      },
-      "endBinding": {
-        "elementId": "d4-installer",
-        "focus": 0,
-        "gap": 8
-      }
-    },
-    {
-      "id": "d4-security-note",
-      "type": "text",
-      "x": 600,
-      "y": 290,
-      "strokeColor": "#495057",
-      "text": "Webview has ZERO network access.\nAll data routes through postMessage\nto the Extension Host, which\nacts as a proxy for all API calls.",
-      "fontSize": 16,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:18:53.644Z",
-      "updatedAt": "2026-03-04T20:18:53.644Z",
+      "createdAt": "2026-03-04T21:04:27.618Z",
+      "updatedAt": "2026-03-04T21:04:27.618Z",
       "version": 1
     },
     {
@@ -638,25 +448,17 @@
       "backgroundColor": "#fff3bf",
       "strokeColor": "#e8590c",
       "strokeWidth": 1,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
       "roundness": {
         "type": 3
       },
-      "createdAt": "2026-03-04T20:18:53.644Z",
-      "updatedAt": "2026-03-04T20:18:53.644Z",
-      "version": 1
-    },
-    {
-      "id": "d4-callout1-text",
-      "type": "text",
-      "x": 52,
-      "y": 488,
-      "strokeColor": "#495057",
-      "text": "Webview cannot fetch: CSP is\ndefault-src 'none'. Even if malicious\ncode runs in the webview, it\ncannot exfiltrate data.",
-      "fontSize": 14,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:18:53.644Z",
-      "updatedAt": "2026-03-04T20:18:53.644Z",
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:04:27.619Z",
+      "updatedAt": "2026-03-04T21:04:27.619Z",
       "version": 1
     },
     {
@@ -669,25 +471,17 @@
       "backgroundColor": "#fff3bf",
       "strokeColor": "#e8590c",
       "strokeWidth": 1,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
       "roundness": {
         "type": 3
       },
-      "createdAt": "2026-03-04T20:18:53.644Z",
-      "updatedAt": "2026-03-04T20:18:53.644Z",
-      "version": 1
-    },
-    {
-      "id": "d4-callout2-text",
-      "type": "text",
-      "x": 372,
-      "y": 488,
-      "strokeColor": "#495057",
-      "text": "Request deduplication: a counter\n(detailRequestId) ensures only the\nlatest response renders. Stale\nresponses are silently dropped.",
-      "fontSize": 14,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:18:53.644Z",
-      "updatedAt": "2026-03-04T20:18:53.644Z",
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:04:27.619Z",
+      "updatedAt": "2026-03-04T21:04:27.619Z",
       "version": 1
     },
     {
@@ -700,25 +494,17 @@
       "backgroundColor": "#fff3bf",
       "strokeColor": "#e8590c",
       "strokeWidth": 1,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
       "roundness": {
         "type": 3
       },
-      "createdAt": "2026-03-04T20:18:53.644Z",
-      "updatedAt": "2026-03-04T20:18:53.644Z",
-      "version": 1
-    },
-    {
-      "id": "d4-callout3-text",
-      "type": "text",
-      "x": 682,
-      "y": 488,
-      "strokeColor": "#495057",
-      "text": "Nonce-based script loading: each\nrender generates a random 32-char\nnonce. Only scripts with that\nnonce execute. Prevents XSS.",
-      "fontSize": 14,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:18:53.644Z",
-      "updatedAt": "2026-03-04T20:18:53.644Z",
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:04:27.619Z",
+      "updatedAt": "2026-03-04T21:04:27.619Z",
       "version": 1
     },
     {
@@ -731,25 +517,17 @@
       "backgroundColor": "#ffffff",
       "strokeColor": "#868e96",
       "strokeWidth": 1,
+      "strokeStyle": "solid",
       "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
       "roundness": {
         "type": 3
       },
-      "createdAt": "2026-03-04T20:18:53.644Z",
-      "updatedAt": "2026-03-04T20:18:53.644Z",
-      "version": 1
-    },
-    {
-      "id": "d4-legend-title",
-      "type": "text",
-      "x": 130,
-      "y": 598,
-      "strokeColor": "#1e1e1e",
-      "text": "Legend",
-      "fontSize": 16,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:18:53.644Z",
-      "updatedAt": "2026-03-04T20:18:53.644Z",
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:04:27.619Z",
+      "updatedAt": "2026-03-04T21:04:27.619Z",
       "version": 1
     },
     {
@@ -762,22 +540,15 @@
       "backgroundColor": "#a5d8ff",
       "strokeColor": "#1971c2",
       "strokeWidth": 1,
+      "strokeStyle": "solid",
       "roughness": 0,
-      "createdAt": "2026-03-04T20:18:53.644Z",
-      "updatedAt": "2026-03-04T20:18:53.644Z",
-      "version": 1
-    },
-    {
-      "id": "d4-leg-blue-t",
-      "type": "text",
-      "x": 78,
-      "y": 622,
-      "strokeColor": "#495057",
-      "text": "Extension internals",
-      "fontSize": 14,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:18:53.644Z",
-      "updatedAt": "2026-03-04T20:18:53.644Z",
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
+      "roundness": null,
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:04:27.619Z",
+      "updatedAt": "2026-03-04T21:04:27.619Z",
       "version": 1
     },
     {
@@ -790,22 +561,15 @@
       "backgroundColor": "#b2f2bb",
       "strokeColor": "#2f9e44",
       "strokeWidth": 1,
+      "strokeStyle": "solid",
       "roughness": 0,
-      "createdAt": "2026-03-04T20:18:53.644Z",
-      "updatedAt": "2026-03-04T20:18:53.644Z",
-      "version": 1
-    },
-    {
-      "id": "d4-leg-green-t",
-      "type": "text",
-      "x": 78,
-      "y": 642,
-      "strokeColor": "#495057",
-      "text": "External APIs",
-      "fontSize": 14,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:18:53.644Z",
-      "updatedAt": "2026-03-04T20:18:53.644Z",
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
+      "roundness": null,
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:04:27.619Z",
+      "updatedAt": "2026-03-04T21:04:27.619Z",
       "version": 1
     },
     {
@@ -818,22 +582,15 @@
       "backgroundColor": "#eebefa",
       "strokeColor": "#7048e8",
       "strokeWidth": 1,
+      "strokeStyle": "solid",
       "roughness": 0,
-      "createdAt": "2026-03-04T20:18:53.644Z",
-      "updatedAt": "2026-03-04T20:18:53.644Z",
-      "version": 1
-    },
-    {
-      "id": "d4-leg-purple-t",
-      "type": "text",
-      "x": 78,
-      "y": 662,
-      "strokeColor": "#495057",
-      "text": "Terminal / CLI",
-      "fontSize": 14,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:18:53.644Z",
-      "updatedAt": "2026-03-04T20:18:53.644Z",
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
+      "roundness": null,
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:04:27.619Z",
+      "updatedAt": "2026-03-04T21:04:27.619Z",
       "version": 1
     },
     {
@@ -846,22 +603,15 @@
       "backgroundColor": "#ffc9c9",
       "strokeColor": "#e03131",
       "strokeWidth": 1,
+      "strokeStyle": "solid",
       "roughness": 0,
-      "createdAt": "2026-03-04T20:18:53.644Z",
-      "updatedAt": "2026-03-04T20:18:53.644Z",
-      "version": 1
-    },
-    {
-      "id": "d4-leg-red-t",
-      "type": "text",
-      "x": 78,
-      "y": 682,
-      "strokeColor": "#495057",
-      "text": "Error / security",
-      "fontSize": 14,
-      "fontFamily": 5,
-      "createdAt": "2026-03-04T20:18:53.645Z",
-      "updatedAt": "2026-03-04T20:18:53.645Z",
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
+      "roundness": null,
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:04:27.619Z",
+      "updatedAt": "2026-03-04T21:04:27.619Z",
       "version": 1
     },
     {
@@ -874,22 +624,366 @@
       "backgroundColor": "#fff3bf",
       "strokeColor": "#e8590c",
       "strokeWidth": 1,
+      "strokeStyle": "solid",
       "roughness": 0,
-      "createdAt": "2026-03-04T20:18:53.645Z",
-      "updatedAt": "2026-03-04T20:18:53.645Z",
+      "opacity": 100,
+      "groupIds": [],
+      "locked": false,
+      "roundness": null,
+      "fillStyle": "solid",
+      "createdAt": "2026-03-04T21:04:27.619Z",
+      "updatedAt": "2026-03-04T21:04:27.619Z",
       "version": 1
     },
     {
-      "id": "d4-leg-yellow-t",
+      "id": "mmciz293r6p2cr7swgc",
       "type": "text",
-      "x": 78,
-      "y": 702,
-      "strokeColor": "#495057",
-      "text": "Decision annotation",
+      "x": 40,
+      "y": 70,
+      "strokeColor": "#1e1e1e",
+      "text": "04 — Webview Communication",
+      "fontSize": 28,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:04:44.588Z",
+      "updatedAt": "2026-03-04T21:04:44.588Z",
+      "version": 1
+    },
+    {
+      "id": "mmciz294luee02zb3vh",
+      "type": "text",
+      "x": 40,
+      "y": 105,
+      "strokeColor": "#868e96",
+      "text": "How do two isolated JS contexts coordinate securely?",
+      "fontSize": 18,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:04:44.588Z",
+      "updatedAt": "2026-03-04T21:04:44.588Z",
+      "version": 1
+    },
+    {
+      "id": "mmciz294x4jiwtnywwi",
+      "type": "text",
+      "x": 100,
+      "y": 135,
+      "strokeColor": "#1971c2",
+      "text": "Extension Host [Node.js]",
+      "fontSize": 18,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:04:44.588Z",
+      "updatedAt": "2026-03-04T21:04:44.588Z",
+      "version": 1
+    },
+    {
+      "id": "mmciz294v7ohnfaf7",
+      "type": "text",
+      "x": 620,
+      "y": 135,
+      "strokeColor": "#1971c2",
+      "text": "Webview Sandbox [Browser]",
+      "fontSize": 18,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:04:44.588Z",
+      "updatedAt": "2026-03-04T21:04:44.588Z",
+      "version": 1
+    },
+    {
+      "id": "mmciz294q8k8eimzd1a",
+      "type": "text",
+      "x": 100,
+      "y": 185,
+      "strokeColor": "#1971c2",
+      "text": "provider.ts",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:04:44.588Z",
+      "updatedAt": "2026-03-04T21:04:44.588Z",
+      "version": 1
+    },
+    {
+      "id": "mmciz29417c68hwns7z",
+      "type": "text",
+      "x": 100,
+      "y": 215,
+      "strokeColor": "#868e96",
+      "text": "[Message Handler]",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:04:44.588Z",
+      "updatedAt": "2026-03-04T21:04:44.588Z",
+      "version": 1
+    },
+    {
+      "id": "mmciz2948sxysmga9df",
+      "type": "text",
+      "x": 610,
+      "y": 185,
+      "strokeColor": "#1971c2",
+      "text": "webview-script.ts",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:04:44.588Z",
+      "updatedAt": "2026-03-04T21:04:44.588Z",
+      "version": 1
+    },
+    {
+      "id": "mmciz294x3hdlhq4hzr",
+      "type": "text",
+      "x": 620,
+      "y": 215,
+      "strokeColor": "#868e96",
+      "text": "[UI Renderer]",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:04:44.588Z",
+      "updatedAt": "2026-03-04T21:04:44.588Z",
+      "version": 1
+    },
+    {
+      "id": "mmciz294yqwu4ctpf1h",
+      "type": "text",
+      "x": 428,
+      "y": 190,
+      "strokeColor": "#e03131",
+      "text": "CSP:",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:04:44.588Z",
+      "updatedAt": "2026-03-04T21:04:44.588Z",
+      "version": 1
+    },
+    {
+      "id": "mmciz29489ccny9ggk6",
+      "type": "text",
+      "x": 425,
+      "y": 212,
+      "strokeColor": "#e03131",
+      "text": "default-src\n'none'",
       "fontSize": 14,
       "fontFamily": 5,
-      "createdAt": "2026-03-04T20:18:53.645Z",
-      "updatedAt": "2026-03-04T20:18:53.645Z",
+      "createdAt": "2026-03-04T21:04:44.588Z",
+      "updatedAt": "2026-03-04T21:04:44.588Z",
+      "version": 1
+    },
+    {
+      "id": "mmciz294bxk9r4xsai7",
+      "type": "text",
+      "x": 80,
+      "y": 300,
+      "strokeColor": "#2f9e44",
+      "text": "skills.sh API",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:04:44.588Z",
+      "updatedAt": "2026-03-04T21:04:44.588Z",
+      "version": 1
+    },
+    {
+      "id": "mmciz294vjv6ajp2hv",
+      "type": "text",
+      "x": 230,
+      "y": 300,
+      "strokeColor": "#2f9e44",
+      "text": "skills.sh Website",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:04:44.588Z",
+      "updatedAt": "2026-03-04T21:04:44.588Z",
+      "version": 1
+    },
+    {
+      "id": "mmciz2949ihim5m36in",
+      "type": "text",
+      "x": 85,
+      "y": 322,
+      "strokeColor": "#868e96",
+      "text": "[External]",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:04:44.588Z",
+      "updatedAt": "2026-03-04T21:04:44.588Z",
+      "version": 1
+    },
+    {
+      "id": "mmciz2945a9fezfzw1m",
+      "type": "text",
+      "x": 250,
+      "y": 322,
+      "strokeColor": "#868e96",
+      "text": "[External]",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:04:44.589Z",
+      "updatedAt": "2026-03-04T21:04:44.589Z",
+      "version": 1
+    },
+    {
+      "id": "mmciz294zugf7rqjcca",
+      "type": "text",
+      "x": 85,
+      "y": 378,
+      "strokeColor": "#2f9e44",
+      "text": "GitHub",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:04:44.589Z",
+      "updatedAt": "2026-03-04T21:04:44.589Z",
+      "version": 1
+    },
+    {
+      "id": "mmciz294ucwej6oq78",
+      "type": "text",
+      "x": 100,
+      "y": 398,
+      "strokeColor": "#868e96",
+      "text": "[External]",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:04:44.589Z",
+      "updatedAt": "2026-03-04T21:04:44.589Z",
+      "version": 1
+    },
+    {
+      "id": "mmciz2947y1xjo7e25k",
+      "type": "text",
+      "x": 240,
+      "y": 378,
+      "strokeColor": "#7048e8",
+      "text": "installer.ts",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:04:44.589Z",
+      "updatedAt": "2026-03-04T21:04:44.589Z",
+      "version": 1
+    },
+    {
+      "id": "mmciz294k157e5swfz",
+      "type": "text",
+      "x": 248,
+      "y": 398,
+      "strokeColor": "#868e96",
+      "text": "[Module]",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:04:44.589Z",
+      "updatedAt": "2026-03-04T21:04:44.589Z",
+      "version": 1
+    },
+    {
+      "id": "mmcizap47vet65zvn2c",
+      "type": "text",
+      "x": 48,
+      "y": 488,
+      "strokeColor": "#495057",
+      "text": "Webview can't fetch: CSP is\ndefault-src 'none'. All API\ncalls proxy through host.",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:04:55.531Z",
+      "updatedAt": "2026-03-04T21:04:55.531Z",
+      "version": 1
+    },
+    {
+      "id": "mmcizap4q60oktz725q",
+      "type": "text",
+      "x": 368,
+      "y": 488,
+      "strokeColor": "#495057",
+      "text": "Request dedup: detailRequestId\ncounter drops stale responses\nwhen user navigates away.",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:04:55.532Z",
+      "updatedAt": "2026-03-04T21:04:55.532Z",
+      "version": 1
+    },
+    {
+      "id": "mmcizap4k4c3zh43rn",
+      "type": "text",
+      "x": 678,
+      "y": 488,
+      "strokeColor": "#495057",
+      "text": "Nonce-based scripts: random\n32-char nonce per render.\nPrevents XSS from scraped HTML.",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:04:55.532Z",
+      "updatedAt": "2026-03-04T21:04:55.532Z",
+      "version": 1
+    },
+    {
+      "id": "mmcizap4klplie7nqqs",
+      "type": "text",
+      "x": 55,
+      "y": 598,
+      "strokeColor": "#1e1e1e",
+      "text": "Legend",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:04:55.532Z",
+      "updatedAt": "2026-03-04T21:04:55.532Z",
+      "version": 1
+    },
+    {
+      "id": "mmcizap452ia7zo5jyn",
+      "type": "text",
+      "x": 78,
+      "y": 623,
+      "strokeColor": "#868e96",
+      "text": "Extension internals",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:04:55.532Z",
+      "updatedAt": "2026-03-04T21:04:55.532Z",
+      "version": 1
+    },
+    {
+      "id": "mmcizap4f51oa6fill6",
+      "type": "text",
+      "x": 78,
+      "y": 643,
+      "strokeColor": "#868e96",
+      "text": "External APIs/services",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:04:55.532Z",
+      "updatedAt": "2026-03-04T21:04:55.532Z",
+      "version": 1
+    },
+    {
+      "id": "mmcizap4ryvy3ppgu8m",
+      "type": "text",
+      "x": 78,
+      "y": 663,
+      "strokeColor": "#868e96",
+      "text": "Terminal/CLI",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:04:55.532Z",
+      "updatedAt": "2026-03-04T21:04:55.532Z",
+      "version": 1
+    },
+    {
+      "id": "mmcizap4uskh4bgx5jb",
+      "type": "text",
+      "x": 78,
+      "y": 683,
+      "strokeColor": "#868e96",
+      "text": "Error paths / security",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:04:55.532Z",
+      "updatedAt": "2026-03-04T21:04:55.532Z",
+      "version": 1
+    },
+    {
+      "id": "mmcizap49z9807r9br6",
+      "type": "text",
+      "x": 78,
+      "y": 703,
+      "strokeColor": "#868e96",
+      "text": "Decision annotations",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-04T21:04:55.532Z",
+      "updatedAt": "2026-03-04T21:04:55.532Z",
       "version": 1
     }
   ],
