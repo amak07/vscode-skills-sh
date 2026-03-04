@@ -24,11 +24,19 @@ jobs:
       - name: Export Excalidraw to SVG
         run: |
           excalidraw_export --embed-fonts docs/architecture/*.excalidraw
+          # Rename .excalidraw.svg → .svg for cleaner references in docs
+          for f in docs/architecture/*.excalidraw.svg; do
+            [ -f "$f" ] && mv "$f" "${f/.excalidraw.svg/.svg}"
+          done
 
       - name: Check for changes
         id: diff
         run: |
-          git diff --quiet docs/architecture/*.svg 2>/dev/null && echo "changed=false" >> "$GITHUB_OUTPUT" || echo "changed=true" >> "$GITHUB_OUTPUT"
+          if [ -n "$(git status --porcelain docs/architecture/*.svg)" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Commit SVGs
         if: steps.diff.outputs.changed == 'true'
