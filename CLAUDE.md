@@ -100,7 +100,7 @@ Both secrets are configured at: https://github.com/amak07/vscode-skills-sh/setti
 
 ## Architecture Diagrams
 
-Excalidraw source files live in `docs/architecture/`. CI auto-exports to SVG for README embedding.
+Excalidraw source files live in `docs/architecture/`. The rendered documentation is in [`docs/architecture/architecture.md`](docs/architecture/architecture.md). CI auto-exports `.excalidraw` → `.svg` on push to master.
 
 ### Best Practices (Interview-Ready Diagrams)
 - **One concept per diagram** — don't cram everything into a god diagram
@@ -114,19 +114,63 @@ Excalidraw source files live in `docs/architecture/`. CI auto-exports to SVG for
 - **Layered detail** — scannable for PMs ("what it does"), deep enough for engineers ("how and why")
 - **Keep text minimal** — labels and short annotations, not paragraphs
 - **Number diagrams** for presentation order (01-, 02-, etc.)
+- **Font**: Helvetica (fontFamily 2) — not Virgil (hand-drawn). Diagrams are ~1700px wide but render at ~800px in GitHub README. Hand-drawn font becomes illegible at that scale.
+- **Min font size**: 16px for annotations, 20px for labels, 24-32px for titles/section headers
 
-### Editing
-- Install the VS Code Excalidraw extension for in-editor editing
-- CI exports `.excalidraw` → `.svg` automatically on push (`.github/workflows/export-diagrams.yml`)
-- Local export: `npm.cmd run export-diagrams`
-- README references the SVGs (not the source files)
+### Editing with Excalidraw MCP
+
+We use the [yctimlin/mcp_excalidraw](https://github.com/yctimlin/mcp_excalidraw) MCP server for visual diagram editing. This provides a closed feedback loop: import → screenshot → adjust → screenshot → export.
+
+**Why not the official Excalidraw MCP?** The [official one](https://github.com/excalidraw/excalidraw-mcp) is generation-only (streams new diagrams from prompts). It has no `import_scene`, `get_canvas_screenshot`, or `update_element` — useless for editing existing diagrams.
+
+**Setup (already done, persisted at user scope):**
+```bash
+# Canvas server lives at ~/Projects/mcp_excalidraw (cloned + built)
+# MCP registered with Claude Code:
+claude mcp add excalidraw --scope user \
+  -e EXPRESS_SERVER_URL=http://localhost:3777 \
+  -e ENABLE_CANVAS_SYNC=true \
+  -- node /c/Users/abelm/Projects/mcp_excalidraw/dist/index.js
+```
+
+**Before editing diagrams, start the canvas server:**
+```bash
+cd ~/Projects/mcp_excalidraw
+HOST=0.0.0.0 PORT=3777 node dist/server.js
+# Then open http://localhost:3777 in a browser (required for screenshots)
+```
+
+**Workflow for editing a diagram:**
+1. `clear_canvas` → `import_scene` (load the `.excalidraw` file)
+2. `get_canvas_screenshot` → assess current state
+3. `describe_scene` → get structured element IDs and positions
+4. `update_element` / `align_elements` / `distribute_elements` → make changes
+5. `get_canvas_screenshot` → verify fixes visually
+6. `export_scene` → save back to `.excalidraw` file
+7. `export_to_image(format: svg)` → export `.svg` for docs
+
+**Key MCP tools:**
+- `import_scene` / `export_scene` — load/save `.excalidraw` files
+- `get_canvas_screenshot` — visual verification (requires browser open)
+- `describe_scene` — structured list of all elements with IDs, positions, text
+- `update_element` — modify individual element properties (position, font, color)
+- `align_elements` / `distribute_elements` — layout helpers
+- `export_to_image` — export to SVG or PNG
+
+### SVG Export Pipeline
+
+**CI (automatic):** `.github/workflows/export-diagrams.yml` runs on push to master when `.excalidraw` files change. Uses `excalidraw_export --embed-fonts`.
+
+**Local (manual):** `npm.cmd run export-diagrams` or use the MCP's `export_to_image` tool.
+
+**Important:** The SVGs must be committed alongside the `.excalidraw` source files. `architecture.md` references SVGs with relative paths (`01-system-context.svg`). The README links to `architecture.md`.
 
 ### Adding a New Diagram
 1. Create `docs/architecture/NN-name.excalidraw`
-2. Follow the color coding convention above
+2. Follow the color coding and font conventions above
 3. Add 2-3 decision annotations (italic callouts explaining trade-offs)
-4. Push — CI will generate the SVG
-5. Add `![Name](docs/architecture/NN-name.svg)` to README
+4. Export SVG via MCP (`export_to_image`) or push and let CI handle it
+5. Add a section to `docs/architecture/architecture.md` with `![Name](NN-name.svg)`
 
 ## Beads Task Management
 
