@@ -6,8 +6,8 @@
     {
       "id": "callout-bg-90090",
       "type": "rectangle",
-      "x": 648,
-      "y": 608,
+      "x": 710.5797872340426,
+      "y": 653.8643617021277,
       "width": 314.40000000000003,
       "height": 64,
       "angle": 0,
@@ -18,7 +18,9 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "groupIds": [],
+      "groupIds": [
+        "grp-63"
+      ],
       "frameId": null,
       "roundness": {
         "type": 3
@@ -35,8 +37,8 @@
     {
       "id": "callout-bg-90093",
       "type": "rectangle",
-      "x": 688,
-      "y": 438,
+      "x": 745.1797872340426,
+      "y": 441.36436170212767,
       "width": 191.20000000000002,
       "height": 64,
       "angle": 0,
@@ -47,7 +49,9 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "groupIds": [],
+      "groupIds": [
+        "grp-64"
+      ],
       "frameId": null,
       "roundness": {
         "type": 3
@@ -64,8 +68,8 @@
     {
       "id": "callout-bg-90096",
       "type": "rectangle",
-      "x": 858,
-      "y": 578,
+      "x": 963.1797872340426,
+      "y": 616.3643617021277,
       "width": 235.20000000000002,
       "height": 64,
       "angle": 0,
@@ -76,7 +80,9 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "groupIds": [],
+      "groupIds": [
+        "grp-65"
+      ],
       "frameId": null,
       "roundness": {
         "type": 3
@@ -93,8 +99,8 @@
     {
       "id": "cicd-title",
       "type": "text",
-      "x": 20,
-      "y": 20,
+      "x": -86.22021276595746,
+      "y": -84.76063829787235,
       "width": 220,
       "height": 35,
       "angle": 0,
@@ -129,8 +135,8 @@
     {
       "id": "cicd-subtitle",
       "type": "text",
-      "x": 20,
-      "y": 55,
+      "x": -73.72021276595746,
+      "y": -42.88563829787235,
       "width": 320,
       "height": 20,
       "angle": 0,
@@ -165,8 +171,8 @@
     {
       "id": "trigger-ci",
       "type": "diamond",
-      "x": 150,
-      "y": 130,
+      "x": 73.77978723404254,
+      "y": 60.86436170212765,
       "width": 200,
       "height": 100,
       "angle": 0,
@@ -203,8 +209,8 @@
     {
       "id": "trigger-ci-label",
       "type": "text",
-      "x": 195,
-      "y": 165,
+      "x": 118.77978723404254,
+      "y": 96.61436170212765,
       "width": 110,
       "height": 36,
       "angle": 0,
@@ -239,8 +245,8 @@
     {
       "id": "trigger-publish",
       "type": "diamond",
-      "x": 800,
-      "y": 130,
+      "x": 886.2797872340425,
+      "y": 60.86436170212765,
       "width": 200,
       "height": 100,
       "angle": 0,
@@ -277,8 +283,8 @@
     {
       "id": "trigger-publish-label",
       "type": "text",
-      "x": 850,
-      "y": 165,
+      "x": 936.2797872340425,
+      "y": 96.61436170212765,
       "width": 100,
       "height": 36,
       "angle": 0,
@@ -313,8 +319,8 @@
     {
       "id": "ci-workflow-box",
       "type": "rectangle",
-      "x": 100,
-      "y": 280,
+      "x": 23.779787234042544,
+      "y": 243.36436170212767,
       "width": 300,
       "height": 60,
       "angle": 0,
@@ -325,7 +331,9 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "groupIds": [],
+      "groupIds": [
+        "grp-67"
+      ],
       "roundness": {
         "type": 3
       },
@@ -355,8 +363,8 @@
     {
       "id": "ci-workflow-label",
       "type": "text",
-      "x": 185,
-      "y": 298,
+      "x": 108.77978723404254,
+      "y": 261.48936170212767,
       "width": 130,
       "height": 25,
       "angle": 0,
@@ -367,7 +375,9 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "groupIds": [],
+      "groupIds": [
+        "grp-67"
+      ],
       "roundness": null,
       "seed": 3008,
       "version": 1,
@@ -391,8 +401,8 @@
     {
       "id": "arrow-trigger-ci-to-ciworkflow",
       "type": "arrow",
-      "x": 250,
-      "y": 230,
+      "x": 173.77978723404254,
+      "y": 179.61436170212767,
       "width": 0,
       "height": 50,
       "angle": 0,
@@ -444,8 +454,8 @@
     {
       "id": "ci-matrix-box",
       "type": "rectangle",
-      "x": 100,
-      "y": 370,
+      "x": 23.779787234042544,
+      "y": 355.86436170212767,
       "width": 300,
       "height": 60,
       "angle": 0,
@@ -456,7 +466,9 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "groupIds": [],
+      "groupIds": [
+        "grp-68"
+      ],
       "roundness": {
         "type": 3
       },
@@ -486,8 +498,8 @@
     {
       "id": "ci-matrix-label",
       "type": "text",
-      "x": 130,
-      "y": 388,
+      "x": 53.779787234042544,
+      "y": 373.98936170212767,
       "width": 240,
       "height": 25,
       "angle": 0,
@@ -498,7 +510,9 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "groupIds": [],
+      "groupIds": [
+        "grp-68"
+      ],
       "roundness": null,
       "seed": 3011,
       "version": 1,
@@ -522,8 +536,8 @@
     {
       "id": "arrow-ciworkflow-to-matrix",
       "type": "arrow",
-      "x": 250,
-      "y": 340,
+      "x": 173.77978723404254,
+      "y": 314.61436170212767,
       "width": 0,
       "height": 30,
       "angle": 0,
@@ -575,8 +589,8 @@
     {
       "id": "ci-step-npmci",
       "type": "rectangle",
-      "x": 100,
-      "y": 460,
+      "x": 23.779787234042544,
+      "y": 465.86436170212767,
       "width": 300,
       "height": 40,
       "angle": 0,
@@ -587,7 +601,9 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "groupIds": [],
+      "groupIds": [
+        "grp-69"
+      ],
       "roundness": {
         "type": 3
       },
@@ -617,8 +633,8 @@
     {
       "id": "ci-step-npmci-label",
       "type": "text",
-      "x": 215,
-      "y": 470,
+      "x": 138.77978723404254,
+      "y": 475.86436170212767,
       "width": 70,
       "height": 20,
       "angle": 0,
@@ -629,7 +645,9 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "groupIds": [],
+      "groupIds": [
+        "grp-69"
+      ],
       "roundness": null,
       "seed": 3014,
       "version": 1,
@@ -653,8 +671,8 @@
     {
       "id": "arrow-matrix-to-npmci",
       "type": "arrow",
-      "x": 250,
-      "y": 430,
+      "x": 173.77978723404254,
+      "y": 427.11436170212767,
       "width": 0,
       "height": 30,
       "angle": 0,
@@ -706,8 +724,8 @@
     {
       "id": "ci-step-npmtest",
       "type": "rectangle",
-      "x": 100,
-      "y": 510,
+      "x": 23.779787234042544,
+      "y": 528.3643617021277,
       "width": 300,
       "height": 40,
       "angle": 0,
@@ -718,7 +736,9 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "groupIds": [],
+      "groupIds": [
+        "grp-70"
+      ],
       "roundness": {
         "type": 3
       },
@@ -748,8 +768,8 @@
     {
       "id": "ci-step-npmtest-label",
       "type": "text",
-      "x": 210,
-      "y": 520,
+      "x": 133.77978723404254,
+      "y": 538.3643617021277,
       "width": 80,
       "height": 20,
       "angle": 0,
@@ -760,7 +780,9 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "groupIds": [],
+      "groupIds": [
+        "grp-70"
+      ],
       "roundness": null,
       "seed": 3017,
       "version": 1,
@@ -784,8 +806,8 @@
     {
       "id": "arrow-npmci-to-npmtest",
       "type": "arrow",
-      "x": 250,
-      "y": 500,
+      "x": 173.77978723404254,
+      "y": 512.1143617021277,
       "width": 0,
       "height": 10,
       "angle": 0,
@@ -837,8 +859,8 @@
     {
       "id": "ci-step-npmbuild",
       "type": "rectangle",
-      "x": 100,
-      "y": 560,
+      "x": 23.779787234042544,
+      "y": 590.8643617021277,
       "width": 300,
       "height": 40,
       "angle": 0,
@@ -849,7 +871,9 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "groupIds": [],
+      "groupIds": [
+        "grp-71"
+      ],
       "roundness": {
         "type": 3
       },
@@ -879,8 +903,8 @@
     {
       "id": "ci-step-npmbuild-label",
       "type": "text",
-      "x": 190,
-      "y": 570,
+      "x": 113.77978723404254,
+      "y": 600.8643617021277,
       "width": 120,
       "height": 20,
       "angle": 0,
@@ -891,7 +915,9 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "groupIds": [],
+      "groupIds": [
+        "grp-71"
+      ],
       "roundness": null,
       "seed": 3020,
       "version": 1,
@@ -915,8 +941,8 @@
     {
       "id": "arrow-npmtest-to-npmbuild",
       "type": "arrow",
-      "x": 250,
-      "y": 550,
+      "x": 173.77978723404254,
+      "y": 574.6143617021277,
       "width": 0,
       "height": 10,
       "angle": 0,
@@ -968,8 +994,8 @@
     {
       "id": "ci-artifact-box",
       "type": "rectangle",
-      "x": 100,
-      "y": 630,
+      "x": 23.779787234042544,
+      "y": 680.8643617021277,
       "width": 300,
       "height": 60,
       "angle": 0,
@@ -980,7 +1006,9 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "groupIds": [],
+      "groupIds": [
+        "grp-72"
+      ],
       "roundness": {
         "type": 3
       },
@@ -1006,8 +1034,8 @@
     {
       "id": "ci-artifact-label",
       "type": "text",
-      "x": 175,
-      "y": 648,
+      "x": 98.77978723404254,
+      "y": 698.9893617021277,
       "width": 150,
       "height": 25,
       "angle": 0,
@@ -1018,7 +1046,9 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "groupIds": [],
+      "groupIds": [
+        "grp-72"
+      ],
       "roundness": null,
       "seed": 3023,
       "version": 1,
@@ -1042,8 +1072,8 @@
     {
       "id": "arrow-npmbuild-to-ciartifact",
       "type": "arrow",
-      "x": 250,
-      "y": 600,
+      "x": 173.77978723404254,
+      "y": 639.6143617021277,
       "width": 0,
       "height": 30,
       "angle": 0,
@@ -1095,8 +1125,8 @@
     {
       "id": "pub-buildjob-box",
       "type": "rectangle",
-      "x": 700,
-      "y": 280,
+      "x": 780.0297872340425,
+      "y": 243.36436170212767,
       "width": 350,
       "height": 60,
       "angle": 0,
@@ -1107,7 +1137,9 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "groupIds": [],
+      "groupIds": [
+        "grp-73"
+      ],
       "roundness": {
         "type": 3
       },
@@ -1137,8 +1169,8 @@
     {
       "id": "pub-buildjob-label",
       "type": "text",
-      "x": 815,
-      "y": 298,
+      "x": 895.0297872340425,
+      "y": 261.48936170212767,
       "width": 120,
       "height": 25,
       "angle": 0,
@@ -1149,7 +1181,9 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "groupIds": [],
+      "groupIds": [
+        "grp-73"
+      ],
       "roundness": null,
       "seed": 3026,
       "version": 1,
@@ -1173,8 +1207,8 @@
     {
       "id": "arrow-trigger-pub-to-buildjob",
       "type": "arrow",
-      "x": 900,
-      "y": 230,
+      "x": 986.2797872340425,
+      "y": 179.61436170212767,
       "width": 0,
       "height": 50,
       "angle": 0,
@@ -1226,8 +1260,8 @@
     {
       "id": "pub-artifact-box",
       "type": "rectangle",
-      "x": 700,
-      "y": 380,
+      "x": 780.0297872340425,
+      "y": 368.36436170212767,
       "width": 350,
       "height": 60,
       "angle": 0,
@@ -1238,7 +1272,9 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "groupIds": [],
+      "groupIds": [
+        "grp-74"
+      ],
       "roundness": {
         "type": 3
       },
@@ -1272,8 +1308,8 @@
     {
       "id": "pub-artifact-label",
       "type": "text",
-      "x": 810,
-      "y": 398,
+      "x": 890.0297872340425,
+      "y": 386.48936170212767,
       "width": 130,
       "height": 25,
       "angle": 0,
@@ -1284,7 +1320,9 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "groupIds": [],
+      "groupIds": [
+        "grp-74"
+      ],
       "roundness": null,
       "seed": 3029,
       "version": 1,
@@ -1308,8 +1346,8 @@
     {
       "id": "arrow-buildjob-to-pubartifact",
       "type": "arrow",
-      "x": 875,
-      "y": 340,
+      "x": 955.0297872340425,
+      "y": 315.86436170212767,
       "width": 0,
       "height": 40,
       "angle": 0,
@@ -1361,8 +1399,8 @@
     {
       "id": "pub-vscode-box",
       "type": "rectangle",
-      "x": 550,
-      "y": 500,
+      "x": 580.0297872340425,
+      "y": 520.8643617021277,
       "width": 250,
       "height": 80,
       "angle": 0,
@@ -1373,7 +1411,9 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "groupIds": [],
+      "groupIds": [
+        "grp-66"
+      ],
       "roundness": {
         "type": 3
       },
@@ -1399,8 +1439,8 @@
     {
       "id": "pub-vscode-label",
       "type": "text",
-      "x": 580,
-      "y": 520,
+      "x": 610.0297872340425,
+      "y": 540.8643617021277,
       "width": 190,
       "height": 40,
       "angle": 0,
@@ -1411,7 +1451,9 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "groupIds": [],
+      "groupIds": [
+        "grp-66"
+      ],
       "roundness": null,
       "seed": 3032,
       "version": 1,
@@ -1435,8 +1477,8 @@
     {
       "id": "arrow-pubartifact-to-vscode",
       "type": "arrow",
-      "x": 810,
-      "y": 440,
+      "x": 890.6547872340425,
+      "y": 443.36436170212767,
       "width": 135,
       "height": 60,
       "angle": 0,
@@ -1488,8 +1530,8 @@
     {
       "id": "pub-openvsx-box",
       "type": "rectangle",
-      "x": 850,
-      "y": 500,
+      "x": 955.0297872340425,
+      "y": 520.8643617021277,
       "width": 250,
       "height": 80,
       "angle": 0,
@@ -1500,7 +1542,9 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "groupIds": [],
+      "groupIds": [
+        "grp-75"
+      ],
       "roundness": {
         "type": 3
       },
@@ -1526,8 +1570,8 @@
     {
       "id": "pub-openvsx-label",
       "type": "text",
-      "x": 900,
-      "y": 520,
+      "x": 1005.0297872340425,
+      "y": 540.8643617021277,
       "width": 150,
       "height": 40,
       "angle": 0,
@@ -1538,7 +1582,9 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "groupIds": [],
+      "groupIds": [
+        "grp-75"
+      ],
       "roundness": null,
       "seed": 3035,
       "version": 1,
@@ -1562,8 +1608,8 @@
     {
       "id": "arrow-pubartifact-to-openvsx",
       "type": "arrow",
-      "x": 940,
-      "y": 440,
+      "x": 1040.6547872340425,
+      "y": 443.36436170212767,
       "width": 35,
       "height": 60,
       "angle": 0,
@@ -1615,8 +1661,8 @@
     {
       "id": "annotation-vscepat",
       "type": "text",
-      "x": 580,
-      "y": 590,
+      "x": 606.2797872340425,
+      "y": 625.6143617021277,
       "width": 160,
       "height": 18,
       "angle": 0,
@@ -1627,7 +1673,9 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "groupIds": [],
+      "groupIds": [
+        "grp-66"
+      ],
       "roundness": null,
       "seed": 3037,
       "version": 1,
@@ -1651,8 +1699,8 @@
     {
       "id": "annotation-ovsxpat",
       "type": "text",
-      "x": 900,
-      "y": 590,
+      "x": 1005.0297872340425,
+      "y": 625.6143617021277,
       "width": 150,
       "height": 18,
       "angle": 0,
@@ -1663,7 +1711,9 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "groupIds": [],
+      "groupIds": [
+        "grp-65"
+      ],
       "roundness": null,
       "seed": 3038,
       "version": 1,
@@ -1687,8 +1737,8 @@
     {
       "id": "release-box",
       "type": "rectangle",
-      "x": 350,
-      "y": 700,
+      "x": 361.27978723404254,
+      "y": 773.3643617021277,
       "width": 500,
       "height": 100,
       "angle": 0,
@@ -1699,7 +1749,9 @@
       "strokeStyle": "dashed",
       "roughness": 1,
       "opacity": 100,
-      "groupIds": [],
+      "groupIds": [
+        "grp-76"
+      ],
       "roundness": {
         "type": 3
       },
@@ -1721,8 +1773,8 @@
     {
       "id": "release-content-label",
       "type": "text",
-      "x": 400,
-      "y": 738,
+      "x": 411.27978723404254,
+      "y": 811.4893617021277,
       "width": 400,
       "height": 25,
       "angle": 0,
@@ -1733,7 +1785,9 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "groupIds": [],
+      "groupIds": [
+        "grp-76"
+      ],
       "roundness": null,
       "seed": 3040,
       "version": 1,
@@ -1757,8 +1811,8 @@
     {
       "id": "release-heading-label",
       "type": "text",
-      "x": 520,
-      "y": 680,
+      "x": 530.0297872340425,
+      "y": 738.1143617021277,
       "width": 150,
       "height": 18,
       "angle": 0,
@@ -1793,8 +1847,8 @@
     {
       "id": "annotation-parallel",
       "type": "text",
-      "x": 660,
-      "y": 620,
+      "x": 718.7797872340425,
+      "y": 665.3643617021277,
       "width": 260,
       "height": 36,
       "angle": 0,
@@ -1805,7 +1859,9 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "groupIds": [],
+      "groupIds": [
+        "grp-63"
+      ],
       "roundness": null,
       "seed": 3042,
       "version": 1,
@@ -1829,8 +1885,8 @@
     {
       "id": "annotation-samebinary",
       "type": "text",
-      "x": 700,
-      "y": 450,
+      "x": 761.2797872340425,
+      "y": 452.86436170212767,
       "width": 200,
       "height": 36,
       "angle": 0,
@@ -1841,7 +1897,9 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "groupIds": [],
+      "groupIds": [
+        "grp-64"
+      ],
       "roundness": null,
       "seed": 3043,
       "version": 1,
@@ -1865,8 +1923,8 @@
     {
       "id": "annotation-openvsx-users",
       "type": "text",
-      "x": 870,
-      "y": 590,
+      "x": 975.0297872340425,
+      "y": 627.8643617021277,
       "width": 210,
       "height": 36,
       "angle": 0,
@@ -1877,7 +1935,9 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "groupIds": [],
+      "groupIds": [
+        "grp-65"
+      ],
       "roundness": null,
       "seed": 3044,
       "version": 1,
