@@ -133,6 +133,7 @@ Excalidraw source files live in `docs/architecture/`. The rendered documentation
   Cause: [Root cause — why the problem exists]
   ```
   Each section is 1-2 short sentences. This format works for mixed audiences: non-technical readers scan What/Why, engineers drill into How/Cause. Yellow callout boxes (`#fff3bf` bg, `#e8590c` stroke, `#495057` text, 14px Excalifont).
+- **Always group boxes with their text labels** — after creating/editing a rectangle + its companion text element(s), use `group_elements` to group them. This keeps labels attached when elements are moved or resized. Group: each system box + name + subtitle, each callout bg + text, legend items, title + subtitle.
 
 ### Editing with Excalidraw MCP
 

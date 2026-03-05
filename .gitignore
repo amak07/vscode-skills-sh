@@ -6,3 +6,4 @@ dist/
 .claude/worktrees/
 .claude/settings.local.json
 excalidraw.log
+docs/architecture/*-talking-points.txt
