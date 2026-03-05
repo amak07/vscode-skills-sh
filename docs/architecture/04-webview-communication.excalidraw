@@ -13,12 +13,12 @@
       "text": "04 — Webview Communication",
       "fontSize": 28,
       "fontFamily": 5,
-      "createdAt": "2026-03-05T07:59:34.684Z",
-      "updatedAt": "2026-03-05T08:00:06.347Z",
-      "version": 2,
       "groupIds": [
         "mmd6dv44qkndksjicw9"
-      ]
+      ],
+      "createdAt": "2026-03-05T08:31:39.823Z",
+      "updatedAt": "2026-03-05T08:31:39.823Z",
+      "version": 1
     },
     {
       "id": "d4-subtitle",
@@ -30,12 +30,12 @@
       "text": "How do two isolated JS contexts coordinate securely?",
       "fontSize": 18,
       "fontFamily": 5,
-      "createdAt": "2026-03-05T07:59:34.684Z",
-      "updatedAt": "2026-03-05T08:00:06.349Z",
-      "version": 2,
       "groupIds": [
         "mmd6dv44qkndksjicw9"
-      ]
+      ],
+      "createdAt": "2026-03-05T08:31:39.823Z",
+      "updatedAt": "2026-03-05T08:31:39.823Z",
+      "version": 1
     },
     {
       "id": "d4-ext-box",
@@ -43,54 +43,21 @@
       "x": 60,
       "y": 130,
       "width": 260,
-      "height": 140,
+      "height": 160,
       "backgroundColor": "#a5d8ff",
       "strokeColor": "#1971c2",
       "strokeWidth": 2,
       "roughness": 0,
+      "groupIds": [
+        "mmd6dvmyusjl9wcmkus",
+        "mmd7j03yo4nr7sa18ae"
+      ],
       "roundness": {
         "type": 3
       },
-      "createdAt": "2026-03-05T07:59:34.684Z",
-      "updatedAt": "2026-03-05T08:00:07.025Z",
-      "version": 2,
-      "groupIds": [
-        "mmd6dvmyusjl9wcmkus"
-      ]
-    },
-    {
-      "id": "d4-ext-name",
-      "type": "text",
-      "x": 110,
-      "y": 140,
-      "strokeColor": "#1971c2",
-      "roughness": 0,
-      "text": "Extension Host",
-      "fontSize": 22,
-      "fontFamily": 5,
-      "createdAt": "2026-03-05T07:59:34.684Z",
-      "updatedAt": "2026-03-05T08:00:07.029Z",
-      "version": 2,
-      "groupIds": [
-        "mmd6dvmyusjl9wcmkus"
-      ]
-    },
-    {
-      "id": "d4-ext-detail",
-      "type": "text",
-      "x": 80,
-      "y": 175,
-      "strokeColor": "#868e96",
-      "roughness": 0,
-      "text": "Full access to APIs, files, terminal\nHandles 17 command types\nPushes state to all open webviews",
-      "fontSize": 14,
-      "fontFamily": 5,
-      "createdAt": "2026-03-05T07:59:34.684Z",
-      "updatedAt": "2026-03-05T08:00:07.034Z",
-      "version": 2,
-      "groupIds": [
-        "mmd6dvmyusjl9wcmkus"
-      ]
+      "createdAt": "2026-03-05T08:31:39.823Z",
+      "updatedAt": "2026-03-05T08:32:05.715Z",
+      "version": 3
     },
     {
       "id": "d4-web-box",
@@ -98,54 +65,21 @@
       "x": 660,
       "y": 130,
       "width": 260,
-      "height": 140,
+      "height": 160,
       "backgroundColor": "#a5d8ff",
       "strokeColor": "#1971c2",
       "strokeWidth": 2,
       "roughness": 0,
+      "groupIds": [
+        "mmd6dw05ihb0h4ljrc",
+        "mmd7j0rgdbpgg10b54p"
+      ],
       "roundness": {
         "type": 3
       },
-      "createdAt": "2026-03-05T07:59:34.684Z",
-      "updatedAt": "2026-03-05T08:00:07.499Z",
-      "version": 2,
-      "groupIds": [
-        "mmd6dw05ihb0h4ljrc"
-      ]
-    },
-    {
-      "id": "d4-web-name",
-      "type": "text",
-      "x": 695,
-      "y": 140,
-      "strokeColor": "#1971c2",
-      "roughness": 0,
-      "text": "Webview Sandbox",
-      "fontSize": 22,
-      "fontFamily": 5,
-      "createdAt": "2026-03-05T07:59:34.684Z",
-      "updatedAt": "2026-03-05T08:00:07.501Z",
-      "version": 2,
-      "groupIds": [
-        "mmd6dw05ihb0h4ljrc"
-      ]
-    },
-    {
-      "id": "d4-web-detail",
-      "type": "text",
-      "x": 675,
-      "y": 175,
-      "strokeColor": "#868e96",
-      "roughness": 0,
-      "text": "Isolated iframe — no network,\nno filesystem, no Node.js\nCan only send/receive messages",
-      "fontSize": 14,
-      "fontFamily": 5,
-      "createdAt": "2026-03-05T07:59:34.684Z",
-      "updatedAt": "2026-03-05T08:00:07.502Z",
-      "version": 2,
-      "groupIds": [
-        "mmd6dw05ihb0h4ljrc"
-      ]
+      "createdAt": "2026-03-05T08:31:39.823Z",
+      "updatedAt": "2026-03-05T08:32:06.559Z",
+      "version": 3
     },
     {
       "id": "d4-csp-badge",
@@ -153,93 +87,51 @@
       "x": 380,
       "y": 130,
       "width": 220,
-      "height": 32,
+      "height": 50,
       "backgroundColor": "#ffc9c9",
       "strokeColor": "#e03131",
       "strokeWidth": 2,
       "roughness": 0,
+      "groupIds": [
+        "mmd6dwnnhjitxzt87s",
+        "mmd7j0ys8npzt5ktp1f",
+        "mmd89zudc6gfcgg0jtj",
+        "mmd8cr3xr0ssi3jvugk"
+      ],
       "roundness": {
         "type": 3
       },
-      "createdAt": "2026-03-05T07:59:34.684Z",
-      "updatedAt": "2026-03-05T08:00:08.343Z",
-      "version": 2,
-      "groupIds": [
-        "mmd6dwnnhjitxzt87s"
-      ]
-    },
-    {
-      "id": "d4-csp-t",
-      "type": "text",
-      "x": 400,
-      "y": 136,
-      "strokeColor": "#e03131",
-      "roughness": 0,
-      "text": "Security Boundary (CSP)",
-      "fontSize": 14,
-      "fontFamily": 5,
-      "createdAt": "2026-03-05T07:59:34.684Z",
-      "updatedAt": "2026-03-05T08:00:08.345Z",
-      "version": 2,
-      "groupIds": [
-        "mmd6dwnnhjitxzt87s"
-      ]
-    },
-    {
-      "id": "d4-lbl-cmd",
-      "type": "text",
-      "x": 385,
-      "y": 178,
-      "strokeColor": "#495057",
-      "roughness": 0,
-      "text": "← User commands (search, install...)",
-      "fontSize": 13,
-      "fontFamily": 5,
-      "createdAt": "2026-03-05T07:59:34.684Z",
-      "updatedAt": "2026-03-05T07:59:34.684Z",
-      "version": 1
+      "createdAt": "2026-03-05T08:31:39.824Z",
+      "updatedAt": "2026-03-05T08:55:13.728Z",
+      "version": 6
     },
     {
       "id": "d4-line-cmd",
       "type": "line",
       "x": 335,
-      "y": 196,
+      "y": 205,
       "width": 310,
       "height": 0,
       "strokeColor": "#1971c2",
       "strokeWidth": 2,
       "roughness": 0,
-      "createdAt": "2026-03-05T07:59:34.684Z",
-      "updatedAt": "2026-03-05T07:59:34.684Z",
-      "version": 1
-    },
-    {
-      "id": "d4-lbl-resp",
-      "type": "text",
-      "x": 385,
-      "y": 212,
-      "strokeColor": "#495057",
-      "roughness": 0,
-      "text": "Data responses + state pushes →",
-      "fontSize": 13,
-      "fontFamily": 5,
-      "createdAt": "2026-03-05T07:59:34.684Z",
-      "updatedAt": "2026-03-05T07:59:34.684Z",
-      "version": 1
+      "createdAt": "2026-03-05T08:31:39.824Z",
+      "updatedAt": "2026-03-05T08:35:16.929Z",
+      "version": 2
     },
     {
       "id": "d4-line-resp",
       "type": "line",
       "x": 335,
-      "y": 230,
+      "y": 234,
       "width": 310,
       "height": 0,
       "strokeColor": "#1971c2",
       "strokeWidth": 2,
       "roughness": 0,
-      "createdAt": "2026-03-05T07:59:34.684Z",
-      "updatedAt": "2026-03-05T07:59:34.684Z",
-      "version": 1
+      "createdAt": "2026-03-05T08:31:39.824Z",
+      "updatedAt": "2026-03-05T08:35:17.568Z",
+      "version": 2
     },
     {
       "id": "d4-ann1-bg",
@@ -252,15 +144,15 @@
       "strokeColor": "#e8590c",
       "strokeWidth": 1,
       "roughness": 0,
+      "groupIds": [
+        "mmd6dx0alxdqfr8erf"
+      ],
       "roundness": {
         "type": 3
       },
-      "createdAt": "2026-03-05T07:59:57.933Z",
-      "updatedAt": "2026-03-05T08:00:08.802Z",
-      "version": 2,
-      "groupIds": [
-        "mmd6dx0alxdqfr8erf"
-      ]
+      "createdAt": "2026-03-05T08:31:39.824Z",
+      "updatedAt": "2026-03-05T08:31:39.824Z",
+      "version": 1
     },
     {
       "id": "d4-ann1-text",
@@ -273,12 +165,12 @@
       "text": "Why can't the webview fetch data?\n\nProblem: The webview runs in a locked-\ndown browser sandbox. Its security\npolicy blocks ALL network requests.\n\nSolution: The webview sends a message\nto the extension, the extension makes\nthe API call, and sends the data back.\nAll data is proxied through the host.",
       "fontSize": 14,
       "fontFamily": 5,
-      "createdAt": "2026-03-05T07:59:57.933Z",
-      "updatedAt": "2026-03-05T08:00:08.800Z",
-      "version": 2,
       "groupIds": [
         "mmd6dx0alxdqfr8erf"
-      ]
+      ],
+      "createdAt": "2026-03-05T08:31:39.824Z",
+      "updatedAt": "2026-03-05T08:31:39.824Z",
+      "version": 1
     },
     {
       "id": "d4-ann2-bg",
@@ -291,15 +183,15 @@
       "strokeColor": "#e8590c",
       "strokeWidth": 1,
       "roughness": 0,
+      "groupIds": [
+        "mmd6dxcq7ae74zzwd58"
+      ],
       "roundness": {
         "type": 3
       },
-      "createdAt": "2026-03-05T07:59:57.933Z",
-      "updatedAt": "2026-03-05T08:00:09.247Z",
-      "version": 2,
-      "groupIds": [
-        "mmd6dxcq7ae74zzwd58"
-      ]
+      "createdAt": "2026-03-05T08:31:39.824Z",
+      "updatedAt": "2026-03-05T08:31:39.824Z",
+      "version": 1
     },
     {
       "id": "d4-ann2-text",
@@ -312,12 +204,12 @@
       "text": "Stale response problem\n\nProblem: User clicks skill A, then\nquickly clicks skill B. If A's response\narrives after B's, it overwrites the page.\n\nSolution: A counter increments on each\nrequest. Before sending any response,\ncheck if this is still the latest request.\nOld responses are silently dropped.",
       "fontSize": 14,
       "fontFamily": 5,
-      "createdAt": "2026-03-05T07:59:57.933Z",
-      "updatedAt": "2026-03-05T08:00:09.250Z",
-      "version": 2,
       "groupIds": [
         "mmd6dxcq7ae74zzwd58"
-      ]
+      ],
+      "createdAt": "2026-03-05T08:31:39.824Z",
+      "updatedAt": "2026-03-05T08:31:39.824Z",
+      "version": 1
     },
     {
       "id": "d4-ann3-bg",
@@ -330,15 +222,15 @@
       "strokeColor": "#e8590c",
       "strokeWidth": 1,
       "roughness": 0,
+      "groupIds": [
+        "mmd6dxp172x9jt7lh3e"
+      ],
       "roundness": {
         "type": 3
       },
-      "createdAt": "2026-03-05T07:59:57.933Z",
-      "updatedAt": "2026-03-05T08:00:09.689Z",
-      "version": 2,
-      "groupIds": [
-        "mmd6dxp172x9jt7lh3e"
-      ]
+      "createdAt": "2026-03-05T08:31:39.824Z",
+      "updatedAt": "2026-03-05T08:31:39.824Z",
+      "version": 1
     },
     {
       "id": "d4-ann3-text",
@@ -351,12 +243,12 @@
       "text": "Preventing XSS from scraped HTML\n\nProblem: We inject HTML scraped from\nskills.sh into the webview. A malicious\nscript tag could execute.\n\nSolution: Every render generates a\nrandom 32-character token (nonce).\nOnly scripts with that exact token can\nrun. Injected scripts don't have it.",
       "fontSize": 14,
       "fontFamily": 5,
-      "createdAt": "2026-03-05T07:59:57.933Z",
-      "updatedAt": "2026-03-05T08:00:09.691Z",
-      "version": 2,
       "groupIds": [
         "mmd6dxp172x9jt7lh3e"
-      ]
+      ],
+      "createdAt": "2026-03-05T08:31:39.824Z",
+      "updatedAt": "2026-03-05T08:31:39.824Z",
+      "version": 1
     },
     {
       "id": "d4-leg-title",
@@ -368,12 +260,12 @@
       "text": "Legend:",
       "fontSize": 14,
       "fontFamily": 5,
-      "createdAt": "2026-03-05T07:59:57.933Z",
-      "updatedAt": "2026-03-05T08:00:10.234Z",
-      "version": 2,
       "groupIds": [
         "mmd6dy41rdvn8mwfi3n"
-      ]
+      ],
+      "createdAt": "2026-03-05T08:31:39.824Z",
+      "updatedAt": "2026-03-05T08:31:39.824Z",
+      "version": 1
     },
     {
       "id": "d4-leg-blue",
@@ -386,12 +278,12 @@
       "strokeColor": "#1971c2",
       "strokeWidth": 1,
       "roughness": 0,
-      "createdAt": "2026-03-05T07:59:57.933Z",
-      "updatedAt": "2026-03-05T08:00:10.236Z",
-      "version": 2,
       "groupIds": [
         "mmd6dy41rdvn8mwfi3n"
-      ]
+      ],
+      "createdAt": "2026-03-05T08:31:39.824Z",
+      "updatedAt": "2026-03-05T08:31:39.824Z",
+      "version": 1
     },
     {
       "id": "d4-leg-blue-t",
@@ -403,12 +295,12 @@
       "text": "Extension internals",
       "fontSize": 14,
       "fontFamily": 5,
-      "createdAt": "2026-03-05T07:59:57.933Z",
-      "updatedAt": "2026-03-05T08:00:10.238Z",
-      "version": 2,
       "groupIds": [
         "mmd6dy41rdvn8mwfi3n"
-      ]
+      ],
+      "createdAt": "2026-03-05T08:31:39.824Z",
+      "updatedAt": "2026-03-05T08:31:39.824Z",
+      "version": 1
     },
     {
       "id": "d4-leg-red",
@@ -421,12 +313,12 @@
       "strokeColor": "#e03131",
       "strokeWidth": 1,
       "roughness": 0,
-      "createdAt": "2026-03-05T07:59:57.933Z",
-      "updatedAt": "2026-03-05T08:00:10.242Z",
-      "version": 2,
       "groupIds": [
         "mmd6dy41rdvn8mwfi3n"
-      ]
+      ],
+      "createdAt": "2026-03-05T08:31:39.824Z",
+      "updatedAt": "2026-03-05T08:31:39.824Z",
+      "version": 1
     },
     {
       "id": "d4-leg-red-t",
@@ -438,12 +330,12 @@
       "text": "Security boundary",
       "fontSize": 14,
       "fontFamily": 5,
-      "createdAt": "2026-03-05T07:59:57.933Z",
-      "updatedAt": "2026-03-05T08:00:10.249Z",
-      "version": 2,
       "groupIds": [
         "mmd6dy41rdvn8mwfi3n"
-      ]
+      ],
+      "createdAt": "2026-03-05T08:31:39.824Z",
+      "updatedAt": "2026-03-05T08:31:39.824Z",
+      "version": 1
     },
     {
       "id": "d4-leg-yellow",
@@ -456,12 +348,12 @@
       "strokeColor": "#e8590c",
       "strokeWidth": 1,
       "roughness": 0,
-      "createdAt": "2026-03-05T07:59:57.933Z",
-      "updatedAt": "2026-03-05T08:00:10.245Z",
-      "version": 2,
       "groupIds": [
         "mmd6dy41rdvn8mwfi3n"
-      ]
+      ],
+      "createdAt": "2026-03-05T08:31:39.824Z",
+      "updatedAt": "2026-03-05T08:31:39.824Z",
+      "version": 1
     },
     {
       "id": "d4-leg-yellow-t",
@@ -473,11 +365,124 @@
       "text": "Decision annotation",
       "fontSize": 14,
       "fontFamily": 5,
-      "createdAt": "2026-03-05T07:59:57.933Z",
-      "updatedAt": "2026-03-05T08:00:10.251Z",
-      "version": 2,
       "groupIds": [
         "mmd6dy41rdvn8mwfi3n"
+      ],
+      "createdAt": "2026-03-05T08:31:39.824Z",
+      "updatedAt": "2026-03-05T08:31:39.824Z",
+      "version": 1
+    },
+    {
+      "id": "d4-ext-name2",
+      "type": "text",
+      "x": 80,
+      "y": 138,
+      "strokeColor": "#1971c2",
+      "roughness": 0,
+      "text": "Your Extension (\"backend\")",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "createdAt": "2026-03-05T08:32:00.555Z",
+      "updatedAt": "2026-03-05T08:32:05.715Z",
+      "version": 2,
+      "groupIds": [
+        "mmd7j03yo4nr7sa18ae"
+      ]
+    },
+    {
+      "id": "d4-ext-detail2",
+      "type": "text",
+      "x": 80,
+      "y": 170,
+      "strokeColor": "#868e96",
+      "roughness": 0,
+      "text": "The Node.js process that powers\nthe extension. Has full access to:\n• APIs (skills.sh, GitHub)\n• Local files and symlinks\n• VS Code terminal",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-05T08:32:00.555Z",
+      "updatedAt": "2026-03-05T08:32:05.716Z",
+      "version": 2,
+      "groupIds": [
+        "mmd7j03yo4nr7sa18ae"
+      ]
+    },
+    {
+      "id": "d4-web-name2",
+      "type": "text",
+      "x": 678,
+      "y": 138,
+      "strokeColor": "#1971c2",
+      "roughness": 0,
+      "text": "Marketplace UI (\"frontend\")",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "createdAt": "2026-03-05T08:32:00.555Z",
+      "updatedAt": "2026-03-05T08:32:06.560Z",
+      "version": 2,
+      "groupIds": [
+        "mmd7j0rgdbpgg10b54p"
+      ]
+    },
+    {
+      "id": "d4-web-detail2",
+      "type": "text",
+      "x": 678,
+      "y": 170,
+      "strokeColor": "#868e96",
+      "roughness": 0,
+      "text": "A web page running inside VS Code.\nCompletely locked down:\n• No internet access\n• No file system access\n• Can ONLY send/receive messages",
+      "fontSize": 14,
+      "fontFamily": 5,
+      "createdAt": "2026-03-05T08:32:00.555Z",
+      "updatedAt": "2026-03-05T08:32:06.561Z",
+      "version": 2,
+      "groupIds": [
+        "mmd7j0rgdbpgg10b54p"
+      ]
+    },
+    {
+      "id": "d4-lbl-cmd2",
+      "type": "text",
+      "x": 370,
+      "y": 188,
+      "strokeColor": "#495057",
+      "roughness": 0,
+      "text": "← UI asks for data (search, install...)",
+      "fontSize": 13,
+      "fontFamily": 5,
+      "createdAt": "2026-03-05T08:32:00.555Z",
+      "updatedAt": "2026-03-05T08:32:00.555Z",
+      "version": 1
+    },
+    {
+      "id": "d4-lbl-resp2",
+      "type": "text",
+      "x": 370,
+      "y": 215,
+      "strokeColor": "#495057",
+      "roughness": 0,
+      "text": "Extension sends data back →",
+      "fontSize": 13,
+      "fontFamily": 5,
+      "createdAt": "2026-03-05T08:32:00.555Z",
+      "updatedAt": "2026-03-05T08:35:17.424Z",
+      "version": 2
+    },
+    {
+      "id": "d4-csp-t4",
+      "type": "text",
+      "x": 395,
+      "y": 133,
+      "strokeColor": "#e03131",
+      "roughness": 0,
+      "text": "VS Code Security Rule\nWebviews can't access the internet",
+      "fontSize": 13,
+      "fontFamily": 5,
+      "createdAt": "2026-03-05T08:55:09.634Z",
+      "updatedAt": "2026-03-05T08:55:13.729Z",
+      "version": 2,
+      "groupIds": [
+        "mmd8cr3xr0ssi3jvugk"
       ]
     }
   ],
