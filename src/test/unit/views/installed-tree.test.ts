@@ -302,11 +302,12 @@ describe('InstalledSkillsTreeProvider', () => {
       expect(updatesGroup.children[0].description).toContain('Update available');
     });
 
-    it('shows agent names in description when 2+ agents', async () => {
+    it('shows skill description instead of agent badge in tree view', async () => {
       const scanner = createMockScanner({
         globalSkills: [
           makeSkill({
             name: 'multi-agent',
+            description: 'My description',
             source: 'org/repo',
             hash: 'abc',
             agents: ['Claude Code', 'Cursor', 'skills.sh'],
@@ -318,29 +319,8 @@ describe('InstalledSkillsTreeProvider', () => {
       const children = await provider.getChildren();
       const sourceGroup = children.find((c: any) => c.groupType === 'source') as any;
       const skillItem = sourceGroup.children[0];
-      // "skills.sh" is filtered out; remaining agents shown as badge
-      expect(skillItem.description).toContain('Claude Code');
-      expect(skillItem.description).toContain('Cursor');
-    });
-
-    it('shows normal description when single agent', async () => {
-      const scanner = createMockScanner({
-        globalSkills: [
-          makeSkill({
-            name: 'single-agent',
-            description: 'My description',
-            source: 'org/repo',
-            hash: 'abc',
-            agents: ['Claude Code'],
-          }),
-        ],
-      });
-      const provider = new InstalledSkillsTreeProvider(scanner);
-
-      const children = await provider.getChildren();
-      const sourceGroup = children.find((c: any) => c.groupType === 'source') as any;
-      const skillItem = sourceGroup.children[0];
-      // Should NOT show agent badge, should show normal description
+      // Agent badges removed from tree view — description shown instead
+      expect(skillItem.description).toBe('My description');
       expect(skillItem.description).not.toContain('Claude Code');
     });
 

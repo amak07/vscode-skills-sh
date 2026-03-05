@@ -278,11 +278,6 @@
       ],
       "view/item/context": [
         {
-          "command": "skills-sh.previewSkillFile",
-          "when": "view == skills-sh.installedSkills && viewItem =~ /^skill/",
-          "group": "inline"
-        },
-        {
           "command": "skills-sh.launchClaudeWithSkill",
           "when": "view == skills-sh.installedSkills && viewItem =~ /^skill/",
           "group": "inline"

@@ -42,23 +42,21 @@ class SkillItem extends vscode.TreeItem {
   ) {
     super(skill.name, vscode.TreeItemCollapsibleState.None);
 
-    // Agent badges: filter out "skills.sh" (canonical is implicit)
+    // Agent names for tooltip only (filter out "skills.sh" — canonical is implicit)
     const agentNames = (skill.agents || []).filter(a => a !== 'skills.sh');
-    const showAgentBadge = agentNames.length >= 2;
-    const agentBadge = showAgentBadge ? agentNames.join(' · ') : '';
 
     if (hasUpdate) {
       this.description = 'Update available';
       this.iconPath = new vscode.ThemeIcon('arrow-up');
     } else if (skill.isCustom) {
-      this.description = agentBadge || skill.description;
+      this.description = skill.description;
       this.iconPath = new vscode.ThemeIcon('file-code');
     } else if (!skill.source || !skill.hash) {
-      const base = agentBadge || skill.description || '';
+      const base = skill.description || '';
       this.description = base ? `${base} (untracked)` : '(untracked)';
       this.iconPath = new vscode.ThemeIcon('file-code');
     } else {
-      this.description = agentBadge || skill.description;
+      this.description = skill.description;
       this.iconPath = new vscode.ThemeIcon('file-code');
     }
 

@@ -100,107 +100,9 @@ Both secrets are configured at: https://github.com/amak07/vscode-skills-sh/setti
 
 ## Architecture Diagrams
 
-Excalidraw source files live in `docs/architecture/`. The rendered documentation is in [`docs/architecture/architecture.md`](docs/architecture/architecture.md). SVGs are exported locally via the Excalidraw MCP and committed alongside source files.
+Excalidraw source files live in `docs/architecture/`. Rendered docs: [`docs/architecture/architecture.md`](docs/architecture/architecture.md).
 
-### Current Diagrams (4)
-| # | Title | Question |
-|---|-------|----------|
-| 01 | System Context | What does this extension talk to? |
-| 02 | Install Flow | How does the extension know when a terminal install finishes? |
-| 03 | Multi-Agent Scanning | How does scanning work across 11 agents with symlinks? |
-| 04 | Webview Communication | How do two isolated JS contexts coordinate securely? |
-
-### Best Practices (Interview-Ready Diagrams)
-- **One concept per diagram** — each answers ONE question with 2-3 decision annotations
-- **Annotate decisions, not just boxes** — interviewers care about WHY, not just WHAT
-- **Color-code by concern** (consistent across all diagrams):
-  - Blue (`#a5d8ff` / `#1971c2`): Extension internals
-  - Green (`#b2f2bb` / `#2f9e44`): External APIs/services
-  - Orange (`#ffd8a8` / `#e8590c`): Filesystem/local
-  - Purple (`#eebefa` / `#7048e8`): Terminal/CLI
-  - Red (`#ffc9c9` / `#e03131`): Error paths / security
-  - Yellow (`#fff3bf` / `#e8590c`): Decision annotations
-- **Audience: junior devs and non-technical interviewers** — no jargon, no acronyms, use analogies and plain English
-- **Layered detail** — scannable for PMs ("what it does"), deep enough for engineers ("how and why")
-- **Keep text minimal** — labels and short annotations, not paragraphs
-- **Number diagrams** for presentation order (01-, 02-, etc.)
-- **Font**: Excalifont (fontFamily 5) — clean, hand-crafted look. All shapes use `roughness: 0` (clean edges) and `roundness: { type: 3 }` (rounded corners).
-- **Min font size**: 14px for annotations, 18px for labels, 28px for titles
-- **Decision annotation format** — use Problem/Solution in plain language:
-  ```
-  Problem: [What's hard or broken — stated simply]
-  Solution: [How we solve it — no jargon, no function names]
-  ```
-  **Language rule: Write for junior devs and non-technical interviewers.** No acronyms (spell out or skip), no function/variable names, no API signatures. Use analogies and everyday language. Example: "like a mini REST API — but messages go through VS Code, not the internet." If a technical term is unavoidable, explain it inline (e.g., "a lock file (a regular file that tracks what's installed)"). Yellow callout boxes (`#fff3bf` bg, `#e8590c` stroke, `#495057` text, 14px Excalifont).
-- **Box labels should be specific** — name the actual file or component (e.g., "Message Handler / provider.ts"), not abstract roles (e.g., "Extension Host"). Include a 1-line plain-English description of what it does.
-- **Always group boxes with their text labels** — after creating/editing a rectangle + its companion text element(s), use `group_elements` to group them. This keeps labels attached when elements are moved or resized. Group: each system box + name + subtitle, each callout bg + text, legend items, title + subtitle.
-
-### Editing with Excalidraw MCP
-
-We use the [yctimlin/mcp_excalidraw](https://github.com/yctimlin/mcp_excalidraw) MCP server for visual diagram editing.
-
-**Why not the official Excalidraw MCP?** The official one is generation-only (streams new diagrams from prompts). It has no `import_scene`, `get_canvas_screenshot`, or `update_element` — useless for editing existing diagrams.
-
-**Setup (already done, persisted at user scope):**
-```bash
-claude mcp add excalidraw --scope user \
-  -e EXPRESS_SERVER_URL=http://localhost:3777 \
-  -e ENABLE_CANVAS_SYNC=true \
-  -- node /c/Users/abelm/Projects/mcp_excalidraw/dist/index.js
-```
-
-**Before editing diagrams, start the canvas server:**
-```bash
-cd ~/Projects/mcp_excalidraw
-HOST=0.0.0.0 PORT=3777 node dist/server.js
-# Then open http://localhost:3777 in a browser (required for screenshots)
-```
-
-**Workflow (MCP-only):**
-1. `import_scene` — load an `.excalidraw` file onto the canvas
-2. `get_canvas_screenshot` / `describe_scene` — assess current state
-3. `batch_create_elements` / `update_element` — make changes (use custom IDs for arrow binding)
-4. `get_canvas_screenshot` — verify fixes visually
-5. `export_scene` — save back to `.excalidraw` file
-
-**Workflow (manual editing via browser):**
-1. `import_scene` — load the `.excalidraw` file onto the canvas at localhost:3777
-2. Make changes directly in the browser (drag, resize, add elements, etc.)
-3. Click **"Sync to Backend"** button in the canvas UI — this pushes your manual edits into the MCP server's memory
-4. `export_scene` — saves the synced state to the `.excalidraw` file on disk
-5. `export_to_image` — exports the SVG
-
-**Important:** Without "Sync to Backend", the MCP only knows about changes made via its API. Manual browser edits will be lost on `export_scene` if you skip the sync. The sync also adds all required Excalidraw properties (seed, versionNonce, index, etc.) to MCP-created elements, making them compatible with the VS Code Excalidraw extension.
-
-**Design spec for all elements:**
-- `fontFamily: 5` (Excalifont), `roughness: 0` (clean edges), `strokeWidth: 2`
-- Rectangles: `roundness: { type: 3 }` (rounded corners)
-- Arrows: always bind with `startElementId` / `endElementId` for auto-routing
-- Arrow labels: set as the arrow's `text` property (bound, not floating)
-- **Text in shapes:** Rectangles/ellipses do NOT have a `text` property. To label a shape, create a separate `text` element centered inside it. Only arrows support inline `text`. Every rectangle must have a companion text element or it renders as a blank colored box.
-- **Text element schema:** The VS Code Excalidraw extension requires full element properties. Text elements must include `width`, `height`, `angle`, `seed`, `versionNonce`, `index`, `isDeleted`, `boundElements`, `updated`, `link`, `locked`, `textAlign`, `verticalAlign`, `containerId`, `originalText`, `autoResize`, `lineHeight`, `frameId`. Minimal text elements (id/type/x/y/text/fontSize only) will be silently dropped when the file is opened in the extension.
-
-**Grouping rules:**
-- **Always group a box with its text labels.** After creating a rectangle + its companion text element(s), use `group_elements` to group them together. This keeps labels attached when elements are moved or resized.
-- **Group related elements together.** Legend swatches with their labels, callout boxes with annotation text, the person icon (head + body) with its label — anything that logically belongs together should be grouped.
-- **Arrows should NOT be grouped** with their source/target boxes (they use element binding instead).
-
-### SVG Export (Local Only)
-
-SVGs are exported locally via the Excalidraw MCP and committed alongside the `.excalidraw` source files. There is no CI export — this keeps the process simple and avoids CI permission / tooling issues on Windows.
-
-**How to export:** For each modified `.excalidraw` file:
-1. `import_scene` — load the `.excalidraw` file
-2. `export_to_image(format: "svg", filePath: "docs/architecture/NN-name.svg")` — export SVG
-
-**Important:** `architecture.md` references SVGs with relative paths (`01-system-context.svg`). Always commit updated SVGs with the source files.
-
-### Adding a New Diagram
-1. Create `docs/architecture/NN-name.excalidraw`
-2. Follow the color coding and font conventions above
-3. Add 2-3 decision annotations (italic callouts explaining trade-offs)
-4. Export SVG via MCP (`import_scene` + `export_to_image`)
-5. Add a section to `docs/architecture/architecture.md` with `![Name](NN-name.svg)`
+See the `project-excalidraw` skill (`~/.claude/skills/project-excalidraw/SKILL.md`) for all diagram conventions, color coding, MCP editing workflow, and SVG export pipeline.
 
 ## Beads Task Management
 
@@ -238,10 +140,7 @@ npm.cmd run build     # Build
 
 ### 2. Export architecture SVGs (if diagrams changed)
 
-If any `.excalidraw` files were modified, re-export their SVGs via the Excalidraw MCP before committing:
-1. `import_scene` each modified `.excalidraw` file
-2. `export_to_image(format: "svg", filePath: "docs/architecture/NN-name.svg")`
-3. Include the updated `.svg` files in the commit
+If any `.excalidraw` files were modified, follow the SVG export steps in the `project-excalidraw` skill and commit the updated `.svg` files.
 
 ### 3. Commit, push, and open PR
 
