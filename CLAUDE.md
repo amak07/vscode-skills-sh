@@ -125,15 +125,51 @@ Excalidraw source files live in `docs/architecture/`. The rendered documentation
 - **Number diagrams** for presentation order (01-, 02-, etc.)
 - **Font**: Excalifont (fontFamily 5) — clean, hand-crafted look. All shapes use `roughness: 0` (clean edges) and `roundness: { type: 3 }` (rounded corners).
 - **Min font size**: 14px for annotations, 18px for labels, 28px for titles
+- **Decision annotation format** — use How/What/Why/Cause for interview-ready annotations:
+  ```
+  How: [Technical mechanism — what the code does]
+  What: [Outcome — what the user/system gets]
+  Why: [Motivation — the problem or need]
+  Cause: [Root cause — why the problem exists]
+  ```
+  Each section is 1-2 short sentences. This format works for mixed audiences: non-technical readers scan What/Why, engineers drill into How/Cause. Yellow callout boxes (`#fff3bf` bg, `#e8590c` stroke, `#495057` text, 14px Excalifont).
 
 ### Editing with Excalidraw MCP
 
-Diagrams are edited via the Excalidraw MCP server (registered at user scope). Workflow:
+We use the [yctimlin/mcp_excalidraw](https://github.com/yctimlin/mcp_excalidraw) MCP server for visual diagram editing.
+
+**Why not the official Excalidraw MCP?** The official one is generation-only (streams new diagrams from prompts). It has no `import_scene`, `get_canvas_screenshot`, or `update_element` — useless for editing existing diagrams.
+
+**Setup (already done, persisted at user scope):**
+```bash
+claude mcp add excalidraw --scope user \
+  -e EXPRESS_SERVER_URL=http://localhost:3777 \
+  -e ENABLE_CANVAS_SYNC=true \
+  -- node /c/Users/abelm/Projects/mcp_excalidraw/dist/index.js
+```
+
+**Before editing diagrams, start the canvas server:**
+```bash
+cd ~/Projects/mcp_excalidraw
+HOST=0.0.0.0 PORT=3777 node dist/server.js
+# Then open http://localhost:3777 in a browser (required for screenshots)
+```
+
+**Workflow (MCP-only):**
 1. `import_scene` — load an `.excalidraw` file onto the canvas
 2. `get_canvas_screenshot` / `describe_scene` — assess current state
 3. `batch_create_elements` / `update_element` — make changes (use custom IDs for arrow binding)
 4. `get_canvas_screenshot` — verify fixes visually
 5. `export_scene` — save back to `.excalidraw` file
+
+**Workflow (manual editing via browser):**
+1. `import_scene` — load the `.excalidraw` file onto the canvas at localhost:3777
+2. Make changes directly in the browser (drag, resize, add elements, etc.)
+3. Click **"Sync to Backend"** button in the canvas UI — this pushes your manual edits into the MCP server's memory
+4. `export_scene` — saves the synced state to the `.excalidraw` file on disk
+5. `export_to_image` — exports the SVG
+
+**Important:** Without "Sync to Backend", the MCP only knows about changes made via its API. Manual browser edits will be lost on `export_scene` if you skip the sync. The sync also adds all required Excalidraw properties (seed, versionNonce, index, etc.) to MCP-created elements, making them compatible with the VS Code Excalidraw extension.
 
 **Design spec for all elements:**
 - `fontFamily: 5` (Excalifont), `roughness: 0` (clean edges), `strokeWidth: 2`
@@ -141,6 +177,12 @@ Diagrams are edited via the Excalidraw MCP server (registered at user scope). Wo
 - Arrows: always bind with `startElementId` / `endElementId` for auto-routing
 - Arrow labels: set as the arrow's `text` property (bound, not floating)
 - **Text in shapes:** Rectangles/ellipses do NOT have a `text` property. To label a shape, create a separate `text` element centered inside it. Only arrows support inline `text`. Every rectangle must have a companion text element or it renders as a blank colored box.
+- **Text element schema:** The VS Code Excalidraw extension requires full element properties. Text elements must include `width`, `height`, `angle`, `seed`, `versionNonce`, `index`, `isDeleted`, `boundElements`, `updated`, `link`, `locked`, `textAlign`, `verticalAlign`, `containerId`, `originalText`, `autoResize`, `lineHeight`, `frameId`. Minimal text elements (id/type/x/y/text/fontSize only) will be silently dropped when the file is opened in the extension.
+
+**Grouping rules:**
+- **Always group a box with its text labels.** After creating a rectangle + its companion text element(s), use `group_elements` to group them together. This keeps labels attached when elements are moved or resized.
+- **Group related elements together.** Legend swatches with their labels, callout boxes with annotation text, the person icon (head + body) with its label — anything that logically belongs together should be grouped.
+- **Arrows should NOT be grouped** with their source/target boxes (they use element binding instead).
 
 ### SVG Export (Local Only)
 
