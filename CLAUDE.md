@@ -120,19 +120,19 @@ Excalidraw source files live in `docs/architecture/`. The rendered documentation
   - Purple (`#eebefa` / `#7048e8`): Terminal/CLI
   - Red (`#ffc9c9` / `#e03131`): Error paths / security
   - Yellow (`#fff3bf` / `#e8590c`): Decision annotations
+- **Audience: junior devs and non-technical interviewers** — no jargon, no acronyms, use analogies and plain English
 - **Layered detail** — scannable for PMs ("what it does"), deep enough for engineers ("how and why")
 - **Keep text minimal** — labels and short annotations, not paragraphs
 - **Number diagrams** for presentation order (01-, 02-, etc.)
 - **Font**: Excalifont (fontFamily 5) — clean, hand-crafted look. All shapes use `roughness: 0` (clean edges) and `roundness: { type: 3 }` (rounded corners).
 - **Min font size**: 14px for annotations, 18px for labels, 28px for titles
-- **Decision annotation format** — use How/What/Why/Cause for interview-ready annotations:
+- **Decision annotation format** — use Problem/Solution in plain language:
   ```
-  How: [Technical mechanism — what the code does]
-  What: [Outcome — what the user/system gets]
-  Why: [Motivation — the problem or need]
-  Cause: [Root cause — why the problem exists]
+  Problem: [What's hard or broken — stated simply]
+  Solution: [How we solve it — no jargon, no function names]
   ```
-  Each section is 1-2 short sentences. This format works for mixed audiences: non-technical readers scan What/Why, engineers drill into How/Cause. Yellow callout boxes (`#fff3bf` bg, `#e8590c` stroke, `#495057` text, 14px Excalifont).
+  **Language rule: Write for junior devs and non-technical interviewers.** No acronyms (spell out or skip), no function/variable names, no API signatures. Use analogies and everyday language. Example: "like a mini REST API — but messages go through VS Code, not the internet." If a technical term is unavoidable, explain it inline (e.g., "a lock file (a regular file that tracks what's installed)"). Yellow callout boxes (`#fff3bf` bg, `#e8590c` stroke, `#495057` text, 14px Excalifont).
+- **Box labels should be specific** — name the actual file or component (e.g., "Message Handler / provider.ts"), not abstract roles (e.g., "Extension Host"). Include a 1-line plain-English description of what it does.
 - **Always group boxes with their text labels** — after creating/editing a rectangle + its companion text element(s), use `group_elements` to group them. This keeps labels attached when elements are moved or resized. Group: each system box + name + subtitle, each callout bg + text, legend items, title + subtitle.
 
 ### Editing with Excalidraw MCP
