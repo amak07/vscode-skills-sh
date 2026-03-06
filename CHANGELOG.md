@@ -4,6 +4,8 @@ All notable changes to the Skills.sh Agent Skills Manager extension will be docu
 
 ## [Unreleased]
 
+## [0.1.8] - 2026-03-06
+
 ### Added
 
 - README demos — hero install flow, marketplace exploration, and skills.json sharing (animated webp)
