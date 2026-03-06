@@ -417,10 +417,29 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
   let navStack: Array<{
     view: string; tab: string; query: string; scrollY: number;
     html: string; heroVisible: boolean; leaderboardChrome: boolean;
+    clickedSkillId: string;
   }> = [];
   let navigationStack: string[] = [];
   let currentDocsPage = 'overview';
   let currentDetailSkillName = '';
+
+  function getDetailOverlay(): HTMLElement {
+    let el = document.getElementById('detail-overlay');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'detail-overlay';
+      document.body.appendChild(el);
+      document.body.style.overflow = 'hidden';
+    }
+    return el;
+  }
+  function removeDetailOverlay(): void {
+    const el = document.getElementById('detail-overlay');
+    if (el) {
+      el.remove();
+      document.body.style.overflow = '';
+    }
+  }
 
   function saveState(): void {
     api.setState({ currentView, currentTab, currentChip, searchQuery: searchInput ? searchInput.value : '' });
@@ -788,23 +807,17 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
     const source = row.dataset.source;
     const skillId = row.dataset.skill;
     if (source && skillId) {
-      const hero = document.querySelector('.hero');
       navStack.push({
         view: currentView, tab: currentTab,
         query: searchInput ? searchInput.value : '',
-        scrollY: window.scrollY,
-        html: resultsEl.innerHTML,
-        heroVisible: hero ? !hero.classList.contains('collapsed') : false,
-        leaderboardChrome: document.querySelector('.search-container') ? (document.querySelector('.search-container') as HTMLElement).style.display !== 'none' : true,
+        scrollY: 0, html: '',
+        heroVisible: false, leaderboardChrome: false,
+        clickedSkillId: '',
       });
-      navigationStack.push(currentView);
       currentView = 'detail';
       currentDetailSkillName = skillId;
-      setHeroVisible(false);
-      showLeaderboardChrome(false);
-      const tabsNav = document.querySelector('.tabs');
-      if (tabsNav) (tabsNav as HTMLElement).style.display = 'none';
-      resultsEl.innerHTML = '<div class="empty-state">Loading skill details...</div>';
+      const overlay = getDetailOverlay();
+      overlay.innerHTML = '<div class="empty-state">Loading skill details...</div>';
       api.postMessage({ command: 'detail', payload: { source, skillId } });
       saveState();
     }
@@ -866,14 +879,8 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
       case 'detailResult': {
         const detail = msg.payload;
         const detailHtml = renderDetailHtml(detail);
-        if (!resultsEl.parentNode) {
-          const container = document.querySelector('.container');
-          if (container) {
-            container.innerHTML = '';
-            container.appendChild(resultsEl);
-          }
-        }
-        resultsEl.innerHTML = detailHtml;
+        const overlay = getDetailOverlay();
+        overlay.innerHTML = detailHtml;
         attachDetailListeners();
         break;
       }
@@ -1018,13 +1025,17 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
 
       case 'navigateToDetail': {
         const { source: navSource, skillId: navSkillId } = msg.payload as { source: string; skillId: string };
+        navStack.push({
+          view: currentView, tab: currentTab,
+          query: searchInput ? searchInput.value : '',
+          scrollY: 0, html: '',
+          heroVisible: false, leaderboardChrome: false,
+          clickedSkillId: '',
+        });
         currentView = 'detail';
         currentDetailSkillName = navSkillId;
-        setHeroVisible(false);
-        showLeaderboardChrome(false);
-        const tabsEl = document.querySelector('.tabs');
-        if (tabsEl) (tabsEl as HTMLElement).style.display = 'none';
-        resultsEl.innerHTML = '<div class="empty-state">Loading skill details...</div>';
+        const navOverlay = getDetailOverlay();
+        navOverlay.innerHTML = '<div class="empty-state">Loading skill details...</div>';
         api.postMessage({ command: 'detail', payload: { source: navSource, skillId: navSkillId } });
         saveState();
         break;
@@ -1042,12 +1053,7 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
     currentView = prev.view;
     currentDetailSkillName = '';
     currentTab = prev.tab;
-    resultsEl.innerHTML = prev.html;
-    setHeroVisible(prev.heroVisible);
-    showLeaderboardChrome(prev.leaderboardChrome);
-    const tabsNav = document.querySelector('.tabs');
-    if (tabsNav) (tabsNav as HTMLElement).style.display = '';
-    updateTabs();
+    removeDetailOverlay();
     if (searchInput) {
       searchInput.value = prev.query || '';
       searchInput.placeholder = currentView === 'installed' ? 'Filter installed skills...' : 'Search skills...';
@@ -1055,7 +1061,6 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
       if (searchKbd) searchKbd.style.display = hasQuery ? 'none' : '';
       if (searchClear) searchClear.style.display = hasQuery ? 'block' : 'none';
     }
-    requestAnimationFrame(function () { window.scrollTo(0, prev.scrollY || 0); });
     saveState();
   }
 

@@ -1333,5 +1333,25 @@ export function getStyles(fontUri: string): string {
       opacity: 1;
       transform: translateX(-50%) translateY(0);
     }
+
+    /* === Detail overlay (preserves list scroll position) === */
+    #detail-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg-200);
+      z-index: 100;
+      overflow-y: auto;
+      padding: 0 0.5rem;
+    }
+    .tab-view #detail-overlay {
+      padding: 0 1rem;
+    }
+    #detail-overlay > .detail-view {
+      max-width: 1152px;
+      margin: 0 auto;
+    }
   `;
 }
