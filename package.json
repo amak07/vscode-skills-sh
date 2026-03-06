@@ -2,7 +2,7 @@
   "name": "skills-sh",
   "displayName": "Skills.sh — Agent Skills Manager",
   "description": "The skills.sh client — browse, install, and manage AI agent skills for Claude Code, Cursor, Copilot, Windsurf, and Codex",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "license": "MIT",
   "publisher": "AbelMak",
   "engines": {
