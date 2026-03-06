@@ -6,7 +6,66 @@ All notable changes to the Skills.sh Agent Skills Manager extension will be docu
 
 ### Added
 
-- **Multi-agent awareness** — scan skill directories for 11 AI coding agents (Claude Code, Cursor, Windsurf, GitHub Copilot, Codex, Roo Code, Gemini CLI, Trae, Kiro, Continue, and the canonical skills.sh directory). Skills found in multiple agent directories are deduplicated and show agent badges in the TreeView, webview installed tab, and skill detail page. All paths verified against the [skills.sh CLI source](https://github.com/vercel-labs/skills).
+- README demos — hero install flow, marketplace exploration, and skills.json sharing (animated webp)
+- Installs badge and updated tagline in README
+- "Edit skills.json" command in installed skills view menu
+- Known issues moved to dedicated `KNOWN_ISSUES.md`
+
+### Changed
+
+- Marketplace UX improvements — preserve scroll position on back navigation with detail overlay
+- Updated README settings table to include `activeAgents`
+- Team Sharing section rewritten for clarity
+- Quick Start step 5 is now agent-agnostic
+
+## [0.1.7] - 2026-03-04
+
+### Added
+
+- Architecture diagrams (Excalidraw) with plain-language annotations for system context, install flow, multi-agent scanning, and webview communication
+- Dedicated architecture documentation page (`docs/architecture/architecture.md`)
+
+### Changed
+
+- Clean up TreeView — removed agent badges and preview button for a simpler sidebar
+- Rebuilt all architecture diagrams from scratch with new design spec and improved readability
+
+## [0.1.6] - 2026-03-01
+
+### Added
+
+- **Multi-agent awareness** — scan skill directories for 11 AI coding agents (Claude Code, Cursor, Windsurf, GitHub Copilot, Codex, Roo Code, Gemini CLI, Trae, Kiro, Continue, and the canonical skills.sh directory). Skills found in multiple agent directories are deduplicated and show agent badges in the TreeView, webview installed tab, and skill detail page.
+- Agent logo carousel in marketplace hero section
+- ROADMAP.md with planned features and priorities
+
+### Changed
+
+- Replaced extension logo with skill tree design
+- Switched CI to `@vscode/vsce` (replacing deprecated `vsce` package)
+
+## [0.1.5] - 2026-02-28
+
+### Changed
+
+- Split publish workflow into parallel independent jobs (VS Code Marketplace and Open VSX publish independently)
+
+## [0.1.4] - 2026-02-27
+
+### Added
+
+- Antigravity added to supported editor list
+
+### Changed
+
+- Switched sidebar icon to line/stroke style
+- Optimized marketplace keywords for discoverability
+
+## [0.1.3] - 2026-02-26
+
+### Changed
+
+- Exclude source maps and CI configs from VSIX package
+- Added publishing documentation to CLAUDE.md
 
 ## [0.1.0] - 2026-02-25
 

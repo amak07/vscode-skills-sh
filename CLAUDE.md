@@ -170,7 +170,7 @@ gh pr create --title "..." --body "..."
    ```
 4. CI builds, tests, and publishes to **both** marketplaces automatically
 
-The `[Unreleased]` section in CHANGELOG.md is where new features/fixes accumulate between releases. Always add entries there as work is completed, then rename to the version number at publish time.
+**Changelog discipline:** Every user-facing change (feature, fix, UI tweak) MUST get an entry in the `[Unreleased]` section of `CHANGELOG.md` before the commit lands. At release time, rename `[Unreleased]` → `[x.y.z] - YYYY-MM-DD` and add a fresh empty `[Unreleased]` section above it. Never let the changelog fall behind — it's the source of truth for release notes.
 
 **Critical rules:**
 - NEVER stop before the PR is merged

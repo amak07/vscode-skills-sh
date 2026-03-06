@@ -7,14 +7,16 @@
 <p align="center">
   <a href="https://marketplace.visualstudio.com/items?itemName=AbelMak.skills-sh"><img src="https://img.shields.io/visual-studio-marketplace/v/AbelMak.skills-sh?label=VS%20Code%20Marketplace" alt="VS Code Marketplace" /></a>
   <a href="https://open-vsx.org/extension/AbelMak/skills-sh"><img src="https://img.shields.io/open-vsx/v/AbelMak/skills-sh?label=Open%20VSX" alt="Open VSX" /></a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=AbelMak.skills-sh"><img src="https://img.shields.io/visual-studio-marketplace/i/AbelMak.skills-sh?label=installs&color=brightgreen" alt="Installs" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT" /></a>
 </p>
 
-<p align="center"><strong>The <a href="https://skills.sh">skills.sh</a> client for your editor.</strong></p>
+<p align="center"><strong>The package manager for AI agent skills — powered by the <a href="https://skills.sh">skills.sh</a> open standard.</strong></p>
 
 <p align="center">
-  Discover, install, and manage Agent Skills without leaving your IDE.<br />
-  Search the skills.sh marketplace, keep skills up to date, and share curated skill sets with your team — all from the sidebar.
+  Discover, install, and manage agent skills without leaving your IDE.<br />
+  Browse the skills.sh marketplace, keep skills up to date, and share curated skill sets with your team — all from the sidebar.<br />
+  Works across <strong>11 AI coding agents</strong> including Claude Code, Cursor, Windsurf, Copilot, Codex, and more.
 </p>
 
 <p align="center">
@@ -26,12 +28,23 @@
   Works with <strong>VS Code</strong> · <strong>Cursor</strong> · <strong>Windsurf</strong> · <strong>Antigravity</strong> · <strong>VSCodium</strong> · any VSIX-compatible editor
 </p>
 
-<!-- TODO: Add screenshots — capture these from the running extension:
-  1. Sidebar showing Installed Skills TreeView with grouped skills
-  2. Marketplace webview panel with search results and leaderboard
-  3. Skill detail page showing install count, audits, and SKILL.md preview
-  4. Context menu showing "Add to skills.json" for team sharing
--->
+<h3 align="center">Find and install a skill in seconds</h3>
+
+<p align="center">
+  <img src="docs/demo.webp" alt="Find and install a skill in seconds" width="100%" />
+</p>
+
+<h3 align="center">Explore the marketplace — leaderboards, search, and skill details</h3>
+
+<p align="center">
+  <img src="docs/demo-marketplace.webp" alt="Explore the marketplace — leaderboards, search, and skill details" width="100%" />
+</p>
+
+<h3 align="center">Share skills with your team via skills.json</h3>
+
+<p align="center">
+  <img src="docs/demo-skills-json.webp" alt="Share skills with your team via skills.json" width="100%" />
+</p>
 
 ---
 
@@ -53,7 +66,7 @@
 - SKILL.md preview (rendered Markdown) and raw file viewing
 - Copy skill path to clipboard
 
-### Updates
+### Skill Updates
 
 - Detect outdated skills using the GitHub Trees API
 - Badge count in the TreeView title showing available updates
@@ -67,19 +80,27 @@
 
 ### Team Sharing
 
-Share recommended skills with your team using a `skills.json` manifest:
+Commit a `skills.json` manifest to your repo so every team member gets the same skills. When a collaborator opens the project, the extension detects any skills listed in the manifest that are missing locally and prompts to install them — no manual setup needed.
 
 - Add or remove skills from the manifest via context menus
-- Auto-detect missing skills when opening a project with a manifest
-- "Install from skills.json" to sync the entire team's skill set
-- Commit `skills.json` to version control for team-wide consistency
+- Automatically detects missing skills on project open and prompts to install
+- "Install from skills.json" to sync all listed skills in one click
+- Commit `skills.json` to version control and share via git
 
 ```json
 {
   "skills": [
     {
-      "source": "anthropics/courses",
-      "skills": ["prompt-engineering", "tool-use"]
+      "source": "remotion-dev/skills",
+      "skills": ["remotion-best-practices"]
+    },
+    {
+      "source": "vercel-labs/skills",
+      "skills": ["find-skills"]
+    },
+    {
+      "source": "wshobson/agents",
+      "skills": ["design-system-patterns"]
     }
   ]
 }
@@ -153,7 +174,7 @@ cursor --install-extension skills-sh-0.1.0.vsix
 2. Open the **Skills.sh** sidebar (circuit-S icon in the Activity Bar)
 3. Browse the **Marketplace** panel or check your **Installed Skills**
 4. Click a skill to view details, then click **Install**
-5. Right-click an installed skill and select **Launch Claude with Skill** to start coding
+5. Right-click an installed skill to launch it with your preferred agent, preview SKILL.md, or share it with your team
 
 ## Settings
 
@@ -164,6 +185,7 @@ All settings are under `skills-sh.*` in VS Code Settings.
 | `installScope` | `global` / `project` / `ask` | `global` | Where skills are installed by default |
 | `claudeLaunchTarget` | `terminal` / `extension` | `terminal` | How to open Claude when launching with a skill |
 | `confirmBeforeInstall` | boolean | `true` | Show confirmation dialog before install/uninstall |
+| `activeAgents` | string[] | all 11 agents | Which AI agents to scan for installed skills |
 | `categories` | string[] | `["react","next",...]` | Marketplace filter chips for quick searching |
 | `autoRefreshOnFocus` | boolean | `true` | Re-scan skills when the editor window regains focus |
 | `checkUpdatesOnStartup` | boolean | `true` | Check for skill updates on activation |
@@ -192,21 +214,7 @@ See [Architecture Documentation](docs/architecture/architecture.md) for detailed
 
 ## Known Issues
 
-### `npx skills update` does not update the lock file hash
-
-The skills.sh CLI's `update` command fails to write the updated `skillFolderHash` back to `~/.agents/.skill-lock.json`, causing subsequent checks to always flag the same skills as outdated.
-
-**Workaround:** This extension uses a remove + add approach instead (`npx skills remove` followed by `npx skills add`), which creates a fresh lock entry with the correct hash.
-
-**Upstream:** [vercel-labs/skills#371](https://github.com/vercel-labs/skills/issues/371)
-
-### Vercel check-updates API branch mismatch (resolved)
-
-The skills.sh API endpoint checks a repo's default branch for the latest hash, but the CLI stores the hash from the `main` branch (falling back to `master`). This creates false positives for repos where the default branch differs.
-
-**Resolution:** This extension bypasses the Vercel API entirely and uses the GitHub Trees API directly, matching the CLI's own branch priority.
-
-**Upstream:** [vercel-labs/skills#373](https://github.com/vercel-labs/skills/issues/373)
+See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for details on upstream CLI quirks and workarounds.
 
 ## Requirements
 

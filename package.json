@@ -511,6 +511,7 @@
     "watch": "node esbuild.config.mjs --watch",
     "package": "vsce package",
     "lint": "eslint src/",
+    "version": "node scripts/stamp-changelog.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
