@@ -4,6 +4,10 @@ All notable changes to the Skills.sh Agent Skills Manager extension will be docu
 
 ## [Unreleased]
 
+### Added
+
+- Open VSX downloads badge in README
+
 ## [0.1.9] - 2026-03-06
 
 ### Fixed

@@ -7,7 +7,8 @@
 <p align="center">
   <a href="https://marketplace.visualstudio.com/items?itemName=AbelMak.skills-sh"><img src="https://img.shields.io/visual-studio-marketplace/v/AbelMak.skills-sh?label=VS%20Code%20Marketplace" alt="VS Code Marketplace" /></a>
   <a href="https://open-vsx.org/extension/AbelMak/skills-sh"><img src="https://img.shields.io/open-vsx/v/AbelMak/skills-sh?label=Open%20VSX" alt="Open VSX" /></a>
-  <a href="https://marketplace.visualstudio.com/items?itemName=AbelMak.skills-sh"><img src="https://img.shields.io/visual-studio-marketplace/i/AbelMak.skills-sh?label=installs&color=brightgreen" alt="Installs" /></a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=AbelMak.skills-sh"><img src="https://img.shields.io/visual-studio-marketplace/i/AbelMak.skills-sh?label=VS%20Code%20installs&color=brightgreen" alt="VS Code Installs" /></a>
+  <a href="https://open-vsx.org/extension/AbelMak/skills-sh"><img src="https://img.shields.io/open-vsx/dt/AbelMak/skills-sh?label=Open%20VSX%20downloads&color=brightgreen" alt="Open VSX Downloads" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT" /></a>
 </p>
 
