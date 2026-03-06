@@ -253,11 +253,17 @@ export function getStyles(fontUri: string): string {
     }
     .row-info { min-width: 0; }
     .row-name {
+      display: flex;
+      align-items: center;
       font-weight: 600;
       font-size: 0.875rem;
       overflow: hidden;
-      text-overflow: ellipsis;
       white-space: nowrap;
+    }
+    .row-name-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
     }
     .row-source {
       font-size: 0.75rem;
@@ -935,22 +941,32 @@ export function getStyles(fontUri: string): string {
 
     /* === Installed Tab === */
     .installed-row {
-      grid-template-columns: minmax(0, 1fr) 9rem;
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+    .installed-row .row-actions {
+      min-width: 5.5rem;
     }
 
     /* Collapsible group sections */
+    .installed-group {
+      margin-top: 0.375rem;
+    }
+    .installed-group:first-child {
+      margin-top: 0;
+    }
     .installed-group-header {
       display: flex;
       align-items: center;
       gap: 0.375rem;
-      padding: 0.5rem 0.75rem 0.25rem;
-      font-size: 0.6875rem;
+      padding: 0.5rem 0.75rem 0.375rem;
+      font-size: 0.75rem;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.04em;
-      color: var(--gray-600);
+      color: var(--gray-900);
       cursor: pointer;
       user-select: none;
+      border-bottom: 1px solid var(--gray-200);
     }
     .installed-group-header:hover { color: var(--fg); }
     .installed-group-header .chevron {
@@ -963,15 +979,19 @@ export function getStyles(fontUri: string): string {
     .installed-group-body.open { display: block; }
 
     .scope-badge {
+      display: inline-flex;
+      align-items: center;
       font-family: var(--font-mono);
-      font-size: 0.625rem;
+      font-size: 0.5625rem;
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.03em;
-      padding: 0.0625rem 0.375rem;
+      padding: 0.125rem 0.25rem;
       border-radius: 9999px;
-      vertical-align: middle;
-      margin-left: 0.375rem;
+      margin-left: 0.25rem;
+      white-space: nowrap;
+      flex-shrink: 0;
+      line-height: 1;
     }
     .scope-global {
       color: var(--green-700);
@@ -1290,5 +1310,28 @@ export function getStyles(fontUri: string): string {
 
     /* === Copy feedback (checkmark) === */
     .copy-icon svg { transition: opacity 150ms; }
+
+    /* === Webview toast notification === */
+    .webview-toast {
+      position: fixed;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(1rem);
+      background: var(--green-700);
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-md);
+      opacity: 0;
+      transition: opacity 200ms, transform 200ms;
+      z-index: 1000;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .webview-toast.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
   `;
 }

@@ -133,16 +133,24 @@ export function activate(context: vscode.ExtensionContext) {
 
     const added = newNames.size - oldNames.size;
     if (oldNames.size > 0 && added > 0) {
-      if (shouldNotify('info')) {
-        vscode.window.showInformationMessage(
-          `Skills.sh: ${added} new skill(s) installed.`,
-          'View Installed',
-        ).then(action => {
-          if (action === 'View Installed') {
-            vscode.commands.executeCommand('skills-sh.installedSkills.focus');
-          }
-        });
-      }
+      // TODO: "View Skill" toast navigation is broken — webview may not receive
+      // the navigateToDetail message when content was destroyed while hidden.
+      // Filed as bug. Re-enable once fixed. See navigateToDetail() in provider.ts.
+      // if (shouldNotify('info')) {
+      //   const addedNames = [...newNames].filter(n => !oldNames.has(n));
+      //   const firstNew = newSkills.find(s => addedNames.includes(s.folderName));
+      //   const label = addedNames.length === 1
+      //     ? `"${addedNames[0]}" installed successfully.`
+      //     : `${addedNames.length} skill(s) installed.`;
+      //   vscode.window.showInformationMessage(
+      //     `Skills.sh: ${label}`,
+      //     'View Skill',
+      //   ).then(action => {
+      //     if (action === 'View Skill' && firstNew?.source) {
+      //       marketplaceProvider.navigateToDetail(firstNew.source, firstNew.folderName);
+      //     }
+      //   });
+      // }
 
       // Post-install: offer to add newly installed skills to skills.json
       if (oldSkills.length > 0 && readManifest()) {
@@ -444,7 +452,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('skills-sh.openSettings', () => {
       vscode.commands.executeCommand(
         'workbench.action.openSettings',
-        '@ext:skills-sh.skills-sh',
+        '@ext:AbelMak.skills-sh',
       );
     })
   );

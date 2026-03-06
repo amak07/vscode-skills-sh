@@ -45,6 +45,17 @@ export class SkillScanner {
     return false;
   }
 
+  /** Returns the active agents based on user configuration. */
+  private getActiveAgents(): KnownAgent[] {
+    const activeIds = vscode.workspace.getConfiguration('skills-sh')
+      .get<string[]>('activeAgents');
+    if (!activeIds || activeIds.length === 0) {
+      return KNOWN_AGENTS;
+    }
+    const idSet = new Set(activeIds);
+    return KNOWN_AGENTS.filter(a => idSet.has(a.id));
+  }
+
   /** Resolve the global skill directory for a given agent. */
   private resolveGlobalDir(agent: KnownAgent): string {
     if (agent.envOverride) {
@@ -73,7 +84,7 @@ export class SkillScanner {
 
   /** Returns all global skill directories to watch for changes */
   getAllGlobalDirs(): string[] {
-    return KNOWN_AGENTS.map(agent => this.resolveGlobalDir(agent));
+    return this.getActiveAgents().map(agent => this.resolveGlobalDir(agent));
   }
 
   /** Returns all project-level skill directories */
@@ -81,16 +92,17 @@ export class SkillScanner {
     const ws = vscode.workspace.workspaceFolders;
     if (!ws || ws.length === 0) { return []; }
     const root = ws[0].uri.fsPath;
-    return KNOWN_AGENTS.map(agent => path.join(root, agent.skillsDir));
+    return this.getActiveAgents().map(agent => path.join(root, agent.skillsDir));
   }
 
   async scan(): Promise<ScanResult> {
     await this.loadLockFile();
     await this.loadLocalLockFile();
 
-    // -- Global skills: scan all known agent directories --
+    // -- Global skills: scan all active agent directories --
+    const activeAgents = this.getActiveAgents();
     const globalEntries: AgentScanEntry[] = [];
-    for (const agent of KNOWN_AGENTS) {
+    for (const agent of activeAgents) {
       const dir = this.resolveGlobalDir(agent);
       const skills = await this.scanDirectory(dir, 'global');
       for (const skill of skills) {
@@ -109,7 +121,7 @@ export class SkillScanner {
     let projectSkills: InstalledSkill[] = [];
     if (root) {
       const projectEntries: AgentScanEntry[] = [];
-      for (const agent of KNOWN_AGENTS) {
+      for (const agent of activeAgents) {
         const dir = path.join(root, agent.skillsDir);
         const skills = await this.scanDirectory(dir, 'project');
         for (const skill of skills) {
@@ -218,7 +230,7 @@ export class SkillScanner {
   getDiagnostics(): ScanDiagnostic {
     const issues: string[] = [];
 
-    const globalDirs = KNOWN_AGENTS.map(agent => {
+    const globalDirs = this.getActiveAgents().map(agent => {
       const dir = this.resolveGlobalDir(agent);
       const exists = fs.existsSync(dir);
       let skillCount = 0;

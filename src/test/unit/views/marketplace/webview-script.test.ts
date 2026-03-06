@@ -598,6 +598,10 @@ describe('initializeWebview', () => {
       currentView: 'installed',
     });
     initializeWebview(api, config);
+    // Send empty installed data so the loaded flag is set
+    window.dispatchEvent(new MessageEvent('message', {
+      data: { command: 'installedSkillsData', payload: [] },
+    }));
     const results = document.getElementById('results')!;
     expect(results.innerHTML).toContain('No skills installed yet');
   });
@@ -726,6 +730,10 @@ describe('initializeWebview', () => {
 
     it('installed tab renders local view', () => {
       initializeWebview(api, config);
+      // Send empty installed data so the loaded flag is set
+      window.dispatchEvent(new MessageEvent('message', {
+        data: { command: 'installedSkillsData', payload: [] },
+      }));
       const installedTab = document.querySelector('.tab[data-tab="installed"]') as HTMLElement;
       installedTab.click();
       const results = document.getElementById('results')!;

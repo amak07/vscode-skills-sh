@@ -204,8 +204,8 @@ export function renderInstalledRow(
     + (source ? ' data-source="' + source + '" data-skill="' + escapeHtml(skill.folderName) + '"' : '')
     + '>'
     + '<div class="row-info">'
-    + '<div class="row-name">' + escapeHtml(skill.name)
-    + ' <span class="scope-badge scope-' + scopeLabel + '">' + scopeLabel + '</span>'
+    + '<div class="row-name"><span class="row-name-text">' + escapeHtml(skill.name)
+    + '</span> <span class="scope-badge scope-' + scopeLabel + '">' + scopeLabel + '</span>'
     + '</div>'
     + '<div class="row-source">' + (desc ? escapeHtml(desc) : (source ? escapeHtml(source) : 'Custom skill')) + '</div>'
     + agentChipsHtml
@@ -412,6 +412,7 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
   let currentChip = (savedState.currentChip as string) || null;
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
   let installedSkills: InstalledSkillData[] = [];
+  let installedSkillsLoaded = false;
   let manifestSkillNames = new Set<string>();
   let navStack: Array<{
     view: string; tab: string; query: string; scrollY: number;
@@ -419,6 +420,7 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
   }> = [];
   let navigationStack: string[] = [];
   let currentDocsPage = 'overview';
+  let currentDetailSkillName = '';
 
   function saveState(): void {
     api.setState({ currentView, currentTab, currentChip, searchQuery: searchInput ? searchInput.value : '' });
@@ -576,6 +578,12 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
       if (searchKbd) searchKbd.style.display = q ? 'none' : '';
       if (searchClear) searchClear.style.display = q ? 'block' : 'none';
 
+      // Local filtering when on installed tab
+      if (currentView === 'installed') {
+        filterInstalledRows(q.toLowerCase());
+        return;
+      }
+
       if (q.length > 0) {
         setHeroVisible(false);
       } else {
@@ -636,20 +644,26 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
       currentTab = (tab as HTMLElement).dataset.tab || '';
       currentPage = 0;
       currentChip = null;
+      currentDetailSkillName = '';
       updateTabs();
       updateChips();
 
       if (currentTab === 'installed') {
         if (searchInput) {
           searchInput.value = '';
+          searchInput.placeholder = 'Filter installed skills...';
           if (searchKbd) searchKbd.style.display = '';
           if (searchClear) searchClear.style.display = 'none';
         }
         setHeroVisible(true);
         currentView = 'installed';
         showLeaderboardChrome(false);
+        // Keep search visible for local filtering on installed tab
+        const searchContainer = document.querySelector('.search-container');
+        if (searchContainer) (searchContainer as HTMLElement).style.display = '';
         renderInstalledView();
       } else {
+        if (searchInput) searchInput.placeholder = 'Search skills...';
         showLeaderboardChrome(true);
         const activeQuery = searchInput ? searchInput.value.trim() : '';
         if (activeQuery.length >= 2) {
@@ -763,6 +777,7 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
         api.postMessage({ command: 'install', payload: { source, skillName } });
         installBtn.textContent = 'Installing...';
         installBtn.disabled = true;
+        installBtn.dataset.pending = 'true';
       }
       return;
     }
@@ -784,6 +799,7 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
       });
       navigationStack.push(currentView);
       currentView = 'detail';
+      currentDetailSkillName = skillId;
       setHeroVisible(false);
       showLeaderboardChrome(false);
       const tabsNav = document.querySelector('.tabs');
@@ -873,20 +889,26 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
         const updatable = new Set<string>(msg.payload.updatableNames || []);
         manifestSkillNames = new Set<string>(msg.payload.manifestSkillNames || []);
         document.querySelectorAll('.btn-install').forEach(function (btn) {
-          const skillName = (btn as HTMLElement).dataset.skillName;
+          const el = btn as HTMLButtonElement;
+          const skillName = el.dataset.skillName;
           if (!skillName) return;
+          const wasPending = el.dataset.pending === 'true';
           if (updatable.has(skillName)) {
             btn.className = 'btn-install btn-updatable';
             btn.textContent = 'Update';
-            (btn as HTMLButtonElement).disabled = false;
+            el.disabled = false;
           } else if (installed.has(skillName)) {
             btn.className = 'btn-install btn-installed';
             btn.textContent = '✓ Installed';
-            (btn as HTMLButtonElement).disabled = false;
+            el.disabled = false;
+            if (wasPending) {
+              delete el.dataset.pending;
+              showWebviewToast(skillName + ' installed successfully');
+            }
           } else {
             btn.className = 'btn-install';
             btn.textContent = 'Install';
-            (btn as HTMLButtonElement).disabled = false;
+            el.disabled = false;
           }
         });
         document.querySelectorAll('.btn-manifest').forEach(function (btn) {
@@ -910,14 +932,38 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
           if (label) label.textContent = inMf ? 'Remove from Skills.json' : 'Add to Skills.json';
           (btn as HTMLElement).title = inMf ? 'Remove from skills.json' : 'Add to skills.json';
         });
-        if (currentView === 'installed') {
-          renderInstalledView();
+        if (currentView === 'detail' && currentDetailSkillName) {
+          const removeBtn = document.querySelector('.btn-action-remove[data-skill-name="' + currentDetailSkillName + '"]') as HTMLButtonElement | null;
+          const existingInstallBtn = document.querySelector('.detail-view .btn-install[data-skill-name="' + currentDetailSkillName + '"]') as HTMLButtonElement | null;
+          if (removeBtn && !installed.has(currentDetailSkillName)) {
+            // Skill was uninstalled: replace action buttons with Install button
+            const actionsContainer = removeBtn.closest('.row-actions');
+            if (actionsContainer) {
+              const source = actionsContainer.querySelector('[data-source]')?.getAttribute('data-source') || '';
+              if (source) {
+                actionsContainer.innerHTML = '<button class="btn-install"'
+                  + ' data-install="' + source + '"'
+                  + ' data-skill-name="' + currentDetailSkillName + '">'
+                  + 'Install</button>';
+              } else {
+                // Custom/local skill with no source — just clear the action buttons
+                actionsContainer.innerHTML = '';
+              }
+            }
+          } else if (existingInstallBtn && installed.has(currentDetailSkillName)) {
+            // Skill was installed from detail: re-request detail for full re-render
+            const source = existingInstallBtn.dataset.install || '';
+            if (source) {
+              api.postMessage({ command: 'detail', payload: { source, skillId: currentDetailSkillName } });
+            }
+          }
         }
         break;
       }
 
       case 'installedSkillsData': {
         installedSkills = msg.payload || [];
+        installedSkillsLoaded = true;
         updateInstalledTabLabel();
         if (currentView === 'installed') {
           renderInstalledView();
@@ -969,6 +1015,20 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
         saveState();
         break;
       }
+
+      case 'navigateToDetail': {
+        const { source: navSource, skillId: navSkillId } = msg.payload as { source: string; skillId: string };
+        currentView = 'detail';
+        currentDetailSkillName = navSkillId;
+        setHeroVisible(false);
+        showLeaderboardChrome(false);
+        const tabsEl = document.querySelector('.tabs');
+        if (tabsEl) (tabsEl as HTMLElement).style.display = 'none';
+        resultsEl.innerHTML = '<div class="empty-state">Loading skill details...</div>';
+        api.postMessage({ command: 'detail', payload: { source: navSource, skillId: navSkillId } });
+        saveState();
+        break;
+      }
     }
   });
 
@@ -980,6 +1040,7 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
       return;
     }
     currentView = prev.view;
+    currentDetailSkillName = '';
     currentTab = prev.tab;
     resultsEl.innerHTML = prev.html;
     setHeroVisible(prev.heroVisible);
@@ -989,6 +1050,7 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
     updateTabs();
     if (searchInput) {
       searchInput.value = prev.query || '';
+      searchInput.placeholder = currentView === 'installed' ? 'Filter installed skills...' : 'Search skills...';
       const hasQuery = (prev.query || '').length > 0;
       if (searchKbd) searchKbd.style.display = hasQuery ? 'none' : '';
       if (searchClear) searchClear.style.display = hasQuery ? 'block' : 'none';
@@ -1014,6 +1076,10 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
   }
 
   function renderInstalledView(): void {
+    if (!installedSkillsLoaded) {
+      resultsEl.innerHTML = _skeletonRows5;
+      return;
+    }
     if (installedSkills.length === 0) {
       resultsEl.innerHTML = '<div class="empty-state">No skills installed yet. Browse the marketplace to get started.</div>';
       return;
@@ -1062,6 +1128,25 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
     html += renderInstalledGroup('Project Skills', project, true, manifestSkillNames);
 
     resultsEl.innerHTML = html;
+    // Apply current search filter if user typed while on installed tab
+    if (searchInput && searchInput.value.trim()) {
+      filterInstalledRows(searchInput.value.trim().toLowerCase());
+    }
+  }
+
+  function filterInstalledRows(query: string): void {
+    document.querySelectorAll('.installed-row').forEach(function (row) {
+      const name = row.querySelector('.row-name')?.textContent?.toLowerCase() || '';
+      const source = row.querySelector('.row-source')?.textContent?.toLowerCase() || '';
+      (row as HTMLElement).style.display =
+        (!query || name.includes(query) || source.includes(query)) ? '' : 'none';
+    });
+    document.querySelectorAll('.installed-group').forEach(function (group) {
+      const body = group.querySelector('.installed-group-body');
+      if (!body) return;
+      const visibleRows = body.querySelectorAll('.installed-row:not([style*="display: none"])');
+      (group as HTMLElement).style.display = visibleRows.length > 0 ? '' : 'none';
+    });
   }
 
   function updateInstalledTabLabel(): void {
@@ -1148,6 +1233,7 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
         if (source && skillId) {
           navigationStack.push('audits');
           currentView = 'detail';
+          currentDetailSkillName = skillId;
           api.postMessage({ command: 'detail', payload: { source, skillId } });
           const container = document.querySelector('.container');
           if (container) container.innerHTML = '<div class="empty-state">Loading skill details...</div>';
@@ -1189,6 +1275,21 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
       iconEl.innerHTML = originalHtml;
       delete (iconEl as HTMLElement).dataset.copying;
     }, 1500);
+  }
+
+  function showWebviewToast(message: string): void {
+    const existing = document.getElementById('webview-toast');
+    if (existing) existing.remove();
+    const toast = document.createElement('div');
+    toast.id = 'webview-toast';
+    toast.className = 'webview-toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    requestAnimationFrame(function () { toast.classList.add('visible'); });
+    setTimeout(function () {
+      toast.classList.remove('visible');
+      setTimeout(function () { toast.remove(); }, 300);
+    }, 3000);
   }
 
   function toggleManifest(btn: HTMLButtonElement): void {

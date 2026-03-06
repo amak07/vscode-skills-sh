@@ -776,7 +776,9 @@ describe('handleSkillChanges (via watcher/operation triggers)', () => {
     expect(calls).toContain('Skill B');
   });
 
-  it('shows "new skills installed" notification when skills count increases', async () => {
+  // Toast notification for new installs is temporarily disabled (see bug skills.sh-agent-skills-manager-5nx).
+  // Re-enable this test when the "View Skill" toast is restored.
+  it.skip('shows "new skills installed" notification when skills count increases', async () => {
     // First, do an initial scan to set previousSkillNames to a non-empty state
     sandbox.createSkill(sandbox.globalSkillsDir, 'existing-skill', {
       frontmatter: { name: 'Existing Skill', description: '' },
@@ -803,8 +805,8 @@ describe('handleSkillChanges (via watcher/operation triggers)', () => {
 
     await vi.waitFor(() => {
       expect(window.showInformationMessage).toHaveBeenCalledWith(
-        expect.stringContaining('new skill(s) installed'),
-        'View Installed',
+        expect.stringContaining('skill(s) installed'),
+        'View Skill',
       );
     });
   });
@@ -1203,7 +1205,7 @@ describe('UI navigation commands', () => {
 
     expect(commands.executeCommand).toHaveBeenCalledWith(
       'workbench.action.openSettings',
-      '@ext:skills-sh.skills-sh',
+      '@ext:AbelMak.skills-sh',
     );
   });
 });

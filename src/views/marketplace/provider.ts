@@ -41,6 +41,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
   private panels: vscode.WebviewPanel[] = [];
   private tabWebviews = new WeakSet<vscode.Webview>();
   private detailRequestId = 0;
+  private pendingNavigation?: { source: string; skillId: string };
 
   private onManifestChanged?: () => void;
 
@@ -65,6 +66,19 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
     for (const panel of this.panels) {
       panel.webview.postMessage({ command: 'installedSkillsData', payload });
     }
+  }
+
+  navigateToDetail(source: string, skillId: string): void {
+    const payload = { source, skillId };
+    // Always queue — webview content may have been destroyed while hidden.
+    // If the webview is alive, postMessage succeeds and ready won't fire again.
+    // If it was destroyed, ready fires on recreate and flushes the pending nav.
+    this.pendingNavigation = { source, skillId };
+    this._view?.webview.postMessage({ command: 'navigateToDetail', payload });
+    for (const panel of this.panels) {
+      panel.webview.postMessage({ command: 'navigateToDetail', payload });
+    }
+    vscode.commands.executeCommand('skills-sh.marketplace.focus');
   }
 
   private pushButtonStates(): void {
@@ -373,6 +387,15 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
           manifestSkillNames: [...getManifestSkillNames()],
         };
         targetWebview.postMessage({ command: 'updateButtonStates', payload: readyPayload });
+        // Flush pending navigation (e.g., from "View Skill" toast)
+        if (this.pendingNavigation) {
+          const nav = this.pendingNavigation;
+          this.pendingNavigation = undefined;
+          targetWebview.postMessage({
+            command: 'navigateToDetail',
+            payload: { source: nav.source, skillId: nav.skillId },
+          });
+        }
         break;
       }
 

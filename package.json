@@ -386,6 +386,41 @@
             "default": true,
             "scope": "window",
             "markdownDescription": "Show a confirmation dialog before installing or uninstalling skills. Disable this to install immediately without prompts."
+          },
+          "skills-sh.activeAgents": {
+            "type": "array",
+            "default": [
+              "canonical",
+              "claude-code",
+              "cursor",
+              "windsurf",
+              "github-copilot",
+              "codex",
+              "roo",
+              "gemini-cli",
+              "trae",
+              "kiro",
+              "continue"
+            ],
+            "items": {
+              "type": "string",
+              "enum": [
+                "canonical",
+                "claude-code",
+                "cursor",
+                "windsurf",
+                "github-copilot",
+                "codex",
+                "roo",
+                "gemini-cli",
+                "trae",
+                "kiro",
+                "continue"
+              ]
+            },
+            "uniqueItems": true,
+            "scope": "window",
+            "markdownDescription": "Which AI agents to scan for installed skills. Only selected agents' skill directories will be included. Remove agents you don't use to reduce noise.\n\nAgent IDs: `canonical` (skills.sh), `claude-code`, `cursor`, `windsurf`, `github-copilot`, `codex`, `roo`, `gemini-cli`, `trae`, `kiro`, `continue`."
           }
         }
       },
