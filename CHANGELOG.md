@@ -4,6 +4,10 @@ All notable changes to the Skills.sh Agent Skills Manager extension will be docu
 
 ## [Unreleased]
 
+### Fixed
+
+- Demo images now render on VS Code Marketplace and Open VSX (switched to absolute GitHub URLs)
+
 ## [0.1.8] - 2026-03-06
 
 ### Added

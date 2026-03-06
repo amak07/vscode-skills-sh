@@ -31,19 +31,19 @@
 <h3 align="center">Find and install a skill in seconds</h3>
 
 <p align="center">
-  <img src="docs/demo.webp" alt="Find and install a skill in seconds" width="100%" />
+  <img src="https://raw.githubusercontent.com/amak07/vscode-skills-sh/master/docs/demo.webp" alt="Find and install a skill in seconds" width="100%" />
 </p>
 
 <h3 align="center">Explore the marketplace — leaderboards, search, and skill details</h3>
 
 <p align="center">
-  <img src="docs/demo-marketplace.webp" alt="Explore the marketplace — leaderboards, search, and skill details" width="100%" />
+  <img src="https://raw.githubusercontent.com/amak07/vscode-skills-sh/master/docs/demo-marketplace.webp" alt="Explore the marketplace — leaderboards, search, and skill details" width="100%" />
 </p>
 
 <h3 align="center">Share skills with your team via skills.json</h3>
 
 <p align="center">
-  <img src="docs/demo-skills-json.webp" alt="Share skills with your team via skills.json" width="100%" />
+  <img src="https://raw.githubusercontent.com/amak07/vscode-skills-sh/master/docs/demo-skills-json.webp" alt="Share skills with your team via skills.json" width="100%" />
 </p>
 
 ---
