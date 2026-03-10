@@ -739,6 +739,81 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
   resultsEl.addEventListener('click', (e) => {
     const target = e.target as HTMLElement;
 
+    // Handle auto-invoke toggle click
+    const toggleEl = target.closest('[data-toggle-invoke]') as HTMLElement | null;
+    if (toggleEl) {
+      const folderName = toggleEl.dataset.toggleInvoke;
+      if (folderName) {
+        const switchEl = toggleEl.querySelector('.toggle-switch');
+        const isCurrentlyOn = switchEl?.classList.contains('on');
+        const newDisable = isCurrentlyOn; // turning OFF = disable true
+        api.postMessage({ command: 'toggleAutoInvoke', payload: { folderName: folderName, disable: newDisable } });
+        // Optimistic UI update
+        if (switchEl) switchEl.classList.toggle('on');
+        const label = toggleEl.querySelector('span:last-child');
+        if (label) label.textContent = 'Auto-invoke: ' + (newDisable ? 'OFF' : 'ON');
+        const card = toggleEl.closest('.installed-card');
+        if (card) card.classList.toggle('card-disabled', !!newDisable);
+        const dot = card?.querySelector('.status-dot');
+        if (dot) {
+          dot.classList.toggle('status-dot-on', !newDisable);
+          dot.classList.toggle('status-dot-off', !!newDisable);
+        }
+      }
+      return;
+    }
+
+    // Handle overflow menu button
+    const overflowBtn = target.closest('.overflow-menu-btn') as HTMLElement | null;
+    if (overflowBtn) {
+      e.stopPropagation();
+      const folderName = overflowBtn.dataset.overflow;
+      // Close any existing menus
+      document.querySelectorAll('.overflow-menu').forEach(function (m) { m.remove(); });
+      const skill = installedSkills.find(function (s) { return s.folderName === folderName; });
+      if (!skill) return;
+      const menu = document.createElement('div');
+      menu.className = 'overflow-menu';
+      menu.innerHTML = '<button class="overflow-menu-item" data-action="open" data-folder="' + escapeHtml(folderName || '') + '">Open SKILL.md</button>'
+        + (skill.source ? '<button class="overflow-menu-item" data-action="manifest" data-folder="' + escapeHtml(folderName || '') + '" data-source="' + escapeHtml(skill.source) + '">'
+          + (skill.inManifest ? 'Remove from skills.json' : 'Add to skills.json') + '</button>' : '')
+        + '<button class="overflow-menu-item" data-action="copy-path" data-folder="' + escapeHtml(folderName || '') + '">Copy path</button>';
+      overflowBtn.parentElement!.appendChild(menu);
+      // Close on outside click
+      setTimeout(function () {
+        document.addEventListener('click', function close() {
+          menu.remove();
+          document.removeEventListener('click', close);
+        }, { once: true });
+      }, 0);
+      return;
+    }
+
+    // Handle overflow menu item click
+    const menuItem = target.closest('.overflow-menu-item') as HTMLElement | null;
+    if (menuItem) {
+      const action = menuItem.dataset.action;
+      const folder = menuItem.dataset.folder;
+      if (action === 'open' && folder) {
+        api.postMessage({ command: 'openSkillFile', payload: { folderName: folder } });
+      } else if (action === 'manifest' && folder) {
+        const src = menuItem.dataset.source;
+        const sk = installedSkills.find(function (s) { return s.folderName === folder; });
+        if (sk?.inManifest) {
+          api.postMessage({ command: 'removeFromManifest', payload: { skillName: folder } });
+        } else if (src) {
+          api.postMessage({ command: 'addToManifest', payload: { source: src, skillName: folder } });
+        }
+      } else if (action === 'copy-path' && folder) {
+        const sk = installedSkills.find(function (s) { return s.folderName === folder; });
+        if (sk && sk.path) {
+          navigator.clipboard.writeText(sk.path);
+        }
+      }
+      document.querySelectorAll('.overflow-menu').forEach(function (m) { m.remove(); });
+      return;
+    }
+
     // Handle collapsible group headers (Installed tab)
     const groupHeader = target.closest('.installed-group-header');
     if (groupHeader) {
