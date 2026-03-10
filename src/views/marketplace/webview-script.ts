@@ -603,7 +603,7 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
 
       // Local filtering when on installed tab
       if (currentView === 'installed') {
-        filterInstalledRows(q.toLowerCase());
+        filterInstalledCards(q.toLowerCase());
         return;
       }
 
@@ -1214,22 +1214,22 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
     resultsEl.innerHTML = html;
     // Apply current search filter if user typed while on installed tab
     if (searchInput && searchInput.value.trim()) {
-      filterInstalledRows(searchInput.value.trim().toLowerCase());
+      filterInstalledCards(searchInput.value.trim().toLowerCase());
     }
   }
 
-  function filterInstalledRows(query: string): void {
-    document.querySelectorAll('.installed-row').forEach(function (row) {
-      const name = row.querySelector('.row-name')?.textContent?.toLowerCase() || '';
-      const source = row.querySelector('.row-source')?.textContent?.toLowerCase() || '';
-      (row as HTMLElement).style.display =
-        (!query || name.includes(query) || source.includes(query)) ? '' : 'none';
+  function filterInstalledCards(query: string): void {
+    document.querySelectorAll('.installed-card').forEach(function (card) {
+      const name = card.querySelector('.card-name')?.textContent?.toLowerCase() || '';
+      const meta = card.querySelector('.card-meta')?.textContent?.toLowerCase() || '';
+      (card as HTMLElement).style.display =
+        (!query || name.includes(query) || meta.includes(query)) ? '' : 'none';
     });
     document.querySelectorAll('.installed-group').forEach(function (group) {
       const body = group.querySelector('.installed-group-body');
       if (!body) return;
-      const visibleRows = body.querySelectorAll('.installed-row:not([style*="display: none"])');
-      (group as HTMLElement).style.display = visibleRows.length > 0 ? '' : 'none';
+      const visibleCards = body.querySelectorAll('.installed-card:not([style*="display: none"])');
+      (group as HTMLElement).style.display = visibleCards.length > 0 ? '' : 'none';
     });
   }
 
