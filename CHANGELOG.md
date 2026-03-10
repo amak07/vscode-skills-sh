@@ -11,6 +11,10 @@ All notable changes to the Skills.sh Agent Skills Manager extension will be docu
 - **Overflow menu** — secondary actions (Open SKILL.md, manifest toggle, copy path) moved to per-card overflow menu
 - **Open SKILL.md** — quickly open a skill's source file from the overflow menu
 
+### Fixed
+
+- **Toggle race condition** — auto-invoke toggle no longer flickers or reverts when file watcher rescans overlap with optimistic UI updates
+
 ## [0.1.10] - 2026-03-06
 
 ### Added

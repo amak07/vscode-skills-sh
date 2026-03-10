@@ -1164,6 +1164,105 @@ describe('initializeWebview', () => {
       expect(results.querySelector('.installed-card')!.classList.contains('card-disabled')).toBe(false);
       expect(results.querySelector('.status-dot')!.classList.contains('status-dot-on')).toBe(true);
     });
+    it('stale installedSkillsData does not overwrite optimistic toggle state', () => {
+      initializeWebview(api, config);
+      // Send initial installed data with toggle ON (disableModelInvocation: false)
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'my-skill', source: 'a/b', scope: 'global', disableModelInvocation: false }],
+        },
+      }));
+      // Switch to installed tab to render cards
+      const installedTab = document.querySelector('.tab[data-tab="installed"]') as HTMLElement;
+      installedTab.click();
+
+      // Click toggle to turn OFF (disableModelInvocation: true)
+      const results = document.getElementById('results')!;
+      results.querySelector('[data-toggle-invoke]')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      // Simulate stale installedSkillsData arriving with OLD state (disableModelInvocation: false)
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'my-skill', source: 'a/b', scope: 'global', disableModelInvocation: false }],
+        },
+      }));
+
+      // Toggle should still show OFF (the inflight guard patches the stale data)
+      expect(results.querySelector('.toggle-switch')!.classList.contains('on')).toBe(false);
+      expect(results.querySelector('.installed-card')!.classList.contains('card-disabled')).toBe(true);
+    });
+
+    it('matching installedSkillsData clears pending toggle and renders correctly', () => {
+      initializeWebview(api, config);
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'my-skill', source: 'a/b', scope: 'global', disableModelInvocation: false }],
+        },
+      }));
+      const installedTab = document.querySelector('.tab[data-tab="installed"]') as HTMLElement;
+      installedTab.click();
+
+      // Toggle OFF
+      const results = document.getElementById('results')!;
+      results.querySelector('[data-toggle-invoke]')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      // Now send MATCHING data (disableModelInvocation: true — same as what we toggled to)
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'my-skill', source: 'a/b', scope: 'global', disableModelInvocation: true }],
+        },
+      }));
+
+      // Toggle should show OFF (confirmed state)
+      expect(results.querySelector('.toggle-switch')!.classList.contains('on')).toBe(false);
+      expect(results.querySelector('.installed-card')!.classList.contains('card-disabled')).toBe(true);
+
+      // Send another update — should render without guard (pending was cleared)
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'my-skill', source: 'a/b', scope: 'global', disableModelInvocation: false }],
+        },
+      }));
+
+      // Now it SHOULD reflect the new data (guard cleared, no longer patching)
+      expect(results.querySelector('.toggle-switch')!.classList.contains('on')).toBe(true);
+      expect(results.querySelector('.installed-card')!.classList.contains('card-disabled')).toBe(false);
+    });
+
+    it('rapid toggle OFF then ON preserves final state', () => {
+      initializeWebview(api, config);
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'my-skill', source: 'a/b', scope: 'global', disableModelInvocation: false }],
+        },
+      }));
+      const installedTab = document.querySelector('.tab[data-tab="installed"]') as HTMLElement;
+      installedTab.click();
+
+      const results = document.getElementById('results')!;
+      // Toggle OFF
+      results.querySelector('[data-toggle-invoke]')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      // Toggle back ON immediately
+      results.querySelector('[data-toggle-invoke]')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      // Stale data arrives (from first toggle's write — shows disable=true)
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'my-skill', source: 'a/b', scope: 'global', disableModelInvocation: true }],
+        },
+      }));
+
+      // Should show ON (the final toggle state was disable=false, i.e. ON)
+      expect(results.querySelector('.toggle-switch')!.classList.contains('on')).toBe(true);
+      expect(results.querySelector('.installed-card')!.classList.contains('card-disabled')).toBe(false);
+    });
   });
 
   describe('overflow menu', () => {

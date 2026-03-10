@@ -417,6 +417,7 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
   let installedSkills: InstalledSkillData[] = [];
   let installedSkillsLoaded = false;
+  var pendingToggles = new Map<string, boolean>(); // folderName → expected disableModelInvocation
   let manifestSkillNames = new Set<string>();
   let navStack: Array<{
     view: string; tab: string; query: string; scrollY: number;
@@ -747,6 +748,8 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
         const switchEl = toggleEl.querySelector('.toggle-switch');
         const isCurrentlyOn = switchEl?.classList.contains('on');
         const newDisable = isCurrentlyOn; // turning OFF = disable true
+        pendingToggles.set(folderName, newDisable);
+        setTimeout(function () { pendingToggles.delete(folderName); }, 3000);
         api.postMessage({ command: 'toggleAutoInvoke', payload: { folderName: folderName, disable: newDisable } });
         // Optimistic UI update
         if (switchEl) switchEl.classList.toggle('on');
@@ -1048,7 +1051,17 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
       }
 
       case 'installedSkillsData': {
-        installedSkills = msg.payload || [];
+        installedSkills = (msg.payload || []).map(function (s: InstalledSkillData) {
+          if (pendingToggles.has(s.folderName)) {
+            var expected = pendingToggles.get(s.folderName);
+            if (s.disableModelInvocation === expected) {
+              pendingToggles.delete(s.folderName);
+            } else {
+              return Object.assign({}, s, { disableModelInvocation: expected });
+            }
+          }
+          return s;
+        });
         installedSkillsLoaded = true;
         updateInstalledTabLabel();
         if (currentView === 'installed') {
