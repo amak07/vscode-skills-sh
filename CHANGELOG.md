@@ -4,6 +4,13 @@ All notable changes to the Skills.sh Agent Skills Manager extension will be docu
 
 ## [Unreleased]
 
+### Added
+
+- **Auto-invocation toggle** — control whether AI agents auto-invoke each skill via a prominent toggle switch on each card. Writes `disable-model-invocation` to SKILL.md frontmatter (respected by Claude Code and Cursor).
+- **Card grid layout** — redesigned Installed tab from row-based list to responsive card grid with status indicators
+- **Overflow menu** — secondary actions (Open SKILL.md, manifest toggle, copy path) moved to per-card overflow menu
+- **Open SKILL.md** — quickly open a skill's source file from the overflow menu
+
 ## [0.1.10] - 2026-03-06
 
 ### Added
