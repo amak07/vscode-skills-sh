@@ -9,6 +9,7 @@ import {
   setConfig,
   renderRow,
   renderInstalledRow,
+  renderInstalledCard,
   renderInstalledGroup,
   renderDetailHtml,
   renderAuditsView,
@@ -221,12 +222,22 @@ describe('renderRow', () => {
   });
 });
 
-describe('renderInstalledRow', () => {
+describe('renderInstalledRow (legacy delegate)', () => {
   beforeEach(() => {
     setConfig(makeConfig());
   });
 
-  it('renders global skill with manifest button', () => {
+  it('delegates to renderInstalledCard', () => {
+    const skill: InstalledSkillData = {
+      name: 'Test Skill', folderName: 'test-skill',
+      source: 'owner/repo', scope: 'global',
+    };
+    const row = renderInstalledRow(skill, new Set());
+    const card = renderInstalledCard(skill, new Set());
+    expect(row).toBe(card);
+  });
+
+  it('renders card with name and scope badge', () => {
     const skill: InstalledSkillData = {
       name: 'Test Skill', folderName: 'test-skill',
       source: 'owner/repo', scope: 'global',
@@ -234,8 +245,7 @@ describe('renderInstalledRow', () => {
     const html = renderInstalledRow(skill, new Set());
     expect(html).toContain('Test Skill');
     expect(html).toContain('scope-global');
-    expect(html).toContain('btn-action-manifest');
-    expect(html).toContain('Add to Skills.json');
+    expect(html).toContain('installed-card');
   });
 
   it('renders project skill with scope badge', () => {
@@ -245,16 +255,6 @@ describe('renderInstalledRow', () => {
     };
     const html = renderInstalledRow(skill, new Set());
     expect(html).toContain('scope-project');
-  });
-
-  it('renders active manifest state when in manifest', () => {
-    const skill: InstalledSkillData = {
-      name: 'Mf Skill', folderName: 'mf',
-      source: 'a/b', inManifest: true,
-    };
-    const html = renderInstalledRow(skill, new Set(['mf']));
-    expect(html).toContain('btn-action-active');
-    expect(html).toContain('Remove from Skills.json');
   });
 
   it('renders update button when hasUpdate', () => {
@@ -276,23 +276,77 @@ describe('renderInstalledRow', () => {
     expect(html).toContain('btn-action-remove');
     expect(html).toContain('Uninstall');
   });
+});
 
-  it('omits manifest button when source is empty', () => {
-    const skill: InstalledSkillData = {
-      name: 'Custom', folderName: 'cust',
-    };
-    const html = renderInstalledRow(skill, new Set());
-    expect(html).not.toContain('btn-action-manifest');
-    expect(html).toContain('Custom skill');
+describe('renderInstalledCard', () => {
+  beforeEach(() => {
+    setConfig(makeConfig());
   });
 
-  it('shows description if present', () => {
+  it('renders enabled skill with status-dot-on and toggle on', () => {
     const skill: InstalledSkillData = {
-      name: 'Desc', folderName: 'desc',
-      source: 'a/b', description: 'A helpful description',
+      name: 'My Skill', folderName: 'my-skill',
+      source: 'owner/repo', scope: 'global',
+      disableModelInvocation: false,
     };
-    const html = renderInstalledRow(skill, new Set());
-    expect(html).toContain('A helpful description');
+    const html = renderInstalledCard(skill, new Set());
+    expect(html).toContain('status-dot-on');
+    expect(html).toContain('toggle-switch on');
+    expect(html).toContain('Auto-invoke: ON');
+    expect(html).not.toContain('card-disabled');
+  });
+
+  it('renders disabled skill with status-dot-off and card-disabled', () => {
+    const skill: InstalledSkillData = {
+      name: 'Disabled Skill', folderName: 'disabled',
+      source: 'owner/repo', scope: 'global',
+      disableModelInvocation: true,
+    };
+    const html = renderInstalledCard(skill, new Set());
+    expect(html).toContain('status-dot-off');
+    expect(html).not.toContain('toggle-switch on');
+    expect(html).toContain('Auto-invoke: OFF');
+    expect(html).toContain('card-disabled');
+  });
+
+  it('renders scope badge and agent count in meta', () => {
+    const skill: InstalledSkillData = {
+      name: 'Test', folderName: 'test',
+      source: 'a/b', scope: 'project',
+      agents: ['Claude Code', 'Cursor'],
+    };
+    const html = renderInstalledCard(skill, new Set());
+    expect(html).toContain('scope-project');
+    expect(html).toContain('2 agents');
+  });
+
+  it('renders update button when hasUpdate is true', () => {
+    const skill: InstalledSkillData = {
+      name: 'Upd', folderName: 'upd',
+      source: 'a/b', hasUpdate: true,
+    };
+    const html = renderInstalledCard(skill, new Set());
+    expect(html).toContain('btn-action-update');
+    expect(html).not.toContain('btn-action-remove');
+  });
+
+  it('renders overflow menu button', () => {
+    const skill: InstalledSkillData = {
+      name: 'Test', folderName: 'test',
+      source: 'a/b',
+    };
+    const html = renderInstalledCard(skill, new Set());
+    expect(html).toContain('overflow-menu-btn');
+    expect(html).toContain('data-overflow="test"');
+  });
+
+  it('renders data-toggle-invoke attribute', () => {
+    const skill: InstalledSkillData = {
+      name: 'Test', folderName: 'my-skill',
+      source: 'a/b',
+    };
+    const html = renderInstalledCard(skill, new Set());
+    expect(html).toContain('data-toggle-invoke="my-skill"');
   });
 });
 
@@ -305,7 +359,7 @@ describe('renderInstalledGroup', () => {
     expect(renderInstalledGroup('Empty', [], true, new Set())).toBe('');
   });
 
-  it('renders expanded group', () => {
+  it('renders expanded group with card grid', () => {
     const skills: InstalledSkillData[] = [
       { name: 'A', folderName: 'a', source: 'x/y' },
     ];
@@ -313,6 +367,8 @@ describe('renderInstalledGroup', () => {
     expect(html).toContain('installed-group-header');
     expect(html).not.toContain('collapsed');
     expect(html).toContain('installed-group-body open');
+    expect(html).toContain('installed-grid');
+    expect(html).toContain('installed-card');
     expect(html).toContain('Test Group (1)');
   });
 

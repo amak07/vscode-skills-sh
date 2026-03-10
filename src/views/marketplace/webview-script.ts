@@ -45,6 +45,8 @@ export interface InstalledSkillData {
   hasUpdate?: boolean;
   inManifest?: boolean;
   agents?: string[];
+  disableModelInvocation?: boolean;
+  path?: string;
 }
 
 export interface DetailData {
@@ -161,59 +163,61 @@ export function renderRow(
     + '</div></div>';
 }
 
+/** @deprecated Use renderInstalledCard instead */
 export function renderInstalledRow(
   skill: InstalledSkillData,
   manifestSkillNames: Set<string>,
 ): string {
-  const source = skill.source || '';
+  return renderInstalledCard(skill, manifestSkillNames);
+}
+
+export function renderInstalledCard(
+  skill: InstalledSkillData,
+  manifestSkillNames: Set<string>,
+): string {
+  const disabled = skill.disableModelInvocation || false;
   const scopeLabel = skill.scope === 'project' ? 'project' : 'global';
-  const desc = skill.description || '';
-  const inMf = skill.inManifest;
+  const agentNames = (skill.agents || []).filter(function (a) { return a !== 'skills.sh'; });
+  const agentCount = agentNames.length;
+  const cardCls = 'installed-card' + (disabled ? ' card-disabled' : '');
 
-  const manifestBtn = source
-    ? '<button class="btn-action btn-action-manifest' + (inMf ? ' btn-action-active' : '') + '"'
-      + ' data-source="' + escapeHtml(source) + '"'
-      + ' data-skill-name="' + escapeHtml(skill.folderName) + '"'
-      + ' title="' + (inMf ? 'Remove from skills.json' : 'Add to skills.json') + '">'
-      + _icons.share + '<span>' + (inMf ? 'Remove from Skills.json' : 'Add to Skills.json') + '</span>'
-      + '</button>'
-    : '';
-
-  let actionBtn: string;
+  let primaryBtn: string;
   if (skill.hasUpdate) {
-    actionBtn = '<button class="btn-action btn-action-update"'
-      + ' data-install="' + escapeHtml(source) + '" data-skill-name="' + escapeHtml(skill.folderName) + '">'
-      + _icons.update + '<span>Update</span>'
-      + '</button>';
-  } else {
-    actionBtn = '<button class="btn-action btn-action-remove"'
+    primaryBtn = '<button class="btn-action btn-action-update"'
+      + ' data-install="' + escapeHtml(skill.source || '') + '"'
       + ' data-skill-name="' + escapeHtml(skill.folderName) + '">'
-      + _icons.trash + '<span>Uninstall</span>'
-      + '</button>';
+      + _icons.update + '<span>Update</span></button>';
+  } else {
+    primaryBtn = '<button class="btn-action btn-action-remove"'
+      + ' data-skill-name="' + escapeHtml(skill.folderName) + '">'
+      + _icons.trash + '<span>Uninstall</span></button>';
   }
 
-  // Agent chips: filter out "skills.sh" (canonical), show when 2+ agents
-  const agentNames = (skill.agents || []).filter(function (a) { return a !== 'skills.sh'; });
-  const agentChipsHtml = agentNames.length >= 2
-    ? '<div class="row-agents">' + agentNames.map(function (a) {
-        return '<span class="agent-chip">' + escapeHtml(a) + '</span>';
-      }).join('') + '</div>'
-    : '';
-
-  return '<div class="grid-row installed-row"'
-    + (source ? ' data-source="' + source + '" data-skill="' + escapeHtml(skill.folderName) + '"' : '')
-    + '>'
-    + '<div class="row-info">'
-    + '<div class="row-name"><span class="row-name-text">' + escapeHtml(skill.name)
-    + '</span> <span class="scope-badge scope-' + scopeLabel + '">' + scopeLabel + '</span>'
+  return '<div class="' + cardCls + '"'
+    + ' data-source="' + escapeHtml(skill.source || '') + '"'
+    + ' data-skill="' + escapeHtml(skill.folderName) + '"'
+    + ' data-folder="' + escapeHtml(skill.folderName) + '">'
+    // Header
+    + '<div class="card-header">'
+    + '<span class="status-dot ' + (disabled ? 'status-dot-off' : 'status-dot-on') + '"></span>'
+    + '<span class="card-name" title="' + escapeHtml(skill.name) + '">' + escapeHtml(skill.name) + '</span>'
     + '</div>'
-    + '<div class="row-source">' + (desc ? escapeHtml(desc) : (source ? escapeHtml(source) : 'Custom skill')) + '</div>'
-    + agentChipsHtml
+    // Toggle
+    + '<div class="card-toggle" data-toggle-invoke="' + escapeHtml(skill.folderName) + '">'
+    + '<span class="toggle-switch ' + (disabled ? '' : 'on') + '"></span>'
+    + '<span>Auto-invoke: ' + (disabled ? 'OFF' : 'ON') + '</span>'
     + '</div>'
-    + '<div class="row-actions">'
-    + manifestBtn
-    + actionBtn
-    + '</div></div>';
+    // Meta
+    + '<div class="card-meta">'
+    + '<span class="scope-badge scope-' + scopeLabel + '">' + scopeLabel + '</span>'
+    + (agentCount > 0 ? ' &middot; ' + agentCount + ' agent' + (agentCount > 1 ? 's' : '') : '')
+    + '</div>'
+    // Actions
+    + '<div class="card-actions">'
+    + primaryBtn
+    + '<button class="overflow-menu-btn" data-overflow="' + escapeHtml(skill.folderName) + '" title="More actions">&#x22EF;</button>'
+    + '</div>'
+    + '</div>';
 }
 
 export function renderInstalledGroup(
@@ -225,12 +229,12 @@ export function renderInstalledGroup(
   if (skills.length === 0) return '';
   const headerCls = expanded ? 'installed-group-header' : 'installed-group-header collapsed';
   const bodyCls = expanded ? 'installed-group-body open' : 'installed-group-body';
-  let rows = '';
-  skills.forEach(function (skill) { rows += renderInstalledRow(skill, manifestSkillNames); });
+  let cards = '';
+  skills.forEach(function (skill) { cards += renderInstalledCard(skill, manifestSkillNames); });
   return '<div class="installed-group">'
     + '<div class="' + headerCls + '"><span class="chevron">&#x25B8;</span> '
     + escapeHtml(label) + ' (' + skills.length + ')</div>'
-    + '<div class="' + bodyCls + '">' + rows + '</div></div>';
+    + '<div class="' + bodyCls + '"><div class="installed-grid">' + cards + '</div></div></div>';
 }
 
 export function renderDetailHtml(detail: DetailData): string {
