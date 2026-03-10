@@ -29,6 +29,22 @@ export async function parseSkillMdAsync(filePath: string): Promise<ParsedSkillMd
   }
 }
 
+export function updateSkillFrontmatter(
+  filePath: string,
+  updates: Record<string, unknown>,
+): void {
+  const content = fs.readFileSync(filePath, 'utf-8');
+  const { data, content: body } = matter(content);
+  for (const [key, value] of Object.entries(updates)) {
+    if (value === undefined) {
+      delete data[key];
+    } else {
+      data[key] = value;
+    }
+  }
+  fs.writeFileSync(filePath, matter.stringify(body, data));
+}
+
 export function parseSkillMdContent(content: string): ParsedSkillMd | null {
   try {
     const { data, content: body } = matter(content);

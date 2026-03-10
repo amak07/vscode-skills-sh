@@ -2,7 +2,7 @@ import { describe, it, expect, afterEach } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
-import { parseSkillMd, parseSkillMdContent } from '../../../local/parser';
+import { parseSkillMd, parseSkillMdContent, updateSkillFrontmatter } from '../../../local/parser';
 import {
   VALID_SKILL_MD,
   MINIMAL_SKILL_MD,
@@ -97,5 +97,52 @@ describe('parseSkillMd (file-based)', () => {
 
   it('returns null for nonexistent file', () => {
     expect(parseSkillMd('/nonexistent/path/SKILL.md')).toBeNull();
+  });
+});
+
+describe('updateSkillFrontmatter', () => {
+  let tempDir: string;
+
+  afterEach(() => {
+    if (tempDir) {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it('adds disable-model-invocation: true to skill without it', () => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'parser-update-'));
+    const filePath = path.join(tempDir, 'SKILL.md');
+    fs.writeFileSync(filePath, `---\nname: Test\ndescription: A test skill\n---\n# Body\n`);
+
+    updateSkillFrontmatter(filePath, { 'disable-model-invocation': true });
+
+    const parsed = parseSkillMd(filePath);
+    expect(parsed?.metadata['disable-model-invocation']).toBe(true);
+  });
+
+  it('removes disable-model-invocation when set to undefined', () => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'parser-update-'));
+    const filePath = path.join(tempDir, 'SKILL.md');
+    fs.writeFileSync(filePath, `---\nname: Test\ndescription: A skill\ndisable-model-invocation: true\n---\n# Body\n`);
+
+    updateSkillFrontmatter(filePath, { 'disable-model-invocation': undefined });
+
+    const parsed = parseSkillMd(filePath);
+    expect(parsed?.metadata['disable-model-invocation']).toBeUndefined();
+  });
+
+  it('preserves existing frontmatter and body', () => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'parser-update-'));
+    const filePath = path.join(tempDir, 'SKILL.md');
+    fs.writeFileSync(filePath, `---\nname: Test\ndescription: A skill\nlicense: MIT\n---\n# Instructions\n\nDo the thing.\n`);
+
+    updateSkillFrontmatter(filePath, { 'disable-model-invocation': true });
+
+    const parsed = parseSkillMd(filePath);
+    expect(parsed?.name).toBe('Test');
+    expect(parsed?.description).toBe('A skill');
+    expect(parsed?.license).toBe('MIT');
+    expect(parsed?.metadata['disable-model-invocation']).toBe(true);
+    expect(parsed?.body.trim()).toContain('# Instructions');
   });
 });
