@@ -6,7 +6,9 @@ import { fetchSkillDetail } from '../../api/detail-scraper';
 import { fetchSkillMd } from '../../api/github';
 import { fetchDocsPage } from '../../api/docs-scraper';
 import { fetchAuditListing } from '../../api/audits-scraper';
+import * as path from 'path';
 import { installSkill, updateSkills, uninstallSkill } from '../../install/installer';
+import { updateSkillFrontmatter } from '../../local/parser';
 import { getLastUpdateResult } from '../../api/updates';
 import { addSkillToManifest, removeSkillFromManifest, getManifestSkillNames } from '../../manifest/manifest';
 import { getStyles } from './styles';
@@ -395,6 +397,35 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
             command: 'navigateToDetail',
             payload: { source: nav.source, skillId: nav.skillId },
           });
+        }
+        break;
+      }
+
+      case 'toggleAutoInvoke': {
+        const { folderName, disable } = message.payload as { folderName: string; disable: boolean };
+        const skill = this.installedSkills.find(s => s.folderName === folderName);
+        if (!skill) break;
+        const skillMdPath = path.join(skill.path, 'SKILL.md');
+        try {
+          updateSkillFrontmatter(skillMdPath, {
+            'disable-model-invocation': disable || undefined,
+          });
+          this.installedSkills = this.installedSkills.map(s =>
+            s.folderName === folderName ? { ...s, disableModelInvocation: disable } : s,
+          );
+          this.setInstalledSkills(this.installedSkills);
+        } catch (e) {
+          vscode.window.showErrorMessage(`Failed to update skill: ${toErrorMessage(e)}`);
+        }
+        break;
+      }
+
+      case 'openSkillFile': {
+        const { folderName } = message.payload as { folderName: string };
+        const skill = this.installedSkills.find(s => s.folderName === folderName);
+        if (skill) {
+          const uri = vscode.Uri.file(path.join(skill.path, 'SKILL.md'));
+          vscode.window.showTextDocument(uri);
         }
         break;
       }
