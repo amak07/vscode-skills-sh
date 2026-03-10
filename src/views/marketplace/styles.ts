@@ -939,12 +939,164 @@ export function getStyles(fontUri: string): string {
     .prose .token.selector { color: #c792ea; }
     .prose .code-line { display: block; }
 
-    /* === Installed Tab === */
-    .installed-row {
-      grid-template-columns: minmax(0, 1fr) auto;
+    /* === Installed Tab: Card Grid === */
+    .installed-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 0.75rem;
+      padding: 0.5rem 0.75rem;
     }
-    .installed-row .row-actions {
-      min-width: 5.5rem;
+    .installed-card {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 0.75rem;
+      transition: border-color 150ms, opacity 150ms;
+      cursor: default;
+      position: relative;
+    }
+    .installed-card:hover {
+      border-color: var(--gray-400);
+    }
+    .installed-card.card-disabled {
+      opacity: 0.55;
+    }
+    .installed-card.card-disabled:hover {
+      opacity: 0.75;
+    }
+    /* Card header: status dot + name */
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.375rem;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .status-dot-on { background: var(--green-700); }
+    .status-dot-off { background: var(--gray-600); }
+    .card-name {
+      font-weight: 600;
+      font-size: 0.8125rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      min-width: 0;
+    }
+    /* Toggle row */
+    .card-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      color: var(--gray-600);
+      margin-bottom: 0.375rem;
+      cursor: pointer;
+      user-select: none;
+    }
+    .card-toggle:hover { color: var(--gray-900); }
+    .toggle-switch {
+      position: relative;
+      width: 28px;
+      height: 16px;
+      border-radius: 8px;
+      background: var(--gray-400);
+      transition: background 150ms;
+      flex-shrink: 0;
+    }
+    .toggle-switch.on { background: var(--green-700); }
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--bg-200);
+      transition: transform 150ms;
+    }
+    .toggle-switch.on::after { transform: translateX(12px); }
+    /* Meta row: scope + agents */
+    .card-meta {
+      font-size: 0.6875rem;
+      color: var(--gray-600);
+      margin-bottom: 0.5rem;
+    }
+    /* Card actions */
+    .card-actions {
+      display: flex;
+      gap: 0.375rem;
+      margin-top: auto;
+      padding-top: 0.5rem;
+      border-top: 1px solid var(--gray-200);
+      align-items: center;
+    }
+    .card-actions .btn-action {
+      flex: 1;
+      font-size: 0.625rem;
+      padding: 0.1875rem 0.375rem;
+    }
+    /* Overflow menu button */
+    .overflow-menu-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: var(--gray-600);
+      cursor: pointer;
+      font-size: 0.875rem;
+      line-height: 1;
+      transition: all 150ms;
+      flex-shrink: 0;
+    }
+    .overflow-menu-btn:hover {
+      border-color: var(--gray-400);
+      color: var(--fg);
+    }
+    /* Overflow dropdown */
+    .overflow-menu {
+      position: absolute;
+      right: 0.5rem;
+      bottom: 3rem;
+      background: var(--bg-100);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      padding: 0.25rem 0;
+      min-width: 160px;
+      z-index: 50;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .overflow-menu-item {
+      display: block;
+      width: 100%;
+      padding: 0.375rem 0.75rem;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      color: var(--gray-900);
+      background: none;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      transition: background 150ms;
+    }
+    .overflow-menu-item:hover {
+      background: var(--gray-100);
+      color: var(--fg);
+    }
+    .overflow-menu-item-danger { color: var(--red-600, #dc2626); }
+    .overflow-menu-item-danger:hover {
+      background: color-mix(in srgb, var(--red-600, #dc2626) 10%, transparent);
     }
 
     /* Collapsible group sections */
@@ -1052,12 +1204,7 @@ export function getStyles(fontUri: string): string {
       text-align: center;
     }
 
-    /* === Installed tab: action buttons with icons === */
-    .row-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
+    /* === Action buttons with icons === */
     .btn-action {
       display: inline-flex;
       align-items: center;
