@@ -1118,6 +1118,138 @@ describe('initializeWebview', () => {
     });
   });
 
+  describe('auto-invoke toggle', () => {
+    it('clicking toggle sends toggleAutoInvoke and updates UI optimistically', () => {
+      initializeWebview(api, config);
+      const results = document.getElementById('results')!;
+      results.innerHTML = '<div class="installed-card">'
+        + '<div class="card-header"><span class="status-dot status-dot-on"></span></div>'
+        + '<div class="card-toggle" data-toggle-invoke="my-skill">'
+        + '<span class="toggle-switch on"></span>'
+        + '<span>Auto-invoke: ON</span>'
+        + '</div></div>';
+
+      (api.postMessage as ReturnType<typeof vi.fn>).mockClear();
+      results.querySelector('[data-toggle-invoke]')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(api.postMessage).toHaveBeenCalledWith({
+        command: 'toggleAutoInvoke',
+        payload: { folderName: 'my-skill', disable: true },
+      });
+      // Optimistic UI updates
+      expect(results.querySelector('.toggle-switch')!.classList.contains('on')).toBe(false);
+      expect(results.querySelector('.installed-card')!.classList.contains('card-disabled')).toBe(true);
+      expect(results.querySelector('.status-dot')!.classList.contains('status-dot-off')).toBe(true);
+      expect(results.querySelector('.card-toggle span:last-child')!.textContent).toBe('Auto-invoke: OFF');
+    });
+
+    it('clicking toggle on disabled skill re-enables it', () => {
+      initializeWebview(api, config);
+      const results = document.getElementById('results')!;
+      results.innerHTML = '<div class="installed-card card-disabled">'
+        + '<div class="card-header"><span class="status-dot status-dot-off"></span></div>'
+        + '<div class="card-toggle" data-toggle-invoke="my-skill">'
+        + '<span class="toggle-switch"></span>'
+        + '<span>Auto-invoke: OFF</span>'
+        + '</div></div>';
+
+      (api.postMessage as ReturnType<typeof vi.fn>).mockClear();
+      results.querySelector('[data-toggle-invoke]')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(api.postMessage).toHaveBeenCalledWith({
+        command: 'toggleAutoInvoke',
+        payload: { folderName: 'my-skill', disable: false },
+      });
+      expect(results.querySelector('.toggle-switch')!.classList.contains('on')).toBe(true);
+      expect(results.querySelector('.installed-card')!.classList.contains('card-disabled')).toBe(false);
+      expect(results.querySelector('.status-dot')!.classList.contains('status-dot-on')).toBe(true);
+    });
+  });
+
+  describe('overflow menu', () => {
+    it('clicking overflow button creates overflow menu', () => {
+      initializeWebview(api, config);
+      // Send installed skills data so the skill lookup works
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'test-skill', source: 'a/b', scope: 'global', path: '/skills/test' }],
+        },
+      }));
+      const results = document.getElementById('results')!;
+      results.innerHTML = '<div class="card-actions">'
+        + '<button class="overflow-menu-btn" data-overflow="test-skill">⋯</button>'
+        + '</div>';
+
+      results.querySelector('.overflow-menu-btn')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      const menu = results.querySelector('.overflow-menu');
+      expect(menu).not.toBeNull();
+      expect(menu!.innerHTML).toContain('Open SKILL.md');
+      expect(menu!.innerHTML).toContain('Copy path');
+    });
+
+    it('clicking "Open SKILL.md" sends openSkillFile command', () => {
+      initializeWebview(api, config);
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'test-skill', source: 'a/b', scope: 'global' }],
+        },
+      }));
+      const results = document.getElementById('results')!;
+      results.innerHTML = '<button class="overflow-menu-item" data-action="open" data-folder="test-skill">Open SKILL.md</button>';
+
+      (api.postMessage as ReturnType<typeof vi.fn>).mockClear();
+      results.querySelector('.overflow-menu-item')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(api.postMessage).toHaveBeenCalledWith({
+        command: 'openSkillFile',
+        payload: { folderName: 'test-skill' },
+      });
+    });
+
+    it('clicking "Add to skills.json" sends addToManifest command', () => {
+      initializeWebview(api, config);
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'test-skill', source: 'a/b', scope: 'global', inManifest: false }],
+        },
+      }));
+      const results = document.getElementById('results')!;
+      results.innerHTML = '<button class="overflow-menu-item" data-action="manifest" data-folder="test-skill" data-source="a/b">Add to skills.json</button>';
+
+      (api.postMessage as ReturnType<typeof vi.fn>).mockClear();
+      results.querySelector('.overflow-menu-item')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(api.postMessage).toHaveBeenCalledWith({
+        command: 'addToManifest',
+        payload: { source: 'a/b', skillName: 'test-skill' },
+      });
+    });
+
+    it('clicking "Remove from skills.json" sends removeFromManifest command', () => {
+      initializeWebview(api, config);
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'test-skill', source: 'a/b', scope: 'global', inManifest: true }],
+        },
+      }));
+      const results = document.getElementById('results')!;
+      results.innerHTML = '<button class="overflow-menu-item" data-action="manifest" data-folder="test-skill" data-source="a/b">Remove from skills.json</button>';
+
+      (api.postMessage as ReturnType<typeof vi.fn>).mockClear();
+      results.querySelector('.overflow-menu-item')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(api.postMessage).toHaveBeenCalledWith({
+        command: 'removeFromManifest',
+        payload: { skillName: 'test-skill' },
+      });
+    });
+  });
+
   describe('state persistence', () => {
     it('saves state on tab switch', () => {
       initializeWebview(api, config);
