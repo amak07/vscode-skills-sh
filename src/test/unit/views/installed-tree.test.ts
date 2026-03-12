@@ -492,5 +492,31 @@ describe('InstalledSkillsTreeProvider', () => {
         'setContext', 'skills-sh.noSkillsFound', true
       );
     });
+
+    it('sets skills-sh.hasInstalledSkill to true when skills present', async () => {
+      const scanner = createMockScanner({
+        globalSkills: [makeSkill({ name: 'some-skill', source: 'org/repo', hash: 'abc' })],
+      });
+      const provider = new InstalledSkillsTreeProvider(scanner);
+
+      await provider.rescan();
+
+      const { commands } = await import('vscode');
+      expect(commands.executeCommand).toHaveBeenCalledWith(
+        'setContext', 'skills-sh.hasInstalledSkill', true
+      );
+    });
+
+    it('sets skills-sh.hasInstalledSkill to false when no skills', async () => {
+      const scanner = createMockScanner({});
+      const provider = new InstalledSkillsTreeProvider(scanner);
+
+      await provider.rescan();
+
+      const { commands } = await import('vscode');
+      expect(commands.executeCommand).toHaveBeenCalledWith(
+        'setContext', 'skills-sh.hasInstalledSkill', false
+      );
+    });
   });
 });

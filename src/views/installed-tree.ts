@@ -129,6 +129,8 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
     const noSkills = this.globalSkills.length === 0
       && this.projectSkills.length === 0;
     vscode.commands.executeCommand('setContext', 'skills-sh.noSkillsFound', noSkills);
+    // Inverse of noSkillsFound — needed as a truthy context for walkthrough completion events
+    vscode.commands.executeCommand('setContext', 'skills-sh.hasInstalledSkill', !noSkills);
 
     this.refresh();
   }

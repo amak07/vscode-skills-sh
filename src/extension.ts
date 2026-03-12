@@ -632,6 +632,13 @@ export function activate(context: vscode.ExtensionContext) {
   treeProvider.rescan().then(() => {
     syncAllState();
 
+    // Auto-open marketplace tab on first activation with no skills
+    const hasSeenOnboarding = context.globalState.get<boolean>('skills-sh.hasSeenOnboarding', false);
+    if (treeProvider.getInstalledSkillNames().size === 0 && !hasSeenOnboarding) {
+      context.globalState.update('skills-sh.hasSeenOnboarding', true);
+      marketplaceProvider.openInTab();
+    }
+
     // Show diagnostic notification if no skills found
     if (treeProvider.getInstalledSkillNames().size === 0) {
       const diagnostics = scanner.getDiagnostics();

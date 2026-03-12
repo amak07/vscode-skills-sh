@@ -132,9 +132,19 @@ let savedEnv: Record<string, string | undefined>;
 /** Minimal ExtensionContext mock */
 function makeContext(): any {
   const subscriptions: { dispose: () => void }[] = [];
+  const globalStateStore = new Map<string, any>();
   return {
     subscriptions,
     extensionUri: Uri.file('/mock/extension'),
+    globalState: {
+      get: (key: string, defaultValue?: any) =>
+        globalStateStore.has(key) ? globalStateStore.get(key) : defaultValue,
+      update: vi.fn((key: string, value: any) => {
+        globalStateStore.set(key, value);
+        return Promise.resolve();
+      }),
+      keys: () => [...globalStateStore.keys()],
+    },
     dispose() { subscriptions.forEach(s => s.dispose()); },
   };
 }
@@ -1321,6 +1331,60 @@ describe('deactivate', () => {
 // ===========================================================================
 // 21. Command registration completeness
 // ===========================================================================
+
+// ===========================================================================
+// Onboarding — auto-open marketplace tab on first activation
+// ===========================================================================
+
+describe('onboarding auto-open marketplace tab', () => {
+  it('opens marketplace tab on first activation with no skills', async () => {
+    // Re-activate with a fresh context, using a generous flush for real I/O
+    ctx.dispose();
+    const freshCtx = makeContext();
+    mockOpenInTab.mockClear();
+
+    activate(freshCtx);
+    // Real filesystem scan needs more than one tick to complete
+    await new Promise(resolve => setTimeout(resolve, 200));
+
+    expect(mockOpenInTab).toHaveBeenCalled();
+    expect(freshCtx.globalState.get('skills-sh.hasSeenOnboarding', false)).toBe(true);
+
+    freshCtx.dispose();
+  });
+
+  it('does NOT open marketplace tab when hasSeenOnboarding flag is set', async () => {
+    // Drain any pending callbacks from the beforeEach activation's rescan
+    await new Promise(resolve => setTimeout(resolve, 200));
+    ctx.dispose();
+    const freshCtx = makeContext();
+    // Pre-set the flag to simulate a second activation
+    freshCtx.globalState.update('skills-sh.hasSeenOnboarding', true);
+    mockOpenInTab.mockClear();
+
+    activate(freshCtx);
+    await new Promise(resolve => setTimeout(resolve, 200));
+
+    expect(mockOpenInTab).not.toHaveBeenCalled();
+
+    freshCtx.dispose();
+  });
+
+  it('does NOT open marketplace tab when skills already exist', async () => {
+    ctx.dispose();
+    sandbox.createSkill(sandbox.globalSkillsDir, 'test-skill');
+    const freshCtx = makeContext();
+    mockOpenInTab.mockClear();
+
+    activate(freshCtx);
+    await new Promise(resolve => setTimeout(resolve, 200));
+
+    expect(mockOpenInTab).not.toHaveBeenCalled();
+    expect(freshCtx.globalState.get('skills-sh.hasSeenOnboarding', false)).toBe(false);
+
+    freshCtx.dispose();
+  });
+});
 
 describe('command registration', () => {
   it('registers all expected commands', () => {

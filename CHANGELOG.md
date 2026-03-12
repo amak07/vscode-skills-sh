@@ -4,6 +4,12 @@ All notable changes to the Skills.sh Agent Skills Manager extension will be docu
 
 ## [Unreleased]
 
+### Added
+
+- **Onboarding walkthrough** — 3-step Getting Started walkthrough (auto-opens on first install) that introduces the Agent Skills open standard and guides users to install their first skill
+- **Auto-open marketplace** — marketplace opens as a full editor tab on first activation when no skills are installed, providing immediate discovery
+- **Walkthrough completion tracking** — "Install Your First Skill" step auto-completes when any skill is installed via new `hasInstalledSkill` context variable
+
 ## [0.2.0] - 2026-03-12
 
 ### Added
