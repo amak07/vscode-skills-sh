@@ -64,6 +64,12 @@ vi.mock('../../../../manifest/manifest', () => ({
   removeSkillFromManifest: (...args: unknown[]) => mockRemoveSkillFromManifest(...args),
 }));
 
+// Mock the parser module (updateSkillFrontmatter)
+const mockUpdateSkillFrontmatter = vi.fn();
+vi.mock('../../../../local/parser', () => ({
+  updateSkillFrontmatter: (...args: unknown[]) => mockUpdateSkillFrontmatter(...args),
+}));
+
 // Mock the styles module (avoid pulling in the large CSS)
 vi.mock('../../../../views/marketplace/styles', () => ({
   getStyles: () => '/* mocked styles */',
@@ -157,6 +163,7 @@ function makeInstalledCard(overrides: Partial<InstalledSkillCard> & { name: stri
     isCustom: false,
     inManifest: false,
     agents: [],
+    disableModelInvocation: false,
     ...overrides,
   };
 }
@@ -1747,6 +1754,103 @@ describe('MarketplaceViewProvider', () => {
       await sendMessage({ command: 'install', payload: { source: 'org/repo', skillName: 'skill-x' } });
 
       expect(mockInstallSkill).toHaveBeenCalled();
+    });
+  });
+
+  describe('toggleAutoInvoke', () => {
+    it('calls updateSkillFrontmatter with disable-model-invocation: true', async () => {
+      const { webview, sendMessage } = resolveProvider(provider);
+      provider.setInstalledSkills([
+        makeInstalledCard({ name: 'my-skill', path: '/home/user/.claude/skills/my-skill' }),
+      ]);
+      webview.postMessage.mockClear();
+
+      await sendMessage({ command: 'toggleAutoInvoke', payload: { folderName: 'my-skill', disable: true } });
+
+      expect(mockUpdateSkillFrontmatter).toHaveBeenCalledWith(
+        expect.stringContaining('my-skill'),
+        { 'disable-model-invocation': true },
+      );
+    });
+
+    it('removes disable-model-invocation when disable is false', async () => {
+      const { webview, sendMessage } = resolveProvider(provider);
+      provider.setInstalledSkills([
+        makeInstalledCard({ name: 'my-skill', path: '/home/user/.claude/skills/my-skill', disableModelInvocation: true }),
+      ]);
+      webview.postMessage.mockClear();
+
+      await sendMessage({ command: 'toggleAutoInvoke', payload: { folderName: 'my-skill', disable: false } });
+
+      expect(mockUpdateSkillFrontmatter).toHaveBeenCalledWith(
+        expect.stringContaining('my-skill'),
+        { 'disable-model-invocation': undefined },
+      );
+    });
+
+    it('updates local skills and re-pushes to webview', async () => {
+      const { webview, sendMessage } = resolveProvider(provider);
+      provider.setInstalledSkills([
+        makeInstalledCard({ name: 'my-skill', path: '/home/user/.claude/skills/my-skill' }),
+      ]);
+
+      await sendMessage({ command: 'toggleAutoInvoke', payload: { folderName: 'my-skill', disable: true } });
+
+      // Find the last installedSkillsData message (after the toggle)
+      const allCalls = webview.postMessage.mock.calls;
+      const skillsMsgs = allCalls
+        .map(c => c[0] as any)
+        .filter((m: any) => m.command === 'installedSkillsData');
+      const lastSkillsMsg = skillsMsgs[skillsMsgs.length - 1];
+      expect(lastSkillsMsg).toBeTruthy();
+      expect(lastSkillsMsg.payload[0].disableModelInvocation).toBe(true);
+    });
+
+    it('does nothing for unknown folderName', async () => {
+      const { sendMessage } = resolveProvider(provider);
+      provider.setInstalledSkills([
+        makeInstalledCard({ name: 'my-skill', path: '/home/user/.claude/skills/my-skill' }),
+      ]);
+
+      await sendMessage({ command: 'toggleAutoInvoke', payload: { folderName: 'nonexistent', disable: true } });
+
+      expect(mockUpdateSkillFrontmatter).not.toHaveBeenCalled();
+    });
+
+    it('setInstalledSkills patches stale disableModelInvocation after toggle', async () => {
+      const { webview, sendMessage } = resolveProvider(provider);
+      provider.setInstalledSkills([
+        makeInstalledCard({ name: 'my-skill', path: '/home/user/.claude/skills/my-skill' }),
+      ]);
+
+      // User toggles OFF
+      await sendMessage({ command: 'toggleAutoInvoke', payload: { folderName: 'my-skill', disable: true } });
+      webview.postMessage.mockClear();
+
+      // Stale rescan pushes old data (disableModelInvocation: false/undefined)
+      provider.setInstalledSkills([
+        makeInstalledCard({ name: 'my-skill', path: '/home/user/.claude/skills/my-skill', disableModelInvocation: false }),
+      ]);
+
+      // Provider should patch the stale value
+      const call = webview.postMessage.mock.calls.find(
+        (c: unknown[]) => (c[0] as any).command === 'installedSkillsData',
+      );
+      expect(call).toBeDefined();
+      expect(call![0].payload[0].disableModelInvocation).toBe(true);
+    });
+  });
+
+  describe('openSkillFile', () => {
+    it('opens SKILL.md in the editor', async () => {
+      const { sendMessage } = resolveProvider(provider);
+      provider.setInstalledSkills([
+        makeInstalledCard({ name: 'my-skill', path: '/home/user/.claude/skills/my-skill' }),
+      ]);
+
+      await sendMessage({ command: 'openSkillFile', payload: { folderName: 'my-skill' } });
+
+      expect(vscode.window.showTextDocument).toHaveBeenCalled();
     });
   });
 });

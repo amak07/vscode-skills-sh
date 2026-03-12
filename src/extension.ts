@@ -80,6 +80,7 @@ export function activate(context: vscode.ExtensionContext) {
       isCustom: s.isCustom,
       inManifest: manifestNames.has(s.folderName),
       agents: s.agents,
+      disableModelInvocation: s.metadata?.['disable-model-invocation'] === true,
     }));
     marketplaceProvider.setInstalledSkills(cards);
   }

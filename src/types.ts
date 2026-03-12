@@ -165,6 +165,8 @@ export type WebviewCommand =
   | 'uninstall'
   | 'audits'
   | 'docs'
+  | 'toggleAutoInvoke'
+  | 'openSkillFile'
   | 'ready';
 
 export interface WebviewMessage {
@@ -198,4 +200,5 @@ export interface InstalledSkillCard {
   isCustom: boolean;
   inManifest: boolean;
   agents: string[];
+  disableModelInvocation: boolean;
 }

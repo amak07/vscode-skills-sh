@@ -127,9 +127,12 @@ bd close <id> --reason="done"             # Complete task
 
 Work is NOT complete until changes are committed, pushed, and CI passes.
 
-### 0. Code review (before committing)
+### 0. Pre-flight checks (before committing)
 
-Use `superpowers:requesting-code-review` to launch a review subagent. Fix all Critical and Important issues before proceeding.
+- **Changelog**: Every user-facing change (feature, fix, UI tweak) MUST have an entry in the `[Unreleased]` section of `CHANGELOG.md`. Never let the changelog fall behind.
+- **README**: If new features were added, ask the user if they want to update the README with a brief description. Don't update without asking.
+- **Unit tests**: Verify new functionality has test coverage. If tests are missing, write them before proceeding.
+- **Code review**: Use `superpowers:requesting-code-review` to launch a review subagent. Fix all Critical and Important issues before proceeding.
 
 ### 1. Run quality gates
 
@@ -169,8 +172,6 @@ gh pr create --title "..." --body "..."
    git push origin master --tags
    ```
 4. CI builds, tests, and publishes to **both** marketplaces automatically
-
-**Changelog discipline:** Every user-facing change (feature, fix, UI tweak) MUST get an entry in the `[Unreleased]` section of `CHANGELOG.md` before the commit lands. At release time, rename `[Unreleased]` → `[x.y.z] - YYYY-MM-DD` and add a fresh empty `[Unreleased]` section above it. Never let the changelog fall behind — it's the source of truth for release notes.
 
 **Critical rules:**
 - NEVER stop before the PR is merged

@@ -45,6 +45,8 @@ export interface InstalledSkillData {
   hasUpdate?: boolean;
   inManifest?: boolean;
   agents?: string[];
+  disableModelInvocation?: boolean;
+  path?: string;
 }
 
 export interface DetailData {
@@ -161,59 +163,61 @@ export function renderRow(
     + '</div></div>';
 }
 
+/** @deprecated Use renderInstalledCard instead */
 export function renderInstalledRow(
   skill: InstalledSkillData,
   manifestSkillNames: Set<string>,
 ): string {
-  const source = skill.source || '';
+  return renderInstalledCard(skill, manifestSkillNames);
+}
+
+export function renderInstalledCard(
+  skill: InstalledSkillData,
+  manifestSkillNames: Set<string>,
+): string {
+  const disabled = skill.disableModelInvocation || false;
   const scopeLabel = skill.scope === 'project' ? 'project' : 'global';
-  const desc = skill.description || '';
-  const inMf = skill.inManifest;
+  const agentNames = (skill.agents || []).filter(function (a) { return a !== 'skills.sh'; });
+  const agentCount = agentNames.length;
+  const cardCls = 'installed-card';
 
-  const manifestBtn = source
-    ? '<button class="btn-action btn-action-manifest' + (inMf ? ' btn-action-active' : '') + '"'
-      + ' data-source="' + escapeHtml(source) + '"'
-      + ' data-skill-name="' + escapeHtml(skill.folderName) + '"'
-      + ' title="' + (inMf ? 'Remove from skills.json' : 'Add to skills.json') + '">'
-      + _icons.share + '<span>' + (inMf ? 'Remove from Skills.json' : 'Add to Skills.json') + '</span>'
-      + '</button>'
-    : '';
-
-  let actionBtn: string;
+  let primaryBtn: string;
   if (skill.hasUpdate) {
-    actionBtn = '<button class="btn-action btn-action-update"'
-      + ' data-install="' + escapeHtml(source) + '" data-skill-name="' + escapeHtml(skill.folderName) + '">'
-      + _icons.update + '<span>Update</span>'
-      + '</button>';
-  } else {
-    actionBtn = '<button class="btn-action btn-action-remove"'
+    primaryBtn = '<button class="btn-action btn-action-update"'
+      + ' data-install="' + escapeHtml(skill.source || '') + '"'
       + ' data-skill-name="' + escapeHtml(skill.folderName) + '">'
-      + _icons.trash + '<span>Uninstall</span>'
-      + '</button>';
+      + _icons.update + '<span>Update</span></button>';
+  } else {
+    primaryBtn = '<button class="btn-action btn-action-remove"'
+      + ' data-skill-name="' + escapeHtml(skill.folderName) + '">'
+      + _icons.trash + '<span>Uninstall</span></button>';
   }
 
-  // Agent chips: filter out "skills.sh" (canonical), show when 2+ agents
-  const agentNames = (skill.agents || []).filter(function (a) { return a !== 'skills.sh'; });
-  const agentChipsHtml = agentNames.length >= 2
-    ? '<div class="row-agents">' + agentNames.map(function (a) {
-        return '<span class="agent-chip">' + escapeHtml(a) + '</span>';
-      }).join('') + '</div>'
-    : '';
-
-  return '<div class="grid-row installed-row"'
-    + (source ? ' data-source="' + source + '" data-skill="' + escapeHtml(skill.folderName) + '"' : '')
-    + '>'
-    + '<div class="row-info">'
-    + '<div class="row-name"><span class="row-name-text">' + escapeHtml(skill.name)
-    + '</span> <span class="scope-badge scope-' + scopeLabel + '">' + scopeLabel + '</span>'
+  return '<div class="' + cardCls + '"'
+    + ' data-source="' + escapeHtml(skill.source || '') + '"'
+    + ' data-skill="' + escapeHtml(skill.folderName) + '"'
+    + ' data-folder="' + escapeHtml(skill.folderName) + '">'
+    // Header
+    + '<div class="card-header">'
+    + '<span class="status-dot ' + (disabled ? 'status-dot-off' : 'status-dot-on') + '"></span>'
+    + '<span class="card-name" title="' + escapeHtml(skill.name) + '">' + escapeHtml(skill.name) + '</span>'
     + '</div>'
-    + '<div class="row-source">' + (desc ? escapeHtml(desc) : (source ? escapeHtml(source) : 'Custom skill')) + '</div>'
-    + agentChipsHtml
+    // Toggle
+    + '<div class="card-toggle" data-toggle-invoke="' + escapeHtml(skill.folderName) + '">'
+    + '<span class="toggle-switch ' + (disabled ? '' : 'on') + '"></span>'
+    + '<span>Auto-invoke: ' + (disabled ? 'OFF' : 'ON') + '</span>'
     + '</div>'
-    + '<div class="row-actions">'
-    + manifestBtn
-    + actionBtn
-    + '</div></div>';
+    // Meta
+    + '<div class="card-meta">'
+    + '<span class="scope-badge scope-' + scopeLabel + '">' + scopeLabel + '</span>'
+    + (agentCount > 0 ? ' &middot; ' + agentCount + ' agent' + (agentCount > 1 ? 's' : '') : '')
+    + '</div>'
+    // Actions
+    + '<div class="card-actions">'
+    + primaryBtn
+    + '<button class="overflow-menu-btn" data-overflow="' + escapeHtml(skill.folderName) + '" title="More actions">&#x22EF;</button>'
+    + '</div>'
+    + '</div>';
 }
 
 export function renderInstalledGroup(
@@ -225,12 +229,12 @@ export function renderInstalledGroup(
   if (skills.length === 0) return '';
   const headerCls = expanded ? 'installed-group-header' : 'installed-group-header collapsed';
   const bodyCls = expanded ? 'installed-group-body open' : 'installed-group-body';
-  let rows = '';
-  skills.forEach(function (skill) { rows += renderInstalledRow(skill, manifestSkillNames); });
+  let cards = '';
+  skills.forEach(function (skill) { cards += renderInstalledCard(skill, manifestSkillNames); });
   return '<div class="installed-group">'
     + '<div class="' + headerCls + '"><span class="chevron">&#x25B8;</span> '
     + escapeHtml(label) + ' (' + skills.length + ')</div>'
-    + '<div class="' + bodyCls + '">' + rows + '</div></div>';
+    + '<div class="' + bodyCls + '"><div class="installed-grid">' + cards + '</div></div></div>';
 }
 
 export function renderDetailHtml(detail: DetailData): string {
@@ -333,7 +337,7 @@ export function renderDetailHtml(detail: DetailData): string {
     + (agentRows ? '<div class="sidebar-section"><div class="sidebar-label">Installs by Agent</div>'
       + '<div class="agent-table">' + agentRows + '</div></div>' : '')
     + (function () {
-        var localAgents = (detail.agents || []).filter(function (a) { return a !== 'skills.sh'; });
+        const localAgents = (detail.agents || []).filter(function (a) { return a !== 'skills.sh'; });
         if (localAgents.length === 0) { return ''; }
         return '<div class="sidebar-section"><div class="sidebar-label">Installed In</div>'
           + '<div class="row-agents">' + localAgents.map(function (a) {
@@ -413,7 +417,10 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
   let installedSkills: InstalledSkillData[] = [];
   let installedSkillsLoaded = false;
+  const pendingToggles = new Map<string, boolean>(); // folderName → expected disableModelInvocation
+  const pendingToggleTimers = new Map<string, ReturnType<typeof setTimeout>>();
   let manifestSkillNames = new Set<string>();
+  let infoBannerDismissed = false;
   let navStack: Array<{
     view: string; tab: string; query: string; scrollY: number;
     html: string; heroVisible: boolean; leaderboardChrome: boolean;
@@ -599,7 +606,7 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
 
       // Local filtering when on installed tab
       if (currentView === 'installed') {
-        filterInstalledRows(q.toLowerCase());
+        filterInstalledCards(q.toLowerCase());
         return;
       }
 
@@ -735,9 +742,104 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
   resultsEl.addEventListener('click', (e) => {
     const target = e.target as HTMLElement;
 
+    // Handle info banner dismiss
+    const dismissBtn = target.closest('[data-dismiss-info]') as HTMLElement | null;
+    if (dismissBtn) {
+      infoBannerDismissed = true;
+      const banner = dismissBtn.closest('.info-banner');
+      if (banner) banner.remove();
+      return;
+    }
+
+    // Handle auto-invoke toggle click
+    const toggleEl = target.closest('[data-toggle-invoke]') as HTMLElement | null;
+    if (toggleEl) {
+      const folderName = toggleEl.dataset.toggleInvoke;
+      if (folderName) {
+        const switchEl = toggleEl.querySelector('.toggle-switch');
+        const isCurrentlyOn = switchEl?.classList.contains('on');
+        const newDisable = isCurrentlyOn; // turning OFF = disable true
+        const prevTimer = pendingToggleTimers.get(folderName);
+        if (prevTimer) clearTimeout(prevTimer);
+        pendingToggles.set(folderName, newDisable);
+        pendingToggleTimers.set(folderName, setTimeout(function () {
+          pendingToggles.delete(folderName);
+          pendingToggleTimers.delete(folderName);
+        }, 10000));
+        api.postMessage({ command: 'toggleAutoInvoke', payload: { folderName: folderName, disable: newDisable } });
+        // Optimistic UI update
+        if (switchEl) switchEl.classList.toggle('on');
+        const label = toggleEl.querySelector('span:last-child');
+        if (label) label.textContent = 'Auto-invoke: ' + (newDisable ? 'OFF' : 'ON');
+        const card = toggleEl.closest('.installed-card');
+        const dot = card?.querySelector('.status-dot');
+        if (dot) {
+          dot.classList.toggle('status-dot-on', !newDisable);
+          dot.classList.toggle('status-dot-off', !!newDisable);
+        }
+      }
+      return;
+    }
+
+    // Handle overflow menu button
+    const overflowBtn = target.closest('.overflow-menu-btn') as HTMLElement | null;
+    if (overflowBtn) {
+      e.stopPropagation();
+      const folderName = overflowBtn.dataset.overflow;
+      // Close any existing menus
+      document.querySelectorAll('.overflow-menu').forEach(function (m) { m.remove(); });
+      const skill = installedSkills.find(function (s) { return s.folderName === folderName; });
+      if (!skill) return;
+      const menu = document.createElement('div');
+      menu.className = 'overflow-menu';
+      menu.innerHTML = '<button class="overflow-menu-item" data-action="open" data-folder="' + escapeHtml(folderName || '') + '">Open SKILL.md</button>'
+        + (skill.source ? '<button class="overflow-menu-item" data-action="manifest" data-folder="' + escapeHtml(folderName || '') + '" data-source="' + escapeHtml(skill.source) + '">'
+          + (skill.inManifest ? 'Remove from skills.json' : 'Add to skills.json') + '</button>' : '')
+        + '<button class="overflow-menu-item" data-action="copy-path" data-folder="' + escapeHtml(folderName || '') + '">Copy path</button>';
+      overflowBtn.parentElement!.appendChild(menu);
+      // Close on outside click
+      setTimeout(function () {
+        document.addEventListener('click', function close() {
+          menu.remove();
+          document.removeEventListener('click', close);
+        }, { once: true });
+      }, 0);
+      return;
+    }
+
+    // Handle overflow menu item click
+    const menuItem = target.closest('.overflow-menu-item') as HTMLElement | null;
+    if (menuItem) {
+      const action = menuItem.dataset.action;
+      const folder = menuItem.dataset.folder;
+      if (action === 'open' && folder) {
+        api.postMessage({ command: 'openSkillFile', payload: { folderName: folder } });
+      } else if (action === 'manifest' && folder) {
+        const src = menuItem.dataset.source;
+        const sk = installedSkills.find(function (s) { return s.folderName === folder; });
+        if (sk?.inManifest) {
+          api.postMessage({ command: 'removeFromManifest', payload: { skillName: folder } });
+        } else if (src) {
+          api.postMessage({ command: 'addToManifest', payload: { source: src, skillName: folder } });
+        }
+      } else if (action === 'copy-path' && folder) {
+        const sk = installedSkills.find(function (s) { return s.folderName === folder; });
+        if (sk && sk.path) {
+          navigator.clipboard.writeText(sk.path);
+        }
+      }
+      document.querySelectorAll('.overflow-menu').forEach(function (m) { m.remove(); });
+      return;
+    }
+
     // Handle collapsible group headers (Installed tab)
-    const groupHeader = target.closest('.installed-group-header');
+    const groupHeader = target.closest('.installed-group-header') as HTMLElement | null;
     if (groupHeader) {
+      // Debounce rapid clicks — ignore if toggled within 200ms
+      const now = Date.now();
+      const last = parseInt(groupHeader.dataset.lastToggle || '0', 10);
+      if (now - last < 200) return;
+      groupHeader.dataset.lastToggle = String(now);
       const body = groupHeader.nextElementSibling;
       if (body) body.classList.toggle('open');
       groupHeader.classList.toggle('collapsed');
@@ -969,7 +1071,12 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
       }
 
       case 'installedSkillsData': {
-        installedSkills = msg.payload || [];
+        installedSkills = (msg.payload || []).map(function (s: InstalledSkillData) {
+          if (pendingToggles.has(s.folderName)) {
+            return Object.assign({}, s, { disableModelInvocation: pendingToggles.get(s.folderName) });
+          }
+          return s;
+        });
         installedSkillsLoaded = true;
         updateInstalledTabLabel();
         if (currentView === 'installed') {
@@ -1105,6 +1212,18 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
       }
     }
 
+    if (!infoBannerDismissed) {
+      html += '<div class="info-banner">'
+        + '<svg class="info-banner-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">'
+        + '<circle cx="8" cy="8" r="6.25"/><line x1="8" y1="7" x2="8" y2="11"/><circle cx="8" cy="5" r="0.5" fill="currentColor" stroke="none"/>'
+        + '</svg>'
+        + '<span>Agents like Claude Code, Cursor, and Windsurf auto-invoke skills by default based on context. '
+        + 'Use the toggle to control which skills can auto-invoke. '
+        + '<a href="https://docs.anthropic.com/en/docs/claude-code/skills" title="Claude Code Skills documentation">Learn more</a></span>'
+        + '<button class="dismiss-banner" data-dismiss-info title="Dismiss">&times;</button>'
+        + '</div>';
+    }
+
     const updates: InstalledSkillData[] = [];
     const custom: InstalledSkillData[] = [];
     const untracked: InstalledSkillData[] = [];
@@ -1135,22 +1254,22 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
     resultsEl.innerHTML = html;
     // Apply current search filter if user typed while on installed tab
     if (searchInput && searchInput.value.trim()) {
-      filterInstalledRows(searchInput.value.trim().toLowerCase());
+      filterInstalledCards(searchInput.value.trim().toLowerCase());
     }
   }
 
-  function filterInstalledRows(query: string): void {
-    document.querySelectorAll('.installed-row').forEach(function (row) {
-      const name = row.querySelector('.row-name')?.textContent?.toLowerCase() || '';
-      const source = row.querySelector('.row-source')?.textContent?.toLowerCase() || '';
-      (row as HTMLElement).style.display =
-        (!query || name.includes(query) || source.includes(query)) ? '' : 'none';
+  function filterInstalledCards(query: string): void {
+    document.querySelectorAll('.installed-card').forEach(function (card) {
+      const name = card.querySelector('.card-name')?.textContent?.toLowerCase() || '';
+      const meta = card.querySelector('.card-meta')?.textContent?.toLowerCase() || '';
+      (card as HTMLElement).style.display =
+        (!query || name.includes(query) || meta.includes(query)) ? '' : 'none';
     });
     document.querySelectorAll('.installed-group').forEach(function (group) {
       const body = group.querySelector('.installed-group-body');
       if (!body) return;
-      const visibleRows = body.querySelectorAll('.installed-row:not([style*="display: none"])');
-      (group as HTMLElement).style.display = visibleRows.length > 0 ? '' : 'none';
+      const visibleCards = body.querySelectorAll('.installed-card:not([style*="display: none"])');
+      (group as HTMLElement).style.display = visibleCards.length > 0 ? '' : 'none';
     });
   }
 

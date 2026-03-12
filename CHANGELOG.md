@@ -4,6 +4,20 @@ All notable changes to the Skills.sh Agent Skills Manager extension will be docu
 
 ## [Unreleased]
 
+### Added
+
+- **Auto-invocation toggle** — control whether AI agents auto-invoke each skill via a prominent toggle switch on each card. Writes `disable-model-invocation` to SKILL.md frontmatter (respected by Claude Code and Cursor).
+- **Card grid layout** — redesigned Installed tab from row-based list to responsive card grid with status indicators
+- **Overflow menu** — secondary actions (Open SKILL.md, manifest toggle, copy path) moved to per-card overflow menu
+- **Open SKILL.md** — quickly open a skill's source file from the overflow menu
+- **Auto-invoke info banner** — informational banner in the Installed tab explaining that agents like Claude Code, Cursor, and Windsurf auto-invoke skills by default, with a link to Anthropic's documentation
+
+### Fixed
+
+- **Toggle race condition** — auto-invoke toggle no longer flickers or reverts when file watcher rescans overlap with optimistic UI updates
+- **Accordion double-click** — group headers in Installed tab no longer toggle twice on rapid clicks (200ms debounce)
+- **Detail page button spacing** — restored missing gap between action buttons (e.g., "Add to skills.json" and "Uninstall") on skill detail pages
+
 ## [0.1.10] - 2026-03-06
 
 ### Added

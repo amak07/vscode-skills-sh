@@ -9,6 +9,7 @@ import {
   setConfig,
   renderRow,
   renderInstalledRow,
+  renderInstalledCard,
   renderInstalledGroup,
   renderDetailHtml,
   renderAuditsView,
@@ -221,12 +222,22 @@ describe('renderRow', () => {
   });
 });
 
-describe('renderInstalledRow', () => {
+describe('renderInstalledRow (legacy delegate)', () => {
   beforeEach(() => {
     setConfig(makeConfig());
   });
 
-  it('renders global skill with manifest button', () => {
+  it('delegates to renderInstalledCard', () => {
+    const skill: InstalledSkillData = {
+      name: 'Test Skill', folderName: 'test-skill',
+      source: 'owner/repo', scope: 'global',
+    };
+    const row = renderInstalledRow(skill, new Set());
+    const card = renderInstalledCard(skill, new Set());
+    expect(row).toBe(card);
+  });
+
+  it('renders card with name and scope badge', () => {
     const skill: InstalledSkillData = {
       name: 'Test Skill', folderName: 'test-skill',
       source: 'owner/repo', scope: 'global',
@@ -234,8 +245,7 @@ describe('renderInstalledRow', () => {
     const html = renderInstalledRow(skill, new Set());
     expect(html).toContain('Test Skill');
     expect(html).toContain('scope-global');
-    expect(html).toContain('btn-action-manifest');
-    expect(html).toContain('Add to Skills.json');
+    expect(html).toContain('installed-card');
   });
 
   it('renders project skill with scope badge', () => {
@@ -245,16 +255,6 @@ describe('renderInstalledRow', () => {
     };
     const html = renderInstalledRow(skill, new Set());
     expect(html).toContain('scope-project');
-  });
-
-  it('renders active manifest state when in manifest', () => {
-    const skill: InstalledSkillData = {
-      name: 'Mf Skill', folderName: 'mf',
-      source: 'a/b', inManifest: true,
-    };
-    const html = renderInstalledRow(skill, new Set(['mf']));
-    expect(html).toContain('btn-action-active');
-    expect(html).toContain('Remove from Skills.json');
   });
 
   it('renders update button when hasUpdate', () => {
@@ -276,23 +276,75 @@ describe('renderInstalledRow', () => {
     expect(html).toContain('btn-action-remove');
     expect(html).toContain('Uninstall');
   });
+});
 
-  it('omits manifest button when source is empty', () => {
-    const skill: InstalledSkillData = {
-      name: 'Custom', folderName: 'cust',
-    };
-    const html = renderInstalledRow(skill, new Set());
-    expect(html).not.toContain('btn-action-manifest');
-    expect(html).toContain('Custom skill');
+describe('renderInstalledCard', () => {
+  beforeEach(() => {
+    setConfig(makeConfig());
   });
 
-  it('shows description if present', () => {
+  it('renders enabled skill with status-dot-on and toggle on', () => {
     const skill: InstalledSkillData = {
-      name: 'Desc', folderName: 'desc',
-      source: 'a/b', description: 'A helpful description',
+      name: 'My Skill', folderName: 'my-skill',
+      source: 'owner/repo', scope: 'global',
+      disableModelInvocation: false,
     };
-    const html = renderInstalledRow(skill, new Set());
-    expect(html).toContain('A helpful description');
+    const html = renderInstalledCard(skill, new Set());
+    expect(html).toContain('status-dot-on');
+    expect(html).toContain('toggle-switch on');
+    expect(html).toContain('Auto-invoke: ON');
+  });
+
+  it('renders disabled skill with status-dot-off', () => {
+    const skill: InstalledSkillData = {
+      name: 'Disabled Skill', folderName: 'disabled',
+      source: 'owner/repo', scope: 'global',
+      disableModelInvocation: true,
+    };
+    const html = renderInstalledCard(skill, new Set());
+    expect(html).toContain('status-dot-off');
+    expect(html).not.toContain('toggle-switch on');
+    expect(html).toContain('Auto-invoke: OFF');
+  });
+
+  it('renders scope badge and agent count in meta', () => {
+    const skill: InstalledSkillData = {
+      name: 'Test', folderName: 'test',
+      source: 'a/b', scope: 'project',
+      agents: ['Claude Code', 'Cursor'],
+    };
+    const html = renderInstalledCard(skill, new Set());
+    expect(html).toContain('scope-project');
+    expect(html).toContain('2 agents');
+  });
+
+  it('renders update button when hasUpdate is true', () => {
+    const skill: InstalledSkillData = {
+      name: 'Upd', folderName: 'upd',
+      source: 'a/b', hasUpdate: true,
+    };
+    const html = renderInstalledCard(skill, new Set());
+    expect(html).toContain('btn-action-update');
+    expect(html).not.toContain('btn-action-remove');
+  });
+
+  it('renders overflow menu button', () => {
+    const skill: InstalledSkillData = {
+      name: 'Test', folderName: 'test',
+      source: 'a/b',
+    };
+    const html = renderInstalledCard(skill, new Set());
+    expect(html).toContain('overflow-menu-btn');
+    expect(html).toContain('data-overflow="test"');
+  });
+
+  it('renders data-toggle-invoke attribute', () => {
+    const skill: InstalledSkillData = {
+      name: 'Test', folderName: 'my-skill',
+      source: 'a/b',
+    };
+    const html = renderInstalledCard(skill, new Set());
+    expect(html).toContain('data-toggle-invoke="my-skill"');
   });
 });
 
@@ -305,7 +357,7 @@ describe('renderInstalledGroup', () => {
     expect(renderInstalledGroup('Empty', [], true, new Set())).toBe('');
   });
 
-  it('renders expanded group', () => {
+  it('renders expanded group with card grid', () => {
     const skills: InstalledSkillData[] = [
       { name: 'A', folderName: 'a', source: 'x/y' },
     ];
@@ -313,6 +365,8 @@ describe('renderInstalledGroup', () => {
     expect(html).toContain('installed-group-header');
     expect(html).not.toContain('collapsed');
     expect(html).toContain('installed-group-body open');
+    expect(html).toContain('installed-grid');
+    expect(html).toContain('installed-card');
     expect(html).toContain('Test Group (1)');
   });
 
@@ -1059,6 +1113,326 @@ describe('initializeWebview', () => {
         command: 'removeFromManifest',
         payload: { skillName: 'sk' },
       });
+    });
+  });
+
+  describe('auto-invoke toggle', () => {
+    it('clicking toggle sends toggleAutoInvoke and updates UI optimistically', () => {
+      initializeWebview(api, config);
+      const results = document.getElementById('results')!;
+      results.innerHTML = '<div class="installed-card">'
+        + '<div class="card-header"><span class="status-dot status-dot-on"></span></div>'
+        + '<div class="card-toggle" data-toggle-invoke="my-skill">'
+        + '<span class="toggle-switch on"></span>'
+        + '<span>Auto-invoke: ON</span>'
+        + '</div></div>';
+
+      (api.postMessage as ReturnType<typeof vi.fn>).mockClear();
+      results.querySelector('[data-toggle-invoke]')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(api.postMessage).toHaveBeenCalledWith({
+        command: 'toggleAutoInvoke',
+        payload: { folderName: 'my-skill', disable: true },
+      });
+      // Optimistic UI updates
+      expect(results.querySelector('.toggle-switch')!.classList.contains('on')).toBe(false);
+      expect(results.querySelector('.status-dot')!.classList.contains('status-dot-off')).toBe(true);
+      expect(results.querySelector('.card-toggle span:last-child')!.textContent).toBe('Auto-invoke: OFF');
+    });
+
+    it('clicking toggle on disabled skill re-enables it', () => {
+      initializeWebview(api, config);
+      const results = document.getElementById('results')!;
+      results.innerHTML = '<div class="installed-card">'
+        + '<div class="card-header"><span class="status-dot status-dot-off"></span></div>'
+        + '<div class="card-toggle" data-toggle-invoke="my-skill">'
+        + '<span class="toggle-switch"></span>'
+        + '<span>Auto-invoke: OFF</span>'
+        + '</div></div>';
+
+      (api.postMessage as ReturnType<typeof vi.fn>).mockClear();
+      results.querySelector('[data-toggle-invoke]')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(api.postMessage).toHaveBeenCalledWith({
+        command: 'toggleAutoInvoke',
+        payload: { folderName: 'my-skill', disable: false },
+      });
+      expect(results.querySelector('.toggle-switch')!.classList.contains('on')).toBe(true);
+      expect(results.querySelector('.status-dot')!.classList.contains('status-dot-on')).toBe(true);
+    });
+    it('stale installedSkillsData does not overwrite optimistic toggle state', () => {
+      initializeWebview(api, config);
+      // Send initial installed data with toggle ON (disableModelInvocation: false)
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'my-skill', source: 'a/b', scope: 'global', disableModelInvocation: false }],
+        },
+      }));
+      // Switch to installed tab to render cards
+      const installedTab = document.querySelector('.tab[data-tab="installed"]') as HTMLElement;
+      installedTab.click();
+
+      // Click toggle to turn OFF (disableModelInvocation: true)
+      const results = document.getElementById('results')!;
+      results.querySelector('[data-toggle-invoke]')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      // Simulate stale installedSkillsData arriving with OLD state (disableModelInvocation: false)
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'my-skill', source: 'a/b', scope: 'global', disableModelInvocation: false }],
+        },
+      }));
+
+      // Toggle should still show OFF (the inflight guard patches the stale data)
+      expect(results.querySelector('.toggle-switch')!.classList.contains('on')).toBe(false);
+    });
+
+    it('guard keeps patching even after matching data arrives (stale rescan protection)', () => {
+      initializeWebview(api, config);
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'my-skill', source: 'a/b', scope: 'global', disableModelInvocation: false }],
+        },
+      }));
+      const installedTab = document.querySelector('.tab[data-tab="installed"]') as HTMLElement;
+      installedTab.click();
+
+      // Toggle OFF
+      const results = document.getElementById('results')!;
+      results.querySelector('[data-toggle-invoke]')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      // Send MATCHING data (disableModelInvocation: true — same as what we toggled to)
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'my-skill', source: 'a/b', scope: 'global', disableModelInvocation: true }],
+        },
+      }));
+
+      // Toggle should show OFF (confirmed state)
+      expect(results.querySelector('.toggle-switch')!.classList.contains('on')).toBe(false);
+
+      // Send STALE data (from in-flight rescan that started before toggle write)
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'my-skill', source: 'a/b', scope: 'global', disableModelInvocation: false }],
+        },
+      }));
+
+      // Guard still active — should STILL show OFF (patched), not revert to ON
+      expect(results.querySelector('.toggle-switch')!.classList.contains('on')).toBe(false);
+    });
+
+    it('rapid toggle OFF then ON preserves final state', () => {
+      initializeWebview(api, config);
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'my-skill', source: 'a/b', scope: 'global', disableModelInvocation: false }],
+        },
+      }));
+      const installedTab = document.querySelector('.tab[data-tab="installed"]') as HTMLElement;
+      installedTab.click();
+
+      const results = document.getElementById('results')!;
+      // Toggle OFF
+      results.querySelector('[data-toggle-invoke]')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      // Toggle back ON immediately
+      results.querySelector('[data-toggle-invoke]')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      // Stale data arrives (from first toggle's write — shows disable=true)
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'my-skill', source: 'a/b', scope: 'global', disableModelInvocation: true }],
+        },
+      }));
+
+      // Should show ON (the final toggle state was disable=false, i.e. ON)
+      expect(results.querySelector('.toggle-switch')!.classList.contains('on')).toBe(true);
+    });
+  });
+
+  describe('overflow menu', () => {
+    it('clicking overflow button creates overflow menu', () => {
+      initializeWebview(api, config);
+      // Send installed skills data so the skill lookup works
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'test-skill', source: 'a/b', scope: 'global', path: '/skills/test' }],
+        },
+      }));
+      const results = document.getElementById('results')!;
+      results.innerHTML = '<div class="card-actions">'
+        + '<button class="overflow-menu-btn" data-overflow="test-skill">⋯</button>'
+        + '</div>';
+
+      results.querySelector('.overflow-menu-btn')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      const menu = results.querySelector('.overflow-menu');
+      expect(menu).not.toBeNull();
+      expect(menu!.innerHTML).toContain('Open SKILL.md');
+      expect(menu!.innerHTML).toContain('Copy path');
+    });
+
+    it('clicking "Open SKILL.md" sends openSkillFile command', () => {
+      initializeWebview(api, config);
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'test-skill', source: 'a/b', scope: 'global' }],
+        },
+      }));
+      const results = document.getElementById('results')!;
+      results.innerHTML = '<button class="overflow-menu-item" data-action="open" data-folder="test-skill">Open SKILL.md</button>';
+
+      (api.postMessage as ReturnType<typeof vi.fn>).mockClear();
+      results.querySelector('.overflow-menu-item')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(api.postMessage).toHaveBeenCalledWith({
+        command: 'openSkillFile',
+        payload: { folderName: 'test-skill' },
+      });
+    });
+
+    it('clicking "Add to skills.json" sends addToManifest command', () => {
+      initializeWebview(api, config);
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'test-skill', source: 'a/b', scope: 'global', inManifest: false }],
+        },
+      }));
+      const results = document.getElementById('results')!;
+      results.innerHTML = '<button class="overflow-menu-item" data-action="manifest" data-folder="test-skill" data-source="a/b">Add to skills.json</button>';
+
+      (api.postMessage as ReturnType<typeof vi.fn>).mockClear();
+      results.querySelector('.overflow-menu-item')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(api.postMessage).toHaveBeenCalledWith({
+        command: 'addToManifest',
+        payload: { source: 'a/b', skillName: 'test-skill' },
+      });
+    });
+
+    it('clicking "Remove from skills.json" sends removeFromManifest command', () => {
+      initializeWebview(api, config);
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'test-skill', source: 'a/b', scope: 'global', inManifest: true }],
+        },
+      }));
+      const results = document.getElementById('results')!;
+      results.innerHTML = '<button class="overflow-menu-item" data-action="manifest" data-folder="test-skill" data-source="a/b">Remove from skills.json</button>';
+
+      (api.postMessage as ReturnType<typeof vi.fn>).mockClear();
+      results.querySelector('.overflow-menu-item')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(api.postMessage).toHaveBeenCalledWith({
+        command: 'removeFromManifest',
+        payload: { skillName: 'test-skill' },
+      });
+    });
+  });
+
+  describe('info banner', () => {
+    it('renders info banner in installed tab', () => {
+      initializeWebview(api, config);
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'test-skill', source: 'a/b', scope: 'global' }],
+        },
+      }));
+      const installedTab = document.querySelector('.tab[data-tab="installed"]') as HTMLElement;
+      installedTab.click();
+
+      const results = document.getElementById('results')!;
+      const banner = results.querySelector('.info-banner');
+      expect(banner).not.toBeNull();
+      expect(banner!.textContent).toContain('auto-invoke');
+      expect(banner!.querySelector('a[href*="anthropic"]')).not.toBeNull();
+    });
+
+    it('dismiss button removes the info banner', () => {
+      initializeWebview(api, config);
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'test-skill', source: 'a/b', scope: 'global' }],
+        },
+      }));
+      const installedTab = document.querySelector('.tab[data-tab="installed"]') as HTMLElement;
+      installedTab.click();
+
+      const results = document.getElementById('results')!;
+      const dismissBtn = results.querySelector('[data-dismiss-info]') as HTMLElement;
+      expect(dismissBtn).not.toBeNull();
+      dismissBtn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(results.querySelector('.info-banner')).toBeNull();
+    });
+
+    it('banner stays dismissed after tab switch', () => {
+      initializeWebview(api, config);
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'test-skill', source: 'a/b', scope: 'global' }],
+        },
+      }));
+      const installedTab = document.querySelector('.tab[data-tab="installed"]') as HTMLElement;
+      installedTab.click();
+
+      // Dismiss
+      const results = document.getElementById('results')!;
+      const dismissBtn = results.querySelector('[data-dismiss-info]') as HTMLElement;
+      dismissBtn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      // Switch away and back
+      const weeklyTab = document.querySelector('.tab[data-tab="weekly"]') as HTMLElement;
+      weeklyTab.click();
+      installedTab.click();
+
+      expect(results.querySelector('.info-banner')).toBeNull();
+    });
+  });
+
+  describe('accordion debounce', () => {
+    it('rapid clicks within 200ms do not double-toggle group header', () => {
+      initializeWebview(api, config);
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'test-skill', source: 'a/b', scope: 'global' }],
+        },
+      }));
+      const installedTab = document.querySelector('.tab[data-tab="installed"]') as HTMLElement;
+      installedTab.click();
+
+      const results = document.getElementById('results')!;
+      const header = results.querySelector('.installed-group-header') as HTMLElement;
+      const body = header.nextElementSibling as HTMLElement;
+      expect(header).not.toBeNull();
+
+      const wasCollapsed = header.classList.contains('collapsed');
+      const wasOpen = body.classList.contains('open');
+
+      // First click — toggles
+      header.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      expect(header.classList.contains('collapsed')).toBe(!wasCollapsed);
+      expect(body.classList.contains('open')).toBe(!wasOpen);
+
+      // Immediate second click — should be debounced (no change)
+      header.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      expect(header.classList.contains('collapsed')).toBe(!wasCollapsed);
+      expect(body.classList.contains('open')).toBe(!wasOpen);
     });
   });
 
