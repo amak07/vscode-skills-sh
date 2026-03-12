@@ -4,6 +4,8 @@ All notable changes to the Skills.sh Agent Skills Manager extension will be docu
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-03-11
+
 ### Added
 
 - **Auto-invocation toggle** — control whether AI agents auto-invoke each skill via a prominent toggle switch on each card. Writes `disable-model-invocation` to SKILL.md frontmatter (respected by Claude Code and Cursor).
