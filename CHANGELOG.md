@@ -4,7 +4,7 @@ All notable changes to the Skills.sh Agent Skills Manager extension will be docu
 
 ## [Unreleased]
 
-## [0.2.0] - 2026-03-11
+## [0.2.0] - 2026-03-12
 
 ### Added
 
