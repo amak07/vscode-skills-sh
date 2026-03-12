@@ -1816,6 +1816,29 @@ describe('MarketplaceViewProvider', () => {
 
       expect(mockUpdateSkillFrontmatter).not.toHaveBeenCalled();
     });
+
+    it('setInstalledSkills patches stale disableModelInvocation after toggle', async () => {
+      const { webview, sendMessage } = resolveProvider(provider);
+      provider.setInstalledSkills([
+        makeInstalledCard({ name: 'my-skill', path: '/home/user/.claude/skills/my-skill' }),
+      ]);
+
+      // User toggles OFF
+      await sendMessage({ command: 'toggleAutoInvoke', payload: { folderName: 'my-skill', disable: true } });
+      webview.postMessage.mockClear();
+
+      // Stale rescan pushes old data (disableModelInvocation: false/undefined)
+      provider.setInstalledSkills([
+        makeInstalledCard({ name: 'my-skill', path: '/home/user/.claude/skills/my-skill', disableModelInvocation: false }),
+      ]);
+
+      // Provider should patch the stale value
+      const call = webview.postMessage.mock.calls.find(
+        (c: unknown[]) => (c[0] as any).command === 'installedSkillsData',
+      );
+      expect(call).toBeDefined();
+      expect(call![0].payload[0].disableModelInvocation).toBe(true);
+    });
   });
 
   describe('openSkillFile', () => {

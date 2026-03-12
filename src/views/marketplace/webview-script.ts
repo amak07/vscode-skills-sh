@@ -179,7 +179,7 @@ export function renderInstalledCard(
   const scopeLabel = skill.scope === 'project' ? 'project' : 'global';
   const agentNames = (skill.agents || []).filter(function (a) { return a !== 'skills.sh'; });
   const agentCount = agentNames.length;
-  const cardCls = 'installed-card' + (disabled ? ' card-disabled' : '');
+  const cardCls = 'installed-card';
 
   let primaryBtn: string;
   if (skill.hasUpdate) {
@@ -337,7 +337,7 @@ export function renderDetailHtml(detail: DetailData): string {
     + (agentRows ? '<div class="sidebar-section"><div class="sidebar-label">Installs by Agent</div>'
       + '<div class="agent-table">' + agentRows + '</div></div>' : '')
     + (function () {
-        var localAgents = (detail.agents || []).filter(function (a) { return a !== 'skills.sh'; });
+        const localAgents = (detail.agents || []).filter(function (a) { return a !== 'skills.sh'; });
         if (localAgents.length === 0) { return ''; }
         return '<div class="sidebar-section"><div class="sidebar-label">Installed In</div>'
           + '<div class="row-agents">' + localAgents.map(function (a) {
@@ -417,8 +417,10 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
   let installedSkills: InstalledSkillData[] = [];
   let installedSkillsLoaded = false;
-  var pendingToggles = new Map<string, boolean>(); // folderName → expected disableModelInvocation
+  const pendingToggles = new Map<string, boolean>(); // folderName → expected disableModelInvocation
+  const pendingToggleTimers = new Map<string, ReturnType<typeof setTimeout>>();
   let manifestSkillNames = new Set<string>();
+  let infoBannerDismissed = false;
   let navStack: Array<{
     view: string; tab: string; query: string; scrollY: number;
     html: string; heroVisible: boolean; leaderboardChrome: boolean;
@@ -740,6 +742,15 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
   resultsEl.addEventListener('click', (e) => {
     const target = e.target as HTMLElement;
 
+    // Handle info banner dismiss
+    const dismissBtn = target.closest('[data-dismiss-info]') as HTMLElement | null;
+    if (dismissBtn) {
+      infoBannerDismissed = true;
+      const banner = dismissBtn.closest('.info-banner');
+      if (banner) banner.remove();
+      return;
+    }
+
     // Handle auto-invoke toggle click
     const toggleEl = target.closest('[data-toggle-invoke]') as HTMLElement | null;
     if (toggleEl) {
@@ -748,15 +759,19 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
         const switchEl = toggleEl.querySelector('.toggle-switch');
         const isCurrentlyOn = switchEl?.classList.contains('on');
         const newDisable = isCurrentlyOn; // turning OFF = disable true
+        const prevTimer = pendingToggleTimers.get(folderName);
+        if (prevTimer) clearTimeout(prevTimer);
         pendingToggles.set(folderName, newDisable);
-        setTimeout(function () { pendingToggles.delete(folderName); }, 3000);
+        pendingToggleTimers.set(folderName, setTimeout(function () {
+          pendingToggles.delete(folderName);
+          pendingToggleTimers.delete(folderName);
+        }, 10000));
         api.postMessage({ command: 'toggleAutoInvoke', payload: { folderName: folderName, disable: newDisable } });
         // Optimistic UI update
         if (switchEl) switchEl.classList.toggle('on');
         const label = toggleEl.querySelector('span:last-child');
         if (label) label.textContent = 'Auto-invoke: ' + (newDisable ? 'OFF' : 'ON');
         const card = toggleEl.closest('.installed-card');
-        if (card) card.classList.toggle('card-disabled', !!newDisable);
         const dot = card?.querySelector('.status-dot');
         if (dot) {
           dot.classList.toggle('status-dot-on', !newDisable);
@@ -818,8 +833,13 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
     }
 
     // Handle collapsible group headers (Installed tab)
-    const groupHeader = target.closest('.installed-group-header');
+    const groupHeader = target.closest('.installed-group-header') as HTMLElement | null;
     if (groupHeader) {
+      // Debounce rapid clicks — ignore if toggled within 200ms
+      const now = Date.now();
+      const last = parseInt(groupHeader.dataset.lastToggle || '0', 10);
+      if (now - last < 200) return;
+      groupHeader.dataset.lastToggle = String(now);
       const body = groupHeader.nextElementSibling;
       if (body) body.classList.toggle('open');
       groupHeader.classList.toggle('collapsed');
@@ -1053,12 +1073,7 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
       case 'installedSkillsData': {
         installedSkills = (msg.payload || []).map(function (s: InstalledSkillData) {
           if (pendingToggles.has(s.folderName)) {
-            var expected = pendingToggles.get(s.folderName);
-            if (s.disableModelInvocation === expected) {
-              pendingToggles.delete(s.folderName);
-            } else {
-              return Object.assign({}, s, { disableModelInvocation: expected });
-            }
+            return Object.assign({}, s, { disableModelInvocation: pendingToggles.get(s.folderName) });
           }
           return s;
         });
@@ -1195,6 +1210,18 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
           + '<button class="btn-install btn-install-missing">Install Missing</button>'
           + '</div>';
       }
+    }
+
+    if (!infoBannerDismissed) {
+      html += '<div class="info-banner">'
+        + '<svg class="info-banner-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">'
+        + '<circle cx="8" cy="8" r="6.25"/><line x1="8" y1="7" x2="8" y2="11"/><circle cx="8" cy="5" r="0.5" fill="currentColor" stroke="none"/>'
+        + '</svg>'
+        + '<span>Agents like Claude Code, Cursor, and Windsurf auto-invoke skills by default based on context. '
+        + 'Use the toggle to control which skills can auto-invoke. '
+        + '<a href="https://docs.anthropic.com/en/docs/claude-code/skills" title="Claude Code Skills documentation">Learn more</a></span>'
+        + '<button class="dismiss-banner" data-dismiss-info title="Dismiss">&times;</button>'
+        + '</div>';
     }
 
     const updates: InstalledSkillData[] = [];

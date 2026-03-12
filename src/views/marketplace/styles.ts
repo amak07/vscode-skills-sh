@@ -959,11 +959,54 @@ export function getStyles(fontUri: string): string {
     .installed-card:hover {
       border-color: var(--gray-400);
     }
-    .installed-card.card-disabled {
-      opacity: 0.55;
+    /* Info banner */
+    .info-banner {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      padding: 0.625rem 0.75rem;
+      margin-bottom: 0.75rem;
+      border-radius: var(--radius);
+      background: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      font-size: 0.75rem;
+      line-height: 1.45;
+      color: var(--gray-900);
     }
-    .installed-card.card-disabled:hover {
-      opacity: 0.75;
+    .info-banner-icon {
+      flex-shrink: 0;
+      width: 14px;
+      height: 14px;
+      margin-top: 1px;
+      color: var(--gray-600);
+    }
+    .info-banner a {
+      color: var(--blue-600);
+      text-decoration: none;
+    }
+    .info-banner a:hover {
+      text-decoration: underline;
+    }
+    .info-banner .dismiss-banner {
+      flex-shrink: 0;
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: var(--gray-600);
+      cursor: pointer;
+      padding: 0;
+      font-size: 1rem;
+      line-height: 1;
+    }
+    .info-banner .dismiss-banner:hover {
+      color: var(--gray-900);
+    }
+    .info-banner code {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      background: var(--gray-200);
+      padding: 0.1rem 0.3rem;
+      border-radius: var(--radius-sm);
     }
     /* Card header: status dot + name */
     .card-header {
@@ -1202,6 +1245,13 @@ export function getStyles(fontUri: string): string {
       padding: 0.375rem 0.5rem;
       font-size: 0.75rem;
       text-align: center;
+    }
+
+    /* === Action button row === */
+    .row-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
     }
 
     /* === Action buttons with icons === */

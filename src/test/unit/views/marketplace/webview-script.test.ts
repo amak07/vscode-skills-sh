@@ -293,10 +293,9 @@ describe('renderInstalledCard', () => {
     expect(html).toContain('status-dot-on');
     expect(html).toContain('toggle-switch on');
     expect(html).toContain('Auto-invoke: ON');
-    expect(html).not.toContain('card-disabled');
   });
 
-  it('renders disabled skill with status-dot-off and card-disabled', () => {
+  it('renders disabled skill with status-dot-off', () => {
     const skill: InstalledSkillData = {
       name: 'Disabled Skill', folderName: 'disabled',
       source: 'owner/repo', scope: 'global',
@@ -306,7 +305,6 @@ describe('renderInstalledCard', () => {
     expect(html).toContain('status-dot-off');
     expect(html).not.toContain('toggle-switch on');
     expect(html).toContain('Auto-invoke: OFF');
-    expect(html).toContain('card-disabled');
   });
 
   it('renders scope badge and agent count in meta', () => {
@@ -1138,7 +1136,6 @@ describe('initializeWebview', () => {
       });
       // Optimistic UI updates
       expect(results.querySelector('.toggle-switch')!.classList.contains('on')).toBe(false);
-      expect(results.querySelector('.installed-card')!.classList.contains('card-disabled')).toBe(true);
       expect(results.querySelector('.status-dot')!.classList.contains('status-dot-off')).toBe(true);
       expect(results.querySelector('.card-toggle span:last-child')!.textContent).toBe('Auto-invoke: OFF');
     });
@@ -1146,7 +1143,7 @@ describe('initializeWebview', () => {
     it('clicking toggle on disabled skill re-enables it', () => {
       initializeWebview(api, config);
       const results = document.getElementById('results')!;
-      results.innerHTML = '<div class="installed-card card-disabled">'
+      results.innerHTML = '<div class="installed-card">'
         + '<div class="card-header"><span class="status-dot status-dot-off"></span></div>'
         + '<div class="card-toggle" data-toggle-invoke="my-skill">'
         + '<span class="toggle-switch"></span>'
@@ -1161,7 +1158,6 @@ describe('initializeWebview', () => {
         payload: { folderName: 'my-skill', disable: false },
       });
       expect(results.querySelector('.toggle-switch')!.classList.contains('on')).toBe(true);
-      expect(results.querySelector('.installed-card')!.classList.contains('card-disabled')).toBe(false);
       expect(results.querySelector('.status-dot')!.classList.contains('status-dot-on')).toBe(true);
     });
     it('stale installedSkillsData does not overwrite optimistic toggle state', () => {
@@ -1191,10 +1187,9 @@ describe('initializeWebview', () => {
 
       // Toggle should still show OFF (the inflight guard patches the stale data)
       expect(results.querySelector('.toggle-switch')!.classList.contains('on')).toBe(false);
-      expect(results.querySelector('.installed-card')!.classList.contains('card-disabled')).toBe(true);
     });
 
-    it('matching installedSkillsData clears pending toggle and renders correctly', () => {
+    it('guard keeps patching even after matching data arrives (stale rescan protection)', () => {
       initializeWebview(api, config);
       window.dispatchEvent(new MessageEvent('message', {
         data: {
@@ -1209,7 +1204,7 @@ describe('initializeWebview', () => {
       const results = document.getElementById('results')!;
       results.querySelector('[data-toggle-invoke]')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
-      // Now send MATCHING data (disableModelInvocation: true — same as what we toggled to)
+      // Send MATCHING data (disableModelInvocation: true — same as what we toggled to)
       window.dispatchEvent(new MessageEvent('message', {
         data: {
           command: 'installedSkillsData',
@@ -1219,9 +1214,8 @@ describe('initializeWebview', () => {
 
       // Toggle should show OFF (confirmed state)
       expect(results.querySelector('.toggle-switch')!.classList.contains('on')).toBe(false);
-      expect(results.querySelector('.installed-card')!.classList.contains('card-disabled')).toBe(true);
 
-      // Send another update — should render without guard (pending was cleared)
+      // Send STALE data (from in-flight rescan that started before toggle write)
       window.dispatchEvent(new MessageEvent('message', {
         data: {
           command: 'installedSkillsData',
@@ -1229,9 +1223,8 @@ describe('initializeWebview', () => {
         },
       }));
 
-      // Now it SHOULD reflect the new data (guard cleared, no longer patching)
-      expect(results.querySelector('.toggle-switch')!.classList.contains('on')).toBe(true);
-      expect(results.querySelector('.installed-card')!.classList.contains('card-disabled')).toBe(false);
+      // Guard still active — should STILL show OFF (patched), not revert to ON
+      expect(results.querySelector('.toggle-switch')!.classList.contains('on')).toBe(false);
     });
 
     it('rapid toggle OFF then ON preserves final state', () => {
@@ -1261,7 +1254,6 @@ describe('initializeWebview', () => {
 
       // Should show ON (the final toggle state was disable=false, i.e. ON)
       expect(results.querySelector('.toggle-switch')!.classList.contains('on')).toBe(true);
-      expect(results.querySelector('.installed-card')!.classList.contains('card-disabled')).toBe(false);
     });
   });
 
@@ -1346,6 +1338,101 @@ describe('initializeWebview', () => {
         command: 'removeFromManifest',
         payload: { skillName: 'test-skill' },
       });
+    });
+  });
+
+  describe('info banner', () => {
+    it('renders info banner in installed tab', () => {
+      initializeWebview(api, config);
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'test-skill', source: 'a/b', scope: 'global' }],
+        },
+      }));
+      const installedTab = document.querySelector('.tab[data-tab="installed"]') as HTMLElement;
+      installedTab.click();
+
+      const results = document.getElementById('results')!;
+      const banner = results.querySelector('.info-banner');
+      expect(banner).not.toBeNull();
+      expect(banner!.textContent).toContain('auto-invoke');
+      expect(banner!.querySelector('a[href*="anthropic"]')).not.toBeNull();
+    });
+
+    it('dismiss button removes the info banner', () => {
+      initializeWebview(api, config);
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'test-skill', source: 'a/b', scope: 'global' }],
+        },
+      }));
+      const installedTab = document.querySelector('.tab[data-tab="installed"]') as HTMLElement;
+      installedTab.click();
+
+      const results = document.getElementById('results')!;
+      const dismissBtn = results.querySelector('[data-dismiss-info]') as HTMLElement;
+      expect(dismissBtn).not.toBeNull();
+      dismissBtn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(results.querySelector('.info-banner')).toBeNull();
+    });
+
+    it('banner stays dismissed after tab switch', () => {
+      initializeWebview(api, config);
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'test-skill', source: 'a/b', scope: 'global' }],
+        },
+      }));
+      const installedTab = document.querySelector('.tab[data-tab="installed"]') as HTMLElement;
+      installedTab.click();
+
+      // Dismiss
+      const results = document.getElementById('results')!;
+      const dismissBtn = results.querySelector('[data-dismiss-info]') as HTMLElement;
+      dismissBtn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      // Switch away and back
+      const weeklyTab = document.querySelector('.tab[data-tab="weekly"]') as HTMLElement;
+      weeklyTab.click();
+      installedTab.click();
+
+      expect(results.querySelector('.info-banner')).toBeNull();
+    });
+  });
+
+  describe('accordion debounce', () => {
+    it('rapid clicks within 200ms do not double-toggle group header', () => {
+      initializeWebview(api, config);
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'test-skill', source: 'a/b', scope: 'global' }],
+        },
+      }));
+      const installedTab = document.querySelector('.tab[data-tab="installed"]') as HTMLElement;
+      installedTab.click();
+
+      const results = document.getElementById('results')!;
+      const header = results.querySelector('.installed-group-header') as HTMLElement;
+      const body = header.nextElementSibling as HTMLElement;
+      expect(header).not.toBeNull();
+
+      const wasCollapsed = header.classList.contains('collapsed');
+      const wasOpen = body.classList.contains('open');
+
+      // First click — toggles
+      header.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      expect(header.classList.contains('collapsed')).toBe(!wasCollapsed);
+      expect(body.classList.contains('open')).toBe(!wasOpen);
+
+      // Immediate second click — should be debounced (no change)
+      header.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      expect(header.classList.contains('collapsed')).toBe(!wasCollapsed);
+      expect(body.classList.contains('open')).toBe(!wasOpen);
     });
   });
 

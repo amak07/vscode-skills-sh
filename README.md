@@ -60,7 +60,8 @@
 
 ### Installed Skills
 
-- TreeView showing all installed skills grouped by source repository
+- **Card grid layout** — visual cards with status indicators, grouped by source
+- **Auto-invoke control** — toggle whether each skill can be auto-invoked by AI agents. By default, agents like Claude Code, Cursor, and Windsurf automatically invoke skills based on context — use the per-skill toggle to disable this for skills you want to invoke manually (`/skill-name`).
 - **Multi-agent awareness** — see which AI tools have each skill (Claude Code, Cursor, Windsurf, etc.)
 - Global (`~/.agents/skills/`) and project-level (`.claude/skills/`) scopes
 - "My Skills" group for locally-authored custom skills
