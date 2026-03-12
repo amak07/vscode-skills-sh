@@ -3,6 +3,7 @@ import { SkillScanner } from './local/scanner';
 import { SkillWatcher } from './local/watcher';
 import { InstalledSkillsTreeProvider } from './views/installed-tree';
 import { MarketplaceViewProvider } from './views/marketplace/provider';
+import { WelcomeViewProvider } from './views/welcome/provider';
 import { updateSkills, uninstallSkill, disposeTerminal, notifyInstallDetected, onOperationCompleted } from './install/installer';
 import { checkUpdates, getLastUpdateResult, clearUpdateForSkill } from './api/updates';
 import { InstalledSkill, InstalledSkillCard } from './types';
@@ -31,6 +32,7 @@ export function activate(context: vscode.ExtensionContext) {
   const scanner = new SkillScanner();
   const treeProvider = new InstalledSkillsTreeProvider(scanner);
   marketplaceProvider = new MarketplaceViewProvider(context.extensionUri, () => treeProvider.refresh());
+  const welcomeProvider = new WelcomeViewProvider(context.extensionUri);
 
   // Register TreeView
   const treeView = vscode.window.createTreeView('skills-sh.installedSkills', {
@@ -431,6 +433,12 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
+    vscode.commands.registerCommand('skills-sh.openWelcome', () => {
+      welcomeProvider.openWelcomePage();
+    })
+  );
+
+  context.subscriptions.push(
     vscode.commands.registerCommand('skills-sh.viewInstalledInEditor', () => {
       marketplaceProvider.openInTab('installed');
     })
@@ -632,11 +640,11 @@ export function activate(context: vscode.ExtensionContext) {
   treeProvider.rescan().then(() => {
     syncAllState();
 
-    // Auto-open marketplace tab on first activation with no skills
+    // Auto-open welcome page on first activation (regardless of skill count)
     const hasSeenOnboarding = context.globalState.get<boolean>('skills-sh.hasSeenOnboarding', false);
-    if (treeProvider.getInstalledSkillNames().size === 0 && !hasSeenOnboarding) {
+    if (!hasSeenOnboarding) {
       context.globalState.update('skills-sh.hasSeenOnboarding', true);
-      marketplaceProvider.openInTab();
+      welcomeProvider.openWelcomePage();
     }
 
     // Show diagnostic notification if no skills found

@@ -198,6 +198,11 @@
         "command": "skills-sh.viewInstalledInEditor",
         "title": "View Installed Skills in Editor",
         "category": "Skills.sh"
+      },
+      {
+        "command": "skills-sh.openWelcome",
+        "title": "Open Welcome Page",
+        "category": "Skills.sh"
       }
     ],
     "menus": {
@@ -385,7 +390,7 @@
           {
             "id": "skills-sh.allSet",
             "title": "You're All Set!",
-            "description": "Your skills are ready! Here's what you can do next:\n\n- View your installed skills in the sidebar\n- Check for updates — we'll notify you when skills have new versions\n- Add skills to your project's skills.json to share with your team\n\n[Open Settings](command:skills-sh.openSettings) | [Read Documentation](command:skills-sh.openDocs)",
+            "description": "Your skills are ready! Here's what you can do next:\n\n- View your installed skills in the sidebar\n- Check for updates — we'll notify you when skills have new versions\n- Add skills to your project's skills.json to share with your team\n\n[Open Welcome Page](command:skills-sh.openWelcome) | [Open Settings](command:skills-sh.openSettings) | [Read Documentation](command:skills-sh.openDocs)",
             "media": {
               "svg": "media/walkthrough/complete.svg"
             },

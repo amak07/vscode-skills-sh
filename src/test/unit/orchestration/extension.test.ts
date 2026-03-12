@@ -22,6 +22,7 @@ const {
   mockNotifyInstallDetected, mockSearchSkills, mockCheckUpdates,
   mockClearUpdateForSkill, mockSetInstalledNames, mockSetUpdatableNames,
   mockSetInstalledSkills, mockNavigateTo, mockOpenInTab, mockMarketplaceDispose,
+  mockOpenWelcomePage,
   operationCompletedEmitter, installDetectedEmitter,
   getMockLastUpdateResult, setMockLastUpdateResult,
 } = vi.hoisted(() => {
@@ -54,6 +55,7 @@ const {
     mockNavigateTo: vi.fn(),
     mockOpenInTab: vi.fn(),
     mockMarketplaceDispose: vi.fn(),
+    mockOpenWelcomePage: vi.fn(),
     operationCompletedEmitter: createEvent<void>(),
     installDetectedEmitter: createEvent<string>(),
     getMockLastUpdateResult: () => _lastUpdateResult,
@@ -116,6 +118,13 @@ vi.mock('../../../views/marketplace/provider', () => ({
     openInTab = mockOpenInTab;
     dispose = mockMarketplaceDispose;
     resolveWebviewView() {}
+  },
+  getNonce: () => 'test-nonce',
+}));
+
+vi.mock('../../../views/welcome/provider', () => ({
+  WelcomeViewProvider: class MockWelcomeViewProvider {
+    openWelcomePage = mockOpenWelcomePage;
   },
 }));
 
@@ -1333,54 +1342,54 @@ describe('deactivate', () => {
 // ===========================================================================
 
 // ===========================================================================
-// Onboarding — auto-open marketplace tab on first activation
+// Onboarding — auto-open welcome page on first activation
 // ===========================================================================
 
-describe('onboarding auto-open marketplace tab', () => {
-  it('opens marketplace tab on first activation with no skills', async () => {
+describe('onboarding auto-open welcome page', () => {
+  it('opens welcome page on first activation', async () => {
     // Re-activate with a fresh context, using a generous flush for real I/O
     ctx.dispose();
     const freshCtx = makeContext();
-    mockOpenInTab.mockClear();
+    mockOpenWelcomePage.mockClear();
 
     activate(freshCtx);
     // Real filesystem scan needs more than one tick to complete
     await new Promise(resolve => setTimeout(resolve, 200));
 
-    expect(mockOpenInTab).toHaveBeenCalled();
+    expect(mockOpenWelcomePage).toHaveBeenCalled();
     expect(freshCtx.globalState.get('skills-sh.hasSeenOnboarding', false)).toBe(true);
 
     freshCtx.dispose();
   });
 
-  it('does NOT open marketplace tab when hasSeenOnboarding flag is set', async () => {
+  it('does NOT open welcome page when hasSeenOnboarding flag is set', async () => {
     // Drain any pending callbacks from the beforeEach activation's rescan
     await new Promise(resolve => setTimeout(resolve, 200));
     ctx.dispose();
     const freshCtx = makeContext();
     // Pre-set the flag to simulate a second activation
     freshCtx.globalState.update('skills-sh.hasSeenOnboarding', true);
-    mockOpenInTab.mockClear();
+    mockOpenWelcomePage.mockClear();
 
     activate(freshCtx);
     await new Promise(resolve => setTimeout(resolve, 200));
 
-    expect(mockOpenInTab).not.toHaveBeenCalled();
+    expect(mockOpenWelcomePage).not.toHaveBeenCalled();
 
     freshCtx.dispose();
   });
 
-  it('does NOT open marketplace tab when skills already exist', async () => {
+  it('opens welcome page even when skills already exist', async () => {
     ctx.dispose();
     sandbox.createSkill(sandbox.globalSkillsDir, 'test-skill');
     const freshCtx = makeContext();
-    mockOpenInTab.mockClear();
+    mockOpenWelcomePage.mockClear();
 
     activate(freshCtx);
     await new Promise(resolve => setTimeout(resolve, 200));
 
-    expect(mockOpenInTab).not.toHaveBeenCalled();
-    expect(freshCtx.globalState.get('skills-sh.hasSeenOnboarding', false)).toBe(false);
+    expect(mockOpenWelcomePage).toHaveBeenCalled();
+    expect(freshCtx.globalState.get('skills-sh.hasSeenOnboarding', false)).toBe(true);
 
     freshCtx.dispose();
   });
@@ -1404,6 +1413,7 @@ describe('command registration', () => {
       'skills-sh.copySkillPath',
       'skills-sh.viewInstalledInEditor',
       'skills-sh.openMarketplaceTab',
+      'skills-sh.openWelcome',
       'skills-sh.openAudits',
       'skills-sh.openDocs',
       'skills-sh.openSettings',

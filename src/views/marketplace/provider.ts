@@ -506,7 +506,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
   }
 }
 
-function getNonce(): string {
+export function getNonce(): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let nonce = '';
   for (let i = 0; i < 32; i++) {
