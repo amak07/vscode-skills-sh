@@ -53,8 +53,19 @@ function makeApi(overrides: Partial<VsCodeApi> = {}): VsCodeApi {
 
 function setupMinimalDom(): void {
   document.body.innerHTML = `
-    <nav><span class="nav-brand">skills.sh</span></nav>
-    <div class="hero"><pre class="hero-ascii"></pre></div>
+    <nav>
+      <span class="nav-brand">skills.sh</span>
+      <a data-nav-page="audits">Audits</a>
+      <a data-nav-page="docs">Docs</a>
+    </nav>
+    <div class="hero">
+      <pre class="hero-ascii"></pre>
+      <div class="hero-cmd-line">
+        <span class="hero-cmd-prefix">npx skills</span>
+        <span id="heroCmdCarousel"><span class="hero-cmd-item active">add &lt;owner/repo&gt;</span></span>
+        <span id="heroCopyIcon" class="hero-copy-icon"><svg id="copy-svg"></svg></span>
+      </div>
+    </div>
     <div class="hero-leaderboard-heading"></div>
     <div class="container">
       <div class="search-container">
@@ -607,6 +618,11 @@ describe('initializeWebview', () => {
     setupMinimalDom();
     api = makeApi();
     config = makeConfig();
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText: vi.fn().mockResolvedValue(undefined) },
+      writable: true,
+      configurable: true,
+    });
   });
 
   afterEach(() => {
@@ -1002,6 +1018,59 @@ describe('initializeWebview', () => {
       const allTimeTab = document.querySelector('.tab[data-tab="all-time"]')!;
       expect(allTimeTab.textContent).toContain('150');
     });
+
+    it('switchTab message activates the specified tab and sends leaderboard command', () => {
+      initializeWebview(api, config);
+      (api.postMessage as ReturnType<typeof vi.fn>).mockClear();
+
+      window.dispatchEvent(new MessageEvent('message', {
+        data: { command: 'switchTab', payload: { tab: 'weekly' } },
+      }));
+
+      const weeklyTab = document.querySelector('.tab[data-tab="weekly"]')!;
+      expect(weeklyTab.classList.contains('active')).toBe(true);
+      expect(api.postMessage).toHaveBeenCalledWith({
+        command: 'leaderboard',
+        payload: { view: 'weekly', page: 0 },
+      });
+    });
+
+    it('switchTab to installed renders installed view', () => {
+      initializeWebview(api, config);
+      // Pre-load installed data
+      window.dispatchEvent(new MessageEvent('message', {
+        data: { command: 'installedSkillsData', payload: [] },
+      }));
+
+      window.dispatchEvent(new MessageEvent('message', {
+        data: { command: 'switchTab', payload: { tab: 'installed' } },
+      }));
+
+      const installedTab = document.querySelector('.tab[data-tab="installed"]')!;
+      expect(installedTab.classList.contains('active')).toBe(true);
+      const results = document.getElementById('results')!;
+      expect(results.innerHTML).toContain('No skills installed');
+    });
+
+    it('navigateToDetail message creates overlay and sends detail command', () => {
+      initializeWebview(api, config);
+      (api.postMessage as ReturnType<typeof vi.fn>).mockClear();
+
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'navigateToDetail',
+          payload: { source: 'owner/repo', skillId: 'my-skill' },
+        },
+      }));
+
+      const overlay = document.getElementById('detail-overlay');
+      expect(overlay).not.toBeNull();
+      expect(overlay!.innerHTML).toContain('Loading skill details');
+      expect(api.postMessage).toHaveBeenCalledWith({
+        command: 'detail',
+        payload: { source: 'owner/repo', skillId: 'my-skill' },
+      });
+    });
   });
 
   describe('results click delegation', () => {
@@ -1339,6 +1408,22 @@ describe('initializeWebview', () => {
         payload: { skillName: 'test-skill' },
       });
     });
+
+    it('clicking "Copy path" copies skill path to clipboard', () => {
+      initializeWebview(api, config);
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'installedSkillsData',
+          payload: [{ name: 'Test', folderName: 'test-skill', source: 'a/b', scope: 'global', path: '/home/user/.claude/skills/test-skill' }],
+        },
+      }));
+      const results = document.getElementById('results')!;
+      results.innerHTML = '<button class="overflow-menu-item" data-action="copy-path" data-folder="test-skill">Copy path</button>';
+
+      results.querySelector('.overflow-menu-item')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith('/home/user/.claude/skills/test-skill');
+    });
   });
 
   describe('info banner', () => {
@@ -1433,6 +1518,462 @@ describe('initializeWebview', () => {
       header.dispatchEvent(new MouseEvent('click', { bubbles: true }));
       expect(header.classList.contains('collapsed')).toBe(!wasCollapsed);
       expect(body.classList.contains('open')).toBe(!wasOpen);
+    });
+  });
+
+  describe('detail view interactions (end-to-end)', () => {
+    function openDetail(overrides: Partial<DetailData> = {}): void {
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'detailResult',
+          payload: {
+            name: 'test-skill',
+            source: 'owner/repo',
+            installCommand: 'npx skills add owner/repo',
+            ...overrides,
+          },
+        },
+      }));
+    }
+
+    /** Push navStack entry by clicking a grid row, then dispatch detailResult */
+    function openDetailWithNavStack(overrides: Partial<DetailData> = {}): void {
+      // Insert a grid row in results and click it to push onto navStack
+      const results = document.getElementById('results')!;
+      results.innerHTML = '<div class="grid-row" data-source="owner/repo" data-skill="test-skill"><span>click</span></div>';
+      results.querySelector('.grid-row')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      // Now dispatch detailResult to fill the overlay
+      openDetail(overrides);
+    }
+
+    it('uninstall button in overlay sends uninstall command', () => {
+      initializeWebview(api, config);
+      openDetail({ isInstalled: true });
+
+      const overlay = document.getElementById('detail-overlay')!;
+      const removeBtn = overlay.querySelector('.btn-action-remove') as HTMLElement;
+      expect(removeBtn).not.toBeNull();
+
+      (api.postMessage as ReturnType<typeof vi.fn>).mockClear();
+      removeBtn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(api.postMessage).toHaveBeenCalledWith({
+        command: 'uninstall',
+        payload: { skillName: 'test-skill' },
+      });
+    });
+
+    it('uninstall button shows "Removing..." and disables', () => {
+      initializeWebview(api, config);
+      openDetail({ isInstalled: true });
+
+      const overlay = document.getElementById('detail-overlay')!;
+      const removeBtn = overlay.querySelector('.btn-action-remove') as HTMLButtonElement;
+      removeBtn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(removeBtn.disabled).toBe(true);
+      expect(removeBtn.querySelector('span')!.textContent).toBe('Removing...');
+    });
+
+    it('update button in overlay sends update command', () => {
+      initializeWebview(api, config);
+      openDetail({ isInstalled: true, hasUpdate: true });
+
+      const overlay = document.getElementById('detail-overlay')!;
+      const updateBtn = overlay.querySelector('.btn-action-update') as HTMLElement;
+      expect(updateBtn).not.toBeNull();
+
+      (api.postMessage as ReturnType<typeof vi.fn>).mockClear();
+      updateBtn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(api.postMessage).toHaveBeenCalledWith({
+        command: 'update',
+        payload: { skillName: 'test-skill' },
+      });
+    });
+
+    it('update button shows "Updating..." and disables', () => {
+      initializeWebview(api, config);
+      openDetail({ isInstalled: true, hasUpdate: true });
+
+      const overlay = document.getElementById('detail-overlay')!;
+      const updateBtn = overlay.querySelector('.btn-action-update') as HTMLButtonElement;
+      updateBtn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(updateBtn.disabled).toBe(true);
+      expect(updateBtn.querySelector('span')!.textContent).toBe('Updating...');
+    });
+
+    it('manifest button renders without active class when not in manifest', () => {
+      initializeWebview(api, config);
+      openDetail({ isInstalled: true, source: 'a/b' });
+
+      const overlay = document.getElementById('detail-overlay')!;
+      const manifestBtn = overlay.querySelector('.btn-action-manifest') as HTMLButtonElement;
+      expect(manifestBtn).not.toBeNull();
+      expect(manifestBtn.classList.contains('btn-action-active')).toBe(false);
+      expect(manifestBtn.dataset.source).toBe('a/b');
+      expect(manifestBtn.dataset.skillName).toBe('test-skill');
+      expect(manifestBtn.querySelector('span')!.textContent).toBe('Add to Skills.json');
+    });
+
+    it('manifest button renders with active class when in manifest', () => {
+      initializeWebview(api, config);
+      openDetail({ isInstalled: true, inManifest: true, source: 'a/b' });
+
+      const overlay = document.getElementById('detail-overlay')!;
+      const manifestBtn = overlay.querySelector('.btn-action-manifest') as HTMLButtonElement;
+      expect(manifestBtn).not.toBeNull();
+      expect(manifestBtn.classList.contains('btn-action-active')).toBe(true);
+      expect(manifestBtn.querySelector('span')!.textContent).toBe('Remove from Skills.json');
+    });
+
+    it('install button sends install command', () => {
+      initializeWebview(api, config);
+      openDetail({ isInstalled: false, source: 'a/b' });
+
+      const overlay = document.getElementById('detail-overlay')!;
+      const installBtn = overlay.querySelector('.btn-install') as HTMLElement;
+      expect(installBtn).not.toBeNull();
+
+      (api.postMessage as ReturnType<typeof vi.fn>).mockClear();
+      installBtn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(api.postMessage).toHaveBeenCalledWith({
+        command: 'install',
+        payload: { source: 'a/b', skillName: 'test-skill' },
+      });
+    });
+
+    it('install button shows "Installing..." and disables', () => {
+      initializeWebview(api, config);
+      openDetail({ isInstalled: false, source: 'a/b' });
+
+      const overlay = document.getElementById('detail-overlay')!;
+      const installBtn = overlay.querySelector('.btn-install') as HTMLButtonElement;
+      installBtn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(installBtn.disabled).toBe(true);
+      expect(installBtn.textContent).toBe('Installing...');
+    });
+
+    it('back button removes overlay (goBack)', () => {
+      initializeWebview(api, config);
+      openDetailWithNavStack();
+
+      const overlay = document.getElementById('detail-overlay')!;
+      expect(overlay).not.toBeNull();
+
+      const backBtn = overlay.querySelector('#backBtn') as HTMLElement;
+      backBtn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(document.getElementById('detail-overlay')).toBeNull();
+    });
+
+    it('breadcrumb home navigates back', () => {
+      initializeWebview(api, config);
+      openDetailWithNavStack();
+
+      const overlay = document.getElementById('detail-overlay')!;
+      const homeLink = overlay.querySelector('[data-nav="home"]') as HTMLElement;
+      expect(homeLink).not.toBeNull();
+
+      homeLink.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      // goBack removes the overlay
+      expect(document.getElementById('detail-overlay')).toBeNull();
+    });
+
+    it('breadcrumb external sends openExternal', () => {
+      initializeWebview(api, config);
+      openDetail({ source: 'owner/repo', repository: 'owner/repo' });
+
+      const overlay = document.getElementById('detail-overlay')!;
+      const externalLinks = overlay.querySelectorAll('[data-nav="external"]');
+      // Find the owner link
+      const ownerLink = Array.from(externalLinks).find(
+        el => el.getAttribute('data-url') === 'https://skills.sh/owner',
+      ) as HTMLElement;
+      expect(ownerLink).not.toBeNull();
+
+      (api.postMessage as ReturnType<typeof vi.fn>).mockClear();
+      ownerLink.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(api.postMessage).toHaveBeenCalledWith({
+        command: 'openExternal',
+        payload: { url: 'https://skills.sh/owner' },
+      });
+    });
+
+    it('copy command copies install command to clipboard', () => {
+      initializeWebview(api, config);
+      openDetail({ installCommand: 'npx skills add owner/repo' });
+
+      const overlay = document.getElementById('detail-overlay')!;
+      const copyCmd = overlay.querySelector('#copyCmd') as HTMLElement;
+      expect(copyCmd).not.toBeNull();
+
+      copyCmd.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith('npx skills add owner/repo');
+    });
+  });
+
+  describe('audits view interactions', () => {
+    function openAuditsView(): void {
+      initializeWebview(api, config);
+      // Click audits nav link
+      const auditsLink = document.querySelector('[data-nav-page="audits"]') as HTMLElement;
+      (api.postMessage as ReturnType<typeof vi.fn>).mockClear();
+      auditsLink.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    }
+
+    it('clicking audits nav link sends audits command', () => {
+      openAuditsView();
+      expect(api.postMessage).toHaveBeenCalledWith({ command: 'audits' });
+    });
+
+    it('audits row click sends detail command', () => {
+      openAuditsView();
+      // Dispatch auditsResult with a skill row
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'auditsResult',
+          payload: {
+            skills: [{
+              name: 'audit-skill',
+              skillId: 'audit-skill',
+              source: 'owner/audit-repo',
+              audits: [{ status: 'pass' }],
+            }],
+          },
+        },
+      }));
+
+      (api.postMessage as ReturnType<typeof vi.fn>).mockClear();
+      const row = document.querySelector('.audits-row') as HTMLElement;
+      expect(row).not.toBeNull();
+      row.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(api.postMessage).toHaveBeenCalledWith({
+        command: 'detail',
+        payload: { source: 'owner/audit-repo', skillId: 'audit-skill' },
+      });
+    });
+
+    it('audits back button navigates back', () => {
+      openAuditsView();
+      // Dispatch auditsResult
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'auditsResult',
+          payload: { skills: [] },
+        },
+      }));
+
+      (api.postMessage as ReturnType<typeof vi.fn>).mockClear();
+      const backBtn = document.getElementById('backBtn') as HTMLElement;
+      expect(backBtn).not.toBeNull();
+      backBtn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      // navigateBack with previous view on navigationStack sends 'back'
+      expect(api.postMessage).toHaveBeenCalledWith({ command: 'back' });
+    });
+  });
+
+  describe('docs view interactions', () => {
+    function openDocsView(): void {
+      initializeWebview(api, config);
+      const docsLink = document.querySelector('[data-nav-page="docs"]') as HTMLElement;
+      (api.postMessage as ReturnType<typeof vi.fn>).mockClear();
+      docsLink.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    }
+
+    it('clicking docs nav link sends docs command with overview page', () => {
+      openDocsView();
+      expect(api.postMessage).toHaveBeenCalledWith({
+        command: 'docs',
+        payload: { page: 'overview' },
+      });
+    });
+
+    it('docs sidebar link sends docs command with page', () => {
+      openDocsView();
+      // Dispatch docsResult with HTML
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'docsResult',
+          payload: { page: 'overview', title: 'Overview', html: '<p>Hello</p>' },
+        },
+      }));
+
+      (api.postMessage as ReturnType<typeof vi.fn>).mockClear();
+      const cliLink = document.querySelector('[data-docs-page="cli"]') as HTMLElement;
+      expect(cliLink).not.toBeNull();
+      cliLink.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(api.postMessage).toHaveBeenCalledWith({
+        command: 'docs',
+        payload: { page: 'cli' },
+      });
+    });
+
+    it('docs external link sends openExternal', () => {
+      openDocsView();
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'docsResult',
+          payload: {
+            page: 'overview',
+            title: 'Overview',
+            html: '<a data-nav="external" data-url="https://example.com">Link</a>',
+          },
+        },
+      }));
+
+      (api.postMessage as ReturnType<typeof vi.fn>).mockClear();
+      const extLink = document.querySelector('.docs-content [data-nav="external"]') as HTMLElement;
+      expect(extLink).not.toBeNull();
+      extLink.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(api.postMessage).toHaveBeenCalledWith({
+        command: 'openExternal',
+        payload: { url: 'https://example.com' },
+      });
+    });
+
+    it('docs home link navigates back', () => {
+      openDocsView();
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'docsResult',
+          payload: {
+            page: 'overview',
+            title: 'Overview',
+            html: '<a data-nav="home">Home</a>',
+          },
+        },
+      }));
+
+      (api.postMessage as ReturnType<typeof vi.fn>).mockClear();
+      const homeLink = document.querySelector('.docs-content [data-nav="home"]') as HTMLElement;
+      expect(homeLink).not.toBeNull();
+      homeLink.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      // navigateBack pops 'leaderboard' from navigationStack, sends 'back'
+      expect(api.postMessage).toHaveBeenCalledWith({ command: 'back' });
+    });
+
+    it('docs back button navigates back', () => {
+      openDocsView();
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          command: 'docsResult',
+          payload: { page: 'overview', title: 'Overview', html: '' },
+        },
+      }));
+
+      (api.postMessage as ReturnType<typeof vi.fn>).mockClear();
+      const backBtn = document.getElementById('backBtn') as HTMLElement;
+      expect(backBtn).not.toBeNull();
+      backBtn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(api.postMessage).toHaveBeenCalledWith({ command: 'back' });
+    });
+  });
+
+  describe('navigation interactions', () => {
+    it('nav brand click sends back command', () => {
+      initializeWebview(api, config);
+      (api.postMessage as ReturnType<typeof vi.fn>).mockClear();
+
+      const brand = document.querySelector('.nav-brand') as HTMLElement;
+      brand.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(api.postMessage).toHaveBeenCalledWith({ command: 'back' });
+    });
+
+    it('search clear button clears input and focuses it', () => {
+      initializeWebview(api, config);
+      const searchInput = document.getElementById('searchInput') as HTMLInputElement;
+      const searchClear = document.getElementById('searchClear') as HTMLElement;
+
+      // Type something first
+      searchInput.value = 'test query';
+      searchInput.dispatchEvent(new Event('input'));
+
+      searchClear.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(searchInput.value).toBe('');
+      expect(document.activeElement).toBe(searchInput);
+    });
+
+    it('Alt+LeftArrow navigates back when navStack has items', () => {
+      initializeWebview(api, config);
+      // Push onto navStack by clicking a grid row
+      const results = document.getElementById('results')!;
+      results.innerHTML = '<div class="grid-row" data-source="o/r" data-skill="sk"><span>x</span></div>';
+      results.querySelector('.grid-row')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      // Overlay should exist
+      expect(document.getElementById('detail-overlay')).not.toBeNull();
+
+      // Press Alt+ArrowLeft
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', altKey: true }));
+
+      // Overlay should be removed
+      expect(document.getElementById('detail-overlay')).toBeNull();
+    });
+  });
+
+  describe('hero section', () => {
+    it('hero copy icon copies current command to clipboard', () => {
+      initializeWebview(api, config);
+      const heroCopyIcon = document.getElementById('heroCopyIcon') as HTMLElement;
+
+      heroCopyIcon.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith('npx skills add <owner/repo>');
+    });
+
+    it('hero copy icon shows checkmark feedback', () => {
+      initializeWebview(api, config);
+      const heroCopyIcon = document.getElementById('heroCopyIcon') as HTMLElement;
+
+      heroCopyIcon.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(heroCopyIcon.dataset.copying).toBe('true');
+    });
+
+    it('hero carousel rotates after 4 seconds', () => {
+      initializeWebview(api, config);
+      const carousel = document.getElementById('heroCmdCarousel')!;
+
+      // Initially has one active item
+      expect(carousel.querySelector('.hero-cmd-item.active')).not.toBeNull();
+
+      vi.advanceTimersByTime(4000);
+
+      // After 4s, old item gets slide-out class, new item is appended
+      const items = carousel.querySelectorAll('.hero-cmd-item');
+      expect(items.length).toBeGreaterThanOrEqual(2);
+      expect(carousel.querySelector('.hero-cmd-item.slide-out')).not.toBeNull();
+      expect(carousel.querySelector('.hero-cmd-item.slide-in')).not.toBeNull();
+    });
+
+    it('hero carousel completes transition after 300ms', () => {
+      initializeWebview(api, config);
+      const carousel = document.getElementById('heroCmdCarousel')!;
+
+      vi.advanceTimersByTime(4000); // trigger rotation
+      vi.advanceTimersByTime(300);  // complete transition
+
+      // Old item should be removed, new item should be active with text 'update'
+      const activeItem = carousel.querySelector('.hero-cmd-item.active');
+      expect(activeItem).not.toBeNull();
+      expect(activeItem!.textContent).toBe('update');
+      // Only one item should remain
+      expect(carousel.querySelectorAll('.hero-cmd-item').length).toBe(1);
     });
   });
 
