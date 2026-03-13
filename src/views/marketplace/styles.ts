@@ -1390,6 +1390,37 @@ export function getStyles(fontUri: string): string {
       background: rgba(239, 68, 68, 0.1);
     }
 
+    /* --- Composite shield badge (cards) --- */
+    .audit-shield {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      font-weight: 500;
+      padding: 1px 6px;
+      border-radius: var(--radius-sm);
+      white-space: nowrap;
+      flex-shrink: 0;
+      cursor: default;
+    }
+    .audit-shield svg { width: 10px; height: 12px; flex-shrink: 0; }
+    .audit-shield-pass {
+      color: #22c55e;
+      background: rgba(34, 197, 94, 0.08);
+    }
+    .audit-shield-warn {
+      color: #eab308;
+      background: rgba(234, 179, 8, 0.12);
+    }
+    .audit-shield-fail {
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.12);
+    }
+    .light-theme .audit-shield-pass { background: rgba(34, 197, 94, 0.12); }
+    .light-theme .audit-shield-warn { background: rgba(234, 179, 8, 0.15); }
+    .light-theme .audit-shield-fail { background: rgba(239, 68, 68, 0.15); }
+
     /* === Nav Bar (Audits / Docs links) === */
     .nav-bar {
       display: flex;

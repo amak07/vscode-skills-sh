@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll, afterEach, vi } from 'vitest';
-import { fetchAuditListing } from '../../../api/audits-scraper';
+import { fetchAuditListing, computeAuditScore, buildAuditMap } from '../../../api/audits-scraper';
 import { mockFetch, htmlResponse, errorResponse } from '../../helpers/fetch-mock';
 
 // The audits-scraper has a 30-minute module-level cache.
@@ -225,5 +225,121 @@ describe('fetchAuditListing', () => {
     const second = await fetchAuditListing();
     expect(second).toEqual(first);
     expect(fetchFn).toHaveBeenCalledTimes(1);
+  });
+});
+
+// ── computeAuditScore ─────────────────────────────────────────────────
+
+describe('computeAuditScore', () => {
+  it('returns "unknown" for empty audits', () => {
+    expect(computeAuditScore([])).toBe('unknown');
+  });
+
+  it('returns "pass" when all partners pass', () => {
+    expect(computeAuditScore([
+      { partner: 'Gen Agent Trust Hub', status: 'Safe' },
+      { partner: 'Socket', status: '0 alerts' },
+      { partner: 'Snyk', status: 'Low Risk' },
+    ])).toBe('pass');
+  });
+
+  it('returns "pass" for "Pass" status string', () => {
+    expect(computeAuditScore([
+      { partner: 'Gen Agent Trust Hub', status: 'Pass' },
+    ])).toBe('pass');
+  });
+
+  it('returns "warn" when any partner has warn-level status', () => {
+    expect(computeAuditScore([
+      { partner: 'Gen Agent Trust Hub', status: 'Safe' },
+      { partner: 'Socket', status: 'Med Risk' },
+      { partner: 'Snyk', status: 'Pass' },
+    ])).toBe('warn');
+  });
+
+  it('returns "warn" for unrecognized status strings', () => {
+    expect(computeAuditScore([
+      { partner: 'Gen Agent Trust Hub', status: 'Something New' },
+    ])).toBe('warn');
+  });
+
+  it('returns "fail" when any partner has fail-level status', () => {
+    expect(computeAuditScore([
+      { partner: 'Gen Agent Trust Hub', status: 'Safe' },
+      { partner: 'Socket', status: '0 alerts' },
+      { partner: 'Snyk', status: 'Critical' },
+    ])).toBe('fail');
+  });
+
+  it('returns "fail" for "High Risk" status', () => {
+    expect(computeAuditScore([
+      { partner: 'Snyk', status: 'High Risk' },
+    ])).toBe('fail');
+  });
+
+  it('fail takes priority over warn', () => {
+    expect(computeAuditScore([
+      { partner: 'Gen Agent Trust Hub', status: 'Safe' },
+      { partner: 'Socket', status: 'Med Risk' },
+      { partner: 'Snyk', status: 'Fail' },
+    ])).toBe('fail');
+  });
+
+  it('is case-insensitive', () => {
+    expect(computeAuditScore([
+      { partner: 'Test', status: 'SAFE' },
+    ])).toBe('pass');
+    expect(computeAuditScore([
+      { partner: 'Test', status: 'CRITICAL' },
+    ])).toBe('fail');
+  });
+});
+
+// ── buildAuditMap ─────────────────────────────────────────────────────
+
+describe('buildAuditMap', () => {
+  it('builds a map keyed by skillId', () => {
+    const listing = {
+      skills: [
+        {
+          name: 'React Best Practices',
+          source: 'vercel-labs/agent-skills',
+          skillId: 'react-best-practices',
+          audits: [
+            { partner: 'Gen Agent Trust Hub', status: 'Safe' },
+            { partner: 'Socket', status: '0 alerts' },
+            { partner: 'Snyk', status: 'Low Risk' },
+          ],
+        },
+        {
+          name: 'Risky Skill',
+          source: 'acme/repo',
+          skillId: 'risky',
+          audits: [
+            { partner: 'Gen Agent Trust Hub', status: 'Safe' },
+            { partner: 'Socket', status: '5 alerts', alertCount: '5 alerts' },
+            { partner: 'Snyk', status: 'Critical' },
+          ],
+        },
+      ],
+      total: 2,
+    };
+
+    const map = buildAuditMap(listing);
+    expect(map.size).toBe(2);
+
+    const react = map.get('react-best-practices');
+    expect(react).toBeDefined();
+    expect(react!.score).toBe('pass');
+    expect(react!.audits).toHaveLength(3);
+
+    const risky = map.get('risky');
+    expect(risky).toBeDefined();
+    expect(risky!.score).toBe('fail');
+  });
+
+  it('returns empty map for empty listing', () => {
+    const map = buildAuditMap({ skills: [], total: 0 });
+    expect(map.size).toBe(0);
   });
 });

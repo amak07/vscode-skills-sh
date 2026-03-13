@@ -6,7 +6,9 @@ import {
   escapeHtml,
   formatInstalls,
   getAuditBadgeClass,
+  renderAuditShieldBadge,
   setConfig,
+  setAuditMap,
   renderRow,
   renderInstalledRow,
   renderInstalledCard,
@@ -20,6 +22,7 @@ import {
   type SkillData,
   type InstalledSkillData,
   type DetailData,
+  type AuditShieldData,
 } from '../../../../views/marketplace/webview-script';
 
 // ── Helpers ──────────────────────────────────────────────────────────
@@ -165,6 +168,65 @@ describe('getAuditBadgeClass', () => {
 
   it('trims whitespace', () => {
     expect(getAuditBadgeClass('  pass  ')).toBe('audit-badge-pass');
+  });
+});
+
+describe('renderAuditShieldBadge', () => {
+  it('returns empty string for undefined data', () => {
+    expect(renderAuditShieldBadge('test-skill', undefined)).toBe('');
+  });
+
+  it('returns empty string for unknown score', () => {
+    const data: AuditShieldData = { score: 'unknown', audits: [] };
+    expect(renderAuditShieldBadge('test-skill', data)).toBe('');
+  });
+
+  it('renders pass badge with "Audited" label', () => {
+    const data: AuditShieldData = {
+      score: 'pass',
+      audits: [
+        { partner: 'Gen Agent Trust Hub', status: 'Safe' },
+        { partner: 'Socket', status: '0 alerts' },
+        { partner: 'Snyk', status: 'Low Risk' },
+      ],
+    };
+    const html = renderAuditShieldBadge('skill-a', data);
+    expect(html).toContain('audit-shield-pass');
+    expect(html).toContain('Audited');
+    expect(html).toContain('<svg');
+  });
+
+  it('renders warn badge with "Caution" label', () => {
+    const data: AuditShieldData = {
+      score: 'warn',
+      audits: [{ partner: 'Socket', status: 'Med Risk' }],
+    };
+    const html = renderAuditShieldBadge('skill-b', data);
+    expect(html).toContain('audit-shield-warn');
+    expect(html).toContain('Caution');
+  });
+
+  it('renders fail badge with "Risk" label', () => {
+    const data: AuditShieldData = {
+      score: 'fail',
+      audits: [{ partner: 'Snyk', status: 'Critical' }],
+    };
+    const html = renderAuditShieldBadge('skill-c', data);
+    expect(html).toContain('audit-shield-fail');
+    expect(html).toContain('Risk');
+  });
+
+  it('tooltip contains partner breakdown', () => {
+    const data: AuditShieldData = {
+      score: 'pass',
+      audits: [
+        { partner: 'Gen Agent Trust Hub', status: 'Safe' },
+        { partner: 'Socket', status: '0 alerts' },
+      ],
+    };
+    const html = renderAuditShieldBadge('skill-d', data);
+    expect(html).toContain('Gen Agent Trust Hub: Safe');
+    expect(html).toContain('Socket: 0 alerts');
   });
 });
 

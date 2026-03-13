@@ -102,6 +102,42 @@ export function getAuditBadgeClass(status: string): string {
   return 'audit-badge-warn';
 }
 
+// ── Audit shield badge (at-a-glance security) ───────────────────────
+
+export interface AuditShieldData {
+  score: 'pass' | 'warn' | 'fail' | 'unknown';
+  audits: { partner: string; status: string }[];
+}
+
+let _auditMap: Record<string, AuditShieldData> = {};
+
+export function setAuditMap(map: Record<string, AuditShieldData>): void {
+  _auditMap = map;
+}
+
+function shieldSvg(score: string): string {
+  const colors: Record<string, string> = {
+    pass: '#22c55e', warn: '#eab308', fail: '#ef4444',
+  };
+  const c = colors[score] || '#888';
+  return '<svg viewBox="0 0 12 14" fill="none" xmlns="http://www.w3.org/2000/svg">'
+    + '<path d="M6 1L1 3.5V6.5C1 9.8 3.2 12.5 6 13C8.8 12.5 11 9.8 11 6.5V3.5L6 1Z" '
+    + 'fill="' + c + '" fill-opacity="0.2" stroke="' + c + '" stroke-width="1"/></svg>';
+}
+
+export function renderAuditShieldBadge(
+  skillId: string,
+  data?: AuditShieldData,
+): string {
+  if (!data || data.score === 'unknown') { return ''; }
+  const labels: Record<string, string> = { pass: 'Audited', warn: 'Caution', fail: 'Risk' };
+  const label = labels[data.score] || '';
+  const tooltip = data.audits.map(a => a.partner + ': ' + a.status).join('\n');
+  return '<span class="audit-shield audit-shield-' + data.score
+    + '" title="' + escapeHtml(tooltip) + '">'
+    + shieldSvg(data.score) + ' ' + label + '</span>';
+}
+
 // ── Module-level state (set by initializeWebview) ────────────────────
 
 let _icons: WebviewConfig['icons'];
@@ -155,6 +191,7 @@ export function renderRow(
     + '<div class="row-right">'
     + '<span class="row-installs">' + formatInstalls(installs) + '</span>'
     + changeHtml
+    + renderAuditShieldBadge(skillId || '', _auditMap[skillId || ''])
     + '<button class="' + btnClass + '"'
     + ' data-install="' + source + '" data-skill-name="' + skillId + '"'
     + ' onclick="event.stopPropagation()">'
@@ -211,6 +248,7 @@ export function renderInstalledCard(
     + '<div class="card-meta">'
     + '<span class="scope-badge scope-' + scopeLabel + '">' + scopeLabel + '</span>'
     + (agentCount > 0 ? ' &middot; ' + agentCount + ' agent' + (agentCount > 1 ? 's' : '') : '')
+    + renderAuditShieldBadge(skill.folderName, _auditMap[skill.folderName])
     + '</div>'
     // Actions
     + '<div class="card-actions">'
@@ -401,6 +439,30 @@ export function renderDocsView(data: DocsData): string {
     + '<h1 class="detail-title">' + escapeHtml(data.title) + '</h1>'
     + '<div class="prose">' + (data.html || '') + '</div></div>'
     + '</div></div>';
+}
+
+// ── DOM patching for async audit data ────────────────────────────────
+
+function updateAuditBadgesOnCards(): void {
+  // Leaderboard / search rows
+  document.querySelectorAll('.grid-row').forEach(row => {
+    const skillId = (row as HTMLElement).dataset.skill;
+    if (!skillId || !_auditMap[skillId]) { return; }
+    if (row.querySelector('.audit-shield')) { return; }
+    const rightDiv = row.querySelector('.row-right');
+    if (rightDiv) {
+      const btn = rightDiv.querySelector('.btn-install');
+      if (btn) { btn.insertAdjacentHTML('beforebegin', renderAuditShieldBadge(skillId, _auditMap[skillId])); }
+    }
+  });
+  // Installed cards
+  document.querySelectorAll('.installed-card').forEach(card => {
+    const skillId = (card as HTMLElement).dataset.skill;
+    if (!skillId || !_auditMap[skillId]) { return; }
+    if (card.querySelector('.audit-shield')) { return; }
+    const meta = card.querySelector('.card-meta');
+    if (meta) { meta.insertAdjacentHTML('beforeend', renderAuditShieldBadge(skillId, _auditMap[skillId])); }
+  });
 }
 
 // ── Main initialization ──────────────────────────────────────────────
@@ -1044,6 +1106,12 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
         if (currentView === 'installed') {
           renderInstalledView();
         }
+        break;
+      }
+
+      case 'auditMapData': {
+        _auditMap = msg.payload || {};
+        updateAuditBadgesOnCards();
         break;
       }
 

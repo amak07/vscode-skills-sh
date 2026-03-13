@@ -6,6 +6,7 @@ import { MarketplaceViewProvider } from './views/marketplace/provider';
 import { WelcomeViewProvider } from './views/welcome/provider';
 import { updateSkills, uninstallSkill, disposeTerminal, notifyInstallDetected, onOperationCompleted, getUpdatingSkillNames } from './install/installer';
 import { checkUpdates, getLastUpdateResult, clearUpdateForSkill } from './api/updates';
+import { fetchAuditListing, buildAuditMap } from './api/audits-scraper';
 import { InstalledSkill, InstalledSkillCard } from './types';
 import { getLog } from './logger';
 import { addSkillToManifest, removeSkillFromManifest, readManifest, writeManifest, getManifestPath, getMissingSkills, getManifestSkillNames } from './manifest/manifest';
@@ -705,6 +706,13 @@ export function activate(context: vscode.ExtensionContext) {
       });
     }
   });
+
+  // Prefetch audit listing for at-a-glance security badges
+  fetchAuditListing().then(listing => {
+    const auditMap = buildAuditMap(listing);
+    marketplaceProvider.setAuditMap(auditMap);
+    treeProvider.setAuditMap(auditMap);
+  }).catch(() => { /* best-effort — badges simply won't appear */ });
 
   // Silent background update check on startup — populate tree + badge only, no toast
   if (vscode.workspace.getConfiguration('skills-sh').get<boolean>('checkUpdatesOnStartup', true)) {

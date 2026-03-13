@@ -35,6 +35,7 @@ vi.mock('../../../logger', () => ({
 
 import { InstalledSkillsTreeProvider } from '../../../views/installed-tree';
 import { SkillScanner } from '../../../local/scanner';
+import type { AuditMapEntry, AuditCompositeScore } from '../../../api/audits-scraper';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -517,6 +518,110 @@ describe('InstalledSkillsTreeProvider', () => {
       expect(commands.executeCommand).toHaveBeenCalledWith(
         'setContext', 'skills-sh.hasInstalledSkill', false
       );
+    });
+  });
+
+  // --- Audit icons ----------------------------------------------------------
+
+  describe('audit icons on SkillItem', () => {
+    function makeAuditMap(entries: Record<string, AuditCompositeScore>): Map<string, AuditMapEntry> {
+      const map = new Map<string, AuditMapEntry>();
+      for (const [key, score] of Object.entries(entries)) {
+        map.set(key, {
+          score,
+          audits: [
+            { partner: 'Gen Agent Trust Hub', status: score === 'pass' ? 'Safe' : score === 'warn' ? 'Med Risk' : 'Critical' },
+            { partner: 'Socket', status: '0 alerts' },
+          ],
+        });
+      }
+      return map;
+    }
+
+    it('shows green circle-filled icon for pass score', async () => {
+      const scanner = createMockScanner({
+        globalSkills: [makeSkill({ name: 'safe-skill', source: 'org/repo', hash: 'abc' })],
+      });
+      const provider = new InstalledSkillsTreeProvider(scanner);
+      provider.setAuditMap(makeAuditMap({ 'safe-skill': 'pass' }));
+
+      const children = await provider.getChildren();
+      const sourceGroup = children.find((c: any) => c.groupType === 'source') as any;
+      const skillItem = sourceGroup.children[0];
+      expect((skillItem.iconPath as any).id).toBe('circle-filled');
+      expect((skillItem.iconPath as any).color.id).toBe('testing.iconPassed');
+    });
+
+    it('shows yellow circle-filled icon for warn score', async () => {
+      const scanner = createMockScanner({
+        globalSkills: [makeSkill({ name: 'warn-skill', source: 'org/repo', hash: 'abc' })],
+      });
+      const provider = new InstalledSkillsTreeProvider(scanner);
+      provider.setAuditMap(makeAuditMap({ 'warn-skill': 'warn' }));
+
+      const children = await provider.getChildren();
+      const sourceGroup = children.find((c: any) => c.groupType === 'source') as any;
+      const skillItem = sourceGroup.children[0];
+      expect((skillItem.iconPath as any).id).toBe('circle-filled');
+      expect((skillItem.iconPath as any).color.id).toBe('list.warningForeground');
+    });
+
+    it('shows red circle-filled icon for fail score', async () => {
+      const scanner = createMockScanner({
+        globalSkills: [makeSkill({ name: 'risky-skill', source: 'org/repo', hash: 'abc' })],
+      });
+      const provider = new InstalledSkillsTreeProvider(scanner);
+      provider.setAuditMap(makeAuditMap({ 'risky-skill': 'fail' }));
+
+      const children = await provider.getChildren();
+      const sourceGroup = children.find((c: any) => c.groupType === 'source') as any;
+      const skillItem = sourceGroup.children[0];
+      expect((skillItem.iconPath as any).id).toBe('circle-filled');
+      expect((skillItem.iconPath as any).color.id).toBe('testing.iconFailed');
+    });
+
+    it('keeps file-code icon when no audit data', async () => {
+      const scanner = createMockScanner({
+        globalSkills: [makeSkill({ name: 'unknown-skill', source: 'org/repo', hash: 'abc' })],
+      });
+      const provider = new InstalledSkillsTreeProvider(scanner);
+      // No audit map set
+
+      const children = await provider.getChildren();
+      const sourceGroup = children.find((c: any) => c.groupType === 'source') as any;
+      const skillItem = sourceGroup.children[0];
+      expect((skillItem.iconPath as any).id).toBe('file-code');
+    });
+
+    it('keeps arrow-up icon for updatable skill even with audit data', async () => {
+      mockUpdateResult = {
+        updates: [{ name: 'updatable-skill', source: 'org/repo', newHash: 'new' }],
+      };
+      const scanner = createMockScanner({
+        globalSkills: [makeSkill({ name: 'updatable-skill', source: 'org/repo', hash: 'old' })],
+      });
+      const provider = new InstalledSkillsTreeProvider(scanner);
+      provider.setAuditMap(makeAuditMap({ 'updatable-skill': 'pass' }));
+
+      const children = await provider.getChildren();
+      const updatesGroup = children.find((c: any) => c.groupType === 'updates') as any;
+      const skillItem = updatesGroup.children[0];
+      expect((skillItem.iconPath as any).id).toBe('arrow-up');
+    });
+
+    it('includes Security Audits in tooltip when data exists', async () => {
+      const scanner = createMockScanner({
+        globalSkills: [makeSkill({ name: 'audited-skill', source: 'org/repo', hash: 'abc' })],
+      });
+      const provider = new InstalledSkillsTreeProvider(scanner);
+      provider.setAuditMap(makeAuditMap({ 'audited-skill': 'pass' }));
+
+      const children = await provider.getChildren();
+      const sourceGroup = children.find((c: any) => c.groupType === 'source') as any;
+      const skillItem = sourceGroup.children[0];
+      expect(skillItem.tooltip).toContain('Security Audits:');
+      expect(skillItem.tooltip).toContain('Gen Agent Trust Hub: Safe');
+      expect(skillItem.tooltip).toContain('Socket: 0 alerts');
     });
   });
 });
