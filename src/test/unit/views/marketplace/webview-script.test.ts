@@ -968,6 +968,173 @@ describe('initializeWebview', () => {
       expect(btn2.textContent).toBe('Update');
     });
 
+    describe('updateButtonStates: updating guard', () => {
+      it('updatingNames skill shows "Updating..." with btn-updating class and is disabled', () => {
+        initializeWebview(api, config);
+        const results = document.getElementById('results')!;
+        results.innerHTML = '<button class="btn-install" data-skill-name="skill1">Install</button>';
+
+        window.dispatchEvent(new MessageEvent('message', {
+          data: {
+            command: 'updateButtonStates',
+            payload: {
+              installedNames: [],
+              updatableNames: [],
+              updatingNames: ['skill1'],
+              manifestSkillNames: [],
+            },
+          },
+        }));
+
+        const btn = results.querySelector('[data-skill-name="skill1"]') as HTMLButtonElement;
+        expect(btn.classList.contains('btn-updating')).toBe(true);
+        expect(btn.textContent).toBe('Updating...');
+        expect(btn.disabled).toBe(true);
+      });
+
+      it('updatingNames takes priority over installedNames', () => {
+        initializeWebview(api, config);
+        const results = document.getElementById('results')!;
+        results.innerHTML = '<button class="btn-install" data-skill-name="skill1">Install</button>';
+
+        window.dispatchEvent(new MessageEvent('message', {
+          data: {
+            command: 'updateButtonStates',
+            payload: {
+              installedNames: ['skill1'],
+              updatableNames: [],
+              updatingNames: ['skill1'],
+              manifestSkillNames: [],
+            },
+          },
+        }));
+
+        const btn = results.querySelector('[data-skill-name="skill1"]') as HTMLButtonElement;
+        expect(btn.classList.contains('btn-updating')).toBe(true);
+        expect(btn.textContent).toBe('Updating...');
+      });
+
+      it('updatingNames takes priority over updatableNames', () => {
+        initializeWebview(api, config);
+        const results = document.getElementById('results')!;
+        results.innerHTML = '<button class="btn-install" data-skill-name="skill1">Install</button>';
+
+        window.dispatchEvent(new MessageEvent('message', {
+          data: {
+            command: 'updateButtonStates',
+            payload: {
+              installedNames: [],
+              updatableNames: ['skill1'],
+              updatingNames: ['skill1'],
+              manifestSkillNames: [],
+            },
+          },
+        }));
+
+        const btn = results.querySelector('[data-skill-name="skill1"]') as HTMLButtonElement;
+        expect(btn.classList.contains('btn-updating')).toBe(true);
+        expect(btn.textContent).toBe('Updating...');
+      });
+
+      it('updatingNames takes priority over default "Install" state', () => {
+        initializeWebview(api, config);
+        const results = document.getElementById('results')!;
+        results.innerHTML = '<button class="btn-install" data-skill-name="skill1">Install</button>';
+
+        window.dispatchEvent(new MessageEvent('message', {
+          data: {
+            command: 'updateButtonStates',
+            payload: {
+              installedNames: [],
+              updatableNames: [],
+              updatingNames: ['skill1'],
+              manifestSkillNames: [],
+            },
+          },
+        }));
+
+        const btn = results.querySelector('[data-skill-name="skill1"]') as HTMLButtonElement;
+        expect(btn.classList.contains('btn-updating')).toBe(true);
+        expect(btn.textContent).toBe('Updating...');
+        // Should NOT be in Install state
+        expect(btn.textContent).not.toBe('Install');
+      });
+
+      it('skill NOT in updatingNames falls through to normal logic (regression guard)', () => {
+        initializeWebview(api, config);
+        const results = document.getElementById('results')!;
+        results.innerHTML = '<button class="btn-install" data-skill-name="skill1">Install</button>'
+          + '<button class="btn-install" data-skill-name="skill2">Install</button>';
+
+        window.dispatchEvent(new MessageEvent('message', {
+          data: {
+            command: 'updateButtonStates',
+            payload: {
+              installedNames: ['skill1'],
+              updatableNames: [],
+              updatingNames: ['skill2'],
+              manifestSkillNames: [],
+            },
+          },
+        }));
+
+        // skill1 should show installed state (not updating)
+        const btn1 = results.querySelector('[data-skill-name="skill1"]') as HTMLButtonElement;
+        expect(btn1.classList.contains('btn-installed')).toBe(true);
+        expect(btn1.textContent).toBe('✓ Installed');
+
+        // skill2 should show updating state
+        const btn2 = results.querySelector('[data-skill-name="skill2"]') as HTMLButtonElement;
+        expect(btn2.classList.contains('btn-updating')).toBe(true);
+        expect(btn2.textContent).toBe('Updating...');
+      });
+
+      it('Detail view: action buttons not replaced while skill is in updatingNames', () => {
+        initializeWebview(api, config);
+
+        // Navigate to detail view: click a grid row to push navStack, then dispatch detailResult
+        const results = document.getElementById('results')!;
+        results.innerHTML = '<div class="grid-row" data-source="owner/repo" data-skill="test-skill"><span>click</span></div>';
+        results.querySelector('.grid-row')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        // Render detail view for an installed skill (no hasUpdate → shows remove button)
+        window.dispatchEvent(new MessageEvent('message', {
+          data: {
+            command: 'detailResult',
+            payload: {
+              name: 'test-skill',
+              source: 'owner/repo',
+              installCommand: 'npx skills add owner/repo',
+              isInstalled: true,
+            },
+          },
+        }));
+
+        const overlay = document.getElementById('detail-overlay')!;
+        // Verify action buttons exist before updateButtonStates
+        const removeBtn = overlay.querySelector('.btn-action-remove');
+        expect(removeBtn).not.toBeNull();
+
+        // Dispatch updateButtonStates with skill in updatingNames but NOT in installedNames
+        // (simulates the mid-update state where the skill folder has been removed)
+        window.dispatchEvent(new MessageEvent('message', {
+          data: {
+            command: 'updateButtonStates',
+            payload: {
+              installedNames: [],
+              updatableNames: [],
+              updatingNames: ['test-skill'],
+              manifestSkillNames: [],
+            },
+          },
+        }));
+
+        // Action buttons should NOT have been replaced with an Install button
+        // because the updating guard skips detail button replacement
+        expect(overlay.querySelector('.btn-action-remove')).not.toBeNull();
+        expect(overlay.querySelector('.btn-install')).toBeNull();
+      });
+    });
+
     it('installedSkillsData updates installed tab label', () => {
       initializeWebview(api, config);
       window.dispatchEvent(new MessageEvent('message', {

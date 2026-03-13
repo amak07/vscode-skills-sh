@@ -30,6 +30,7 @@ import {
   onOperationCompleted,
   notifyInstallDetected,
   disposeTerminal,
+  getUpdatingSkillNames,
 } from '../../../install/installer';
 
 // ---------------------------------------------------------------------------
@@ -453,6 +454,31 @@ describe('disposeTerminal', () => {
     disposeTerminal();
 
     expect(terminal.dispose).toHaveBeenCalled();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getUpdatingSkillNames
+// ---------------------------------------------------------------------------
+
+describe('getUpdatingSkillNames', () => {
+  it('returns empty set initially', () => {
+    const names = getUpdatingSkillNames();
+    expect(names.size).toBe(0);
+  });
+
+  it('returns empty set when update is cancelled (user declines confirmation dialog)', async () => {
+    // Import updateSkills — it populates updatingSkillNames only after confirmation
+    const { updateSkills } = await import('../../../install/installer');
+
+    // User cancels the update confirmation dialog
+    (window.showInformationMessage as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
+
+    await updateSkills([{ name: 'skill-a', source: 'org/repo', newHash: 'abc123' }]);
+
+    // Since the user declined, updatingSkillNames should remain empty
+    const names = getUpdatingSkillNames();
+    expect(names.size).toBe(0);
   });
 });
 

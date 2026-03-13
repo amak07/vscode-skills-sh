@@ -42,10 +42,12 @@ vi.mock('../../../../api/audits-scraper', () => ({
 const mockInstallSkill = vi.fn();
 const mockUpdateSkills = vi.fn();
 const mockUninstallSkill = vi.fn();
+let mockUpdatingNames = new Set<string>();
 vi.mock('../../../../install/installer', () => ({
   installSkill: (...args: unknown[]) => mockInstallSkill(...args),
   updateSkills: (...args: unknown[]) => mockUpdateSkills(...args),
   uninstallSkill: (...args: unknown[]) => mockUninstallSkill(...args),
+  getUpdatingSkillNames: () => mockUpdatingNames,
 }));
 
 // Mock the updates module
@@ -181,6 +183,7 @@ describe('MarketplaceViewProvider', () => {
     (vscode.workspace as any).__resetConfig();
     (vscode.commands as any).__clearRegistered();
     mockManifestNames = new Set();
+    mockUpdatingNames = new Set();
     mockUpdateResult = null;
 
     // Reset all API mocks
@@ -1161,6 +1164,18 @@ describe('MarketplaceViewProvider', () => {
       expect(call).toBeDefined();
       expect((call![0] as any).payload.installedNames).toEqual(['skill-x']);
     });
+
+    it('includes updatingNames in the payload', () => {
+      const { webview } = resolveProvider(provider);
+
+      provider.setInstalledNames(new Set(['skill-x']));
+
+      const call = webview.postMessage.mock.calls.find(
+        (c: unknown[]) => (c[0] as any).command === 'updateButtonStates',
+      );
+      expect(call).toBeDefined();
+      expect((call![0] as any).payload.updatingNames).toEqual([]);
+    });
   });
 
   describe('setUpdatableNames', () => {
@@ -1174,6 +1189,33 @@ describe('MarketplaceViewProvider', () => {
       );
       expect(call).toBeDefined();
       expect((call![0] as any).payload.updatableNames).toEqual(['skill-y']);
+    });
+
+    it('includes updatingNames in the payload', () => {
+      const { webview } = resolveProvider(provider);
+
+      provider.setUpdatableNames(new Set(['skill-y']));
+
+      const call = webview.postMessage.mock.calls.find(
+        (c: unknown[]) => (c[0] as any).command === 'updateButtonStates',
+      );
+      expect(call).toBeDefined();
+      expect((call![0] as any).payload.updatingNames).toEqual([]);
+    });
+  });
+
+  describe('pushButtonStates with non-empty updatingNames', () => {
+    it('includes updatingNames from getUpdatingSkillNames in the payload', () => {
+      mockUpdatingNames = new Set(['skill-being-updated']);
+      const { webview } = resolveProvider(provider);
+
+      provider.setInstalledNames(new Set(['skill-x']));
+
+      const call = webview.postMessage.mock.calls.find(
+        (c: unknown[]) => (c[0] as any).command === 'updateButtonStates',
+      );
+      expect(call).toBeDefined();
+      expect((call![0] as any).payload.updatingNames).toEqual(['skill-being-updated']);
     });
   });
 

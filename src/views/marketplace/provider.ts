@@ -7,7 +7,7 @@ import { fetchSkillMd } from '../../api/github';
 import { fetchDocsPage } from '../../api/docs-scraper';
 import { fetchAuditListing } from '../../api/audits-scraper';
 import * as path from 'path';
-import { installSkill, updateSkills, uninstallSkill } from '../../install/installer';
+import { installSkill, updateSkills, uninstallSkill, getUpdatingSkillNames } from '../../install/installer';
 import { updateSkillFrontmatter } from '../../local/parser';
 import { getLastUpdateResult } from '../../api/updates';
 import { addSkillToManifest, removeSkillFromManifest, getManifestSkillNames } from '../../manifest/manifest';
@@ -95,6 +95,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
     const payload = {
       installedNames: [...this.installedNames],
       updatableNames: [...this.updatableNames],
+      updatingNames: [...getUpdatingSkillNames()],
       manifestSkillNames: manifestNames,
     };
     this._view?.webview.postMessage({ command: 'updateButtonStates', payload });
@@ -400,6 +401,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
         const readyPayload = {
           installedNames: [...this.installedNames],
           updatableNames: [...this.updatableNames],
+          updatingNames: [...getUpdatingSkillNames()],
           manifestSkillNames: [...getManifestSkillNames()],
         };
         targetWebview.postMessage({ command: 'updateButtonStates', payload: readyPayload });

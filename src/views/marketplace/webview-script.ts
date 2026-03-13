@@ -946,11 +946,19 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
       case 'updateButtonStates': {
         const installed = new Set<string>(msg.payload.installedNames || []);
         const updatable = new Set<string>(msg.payload.updatableNames || []);
+        const updating = new Set<string>(msg.payload.updatingNames || []);
         manifestSkillNames = new Set<string>(msg.payload.manifestSkillNames || []);
         document.querySelectorAll('.btn-install').forEach(function (btn) {
           const el = btn as HTMLButtonElement;
           const skillName = el.dataset.skillName;
           if (!skillName) return;
+          // HIGHEST PRIORITY: skill is mid-update — keep "Updating..." state
+          if (updating.has(skillName)) {
+            btn.className = 'btn-install btn-updating';
+            btn.textContent = 'Updating...';
+            el.disabled = true;
+            return;
+          }
           const wasPending = el.dataset.pending === 'true';
           if (updatable.has(skillName)) {
             btn.className = 'btn-install btn-updatable';
@@ -992,28 +1000,32 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
           (btn as HTMLElement).title = inMf ? 'Remove from skills.json' : 'Add to skills.json';
         });
         if (currentView === 'detail' && currentDetailSkillName) {
-          const removeBtn = document.querySelector('.btn-action-remove[data-skill-name="' + currentDetailSkillName + '"]') as HTMLButtonElement | null;
-          const existingInstallBtn = document.querySelector('.detail-view .btn-install[data-skill-name="' + currentDetailSkillName + '"]') as HTMLButtonElement | null;
-          if (removeBtn && !installed.has(currentDetailSkillName)) {
-            // Skill was uninstalled: replace action buttons with Install button
-            const actionsContainer = removeBtn.closest('.row-actions');
-            if (actionsContainer) {
-              const source = actionsContainer.querySelector('[data-source]')?.getAttribute('data-source') || '';
-              if (source) {
-                actionsContainer.innerHTML = '<button class="btn-install"'
-                  + ' data-install="' + source + '"'
-                  + ' data-skill-name="' + currentDetailSkillName + '">'
-                  + 'Install</button>';
-              } else {
-                // Custom/local skill with no source — just clear the action buttons
-                actionsContainer.innerHTML = '';
+          if (updating.has(currentDetailSkillName)) {
+            // Mid-update — don't touch detail buttons
+          } else {
+            const removeBtn = document.querySelector('.btn-action-remove[data-skill-name="' + currentDetailSkillName + '"]') as HTMLButtonElement | null;
+            const existingInstallBtn = document.querySelector('.detail-view .btn-install[data-skill-name="' + currentDetailSkillName + '"]') as HTMLButtonElement | null;
+            if (removeBtn && !installed.has(currentDetailSkillName)) {
+              // Skill was uninstalled: replace action buttons with Install button
+              const actionsContainer = removeBtn.closest('.row-actions');
+              if (actionsContainer) {
+                const source = actionsContainer.querySelector('[data-source]')?.getAttribute('data-source') || '';
+                if (source) {
+                  actionsContainer.innerHTML = '<button class="btn-install"'
+                    + ' data-install="' + source + '"'
+                    + ' data-skill-name="' + currentDetailSkillName + '">'
+                    + 'Install</button>';
+                } else {
+                  // Custom/local skill with no source — just clear the action buttons
+                  actionsContainer.innerHTML = '';
+                }
               }
-            }
-          } else if (existingInstallBtn && installed.has(currentDetailSkillName)) {
-            // Skill was installed from detail: re-request detail for full re-render
-            const source = existingInstallBtn.dataset.install || '';
-            if (source) {
-              api.postMessage({ command: 'detail', payload: { source, skillId: currentDetailSkillName } });
+            } else if (existingInstallBtn && installed.has(currentDetailSkillName)) {
+              // Skill was installed from detail: re-request detail for full re-render
+              const source = existingInstallBtn.dataset.install || '';
+              if (source) {
+                api.postMessage({ command: 'detail', payload: { source, skillId: currentDetailSkillName } });
+              }
             }
           }
         }
