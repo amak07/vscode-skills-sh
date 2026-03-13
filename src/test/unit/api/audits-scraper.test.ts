@@ -239,7 +239,7 @@ describe('computeAuditScore', () => {
     expect(computeAuditScore([
       { partner: 'Gen Agent Trust Hub', status: 'Safe' },
       { partner: 'Socket', status: '0 alerts' },
-      { partner: 'Snyk', status: 'Low Risk' },
+      { partner: 'Snyk', status: 'Pass' },
     ])).toBe('pass');
   });
 
@@ -249,39 +249,39 @@ describe('computeAuditScore', () => {
     ])).toBe('pass');
   });
 
-  it('returns "warn" when any partner has warn-level status', () => {
+  it('returns "partial" when some but not all partners pass', () => {
     expect(computeAuditScore([
       { partner: 'Gen Agent Trust Hub', status: 'Safe' },
       { partner: 'Socket', status: 'Med Risk' },
       { partner: 'Snyk', status: 'Pass' },
-    ])).toBe('warn');
+    ])).toBe('partial');
   });
 
-  it('returns "warn" for unrecognized status strings', () => {
-    expect(computeAuditScore([
-      { partner: 'Gen Agent Trust Hub', status: 'Something New' },
-    ])).toBe('warn');
-  });
-
-  it('returns "fail" when any partner has fail-level status', () => {
+  it('returns "partial" when 2/3 pass and one has critical status', () => {
     expect(computeAuditScore([
       { partner: 'Gen Agent Trust Hub', status: 'Safe' },
       { partner: 'Socket', status: '0 alerts' },
       { partner: 'Snyk', status: 'Critical' },
+    ])).toBe('partial');
+  });
+
+  it('returns "fail" when no partners pass', () => {
+    expect(computeAuditScore([
+      { partner: 'Gen Agent Trust Hub', status: 'High Risk' },
+      { partner: 'Socket', status: 'Critical' },
+      { partner: 'Snyk', status: 'Med Risk' },
     ])).toBe('fail');
   });
 
-  it('returns "fail" for "High Risk" status', () => {
+  it('returns "fail" for single non-pass status', () => {
     expect(computeAuditScore([
-      { partner: 'Snyk', status: 'High Risk' },
+      { partner: 'Snyk', status: 'Low Risk' },
     ])).toBe('fail');
   });
 
-  it('fail takes priority over warn', () => {
+  it('returns "fail" for unrecognized status strings (none count as pass)', () => {
     expect(computeAuditScore([
-      { partner: 'Gen Agent Trust Hub', status: 'Safe' },
-      { partner: 'Socket', status: 'Med Risk' },
-      { partner: 'Snyk', status: 'Fail' },
+      { partner: 'Gen Agent Trust Hub', status: 'Something New' },
     ])).toBe('fail');
   });
 
@@ -308,7 +308,7 @@ describe('buildAuditMap', () => {
           audits: [
             { partner: 'Gen Agent Trust Hub', status: 'Safe' },
             { partner: 'Socket', status: '0 alerts' },
-            { partner: 'Snyk', status: 'Low Risk' },
+            { partner: 'Snyk', status: 'Pass' },
           ],
         },
         {
@@ -331,11 +331,13 @@ describe('buildAuditMap', () => {
     const react = map.get('react-best-practices');
     expect(react).toBeDefined();
     expect(react!.score).toBe('pass');
+    expect(react!.passCount).toBe(3);
     expect(react!.audits).toHaveLength(3);
 
     const risky = map.get('risky');
     expect(risky).toBeDefined();
-    expect(risky!.score).toBe('fail');
+    expect(risky!.score).toBe('partial');
+    expect(risky!.passCount).toBe(1);
   });
 
   it('returns empty map for empty listing', () => {
