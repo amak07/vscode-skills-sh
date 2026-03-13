@@ -184,37 +184,37 @@ export function activate(context: vscode.ExtensionContext) {
       // Compute effective removed count (excluding skills that are just updating)
       const removedNames = [...oldNames].filter(n => !newNames.has(n) && !updating.has(n));
       if (oldNames.size > 0 && removedNames.length > 0) {
-      if (shouldNotify('info')) {
-        vscode.window.showInformationMessage(
-          `Skills.sh: ${removedNames.length} skill(s) removed.`,
-        );
-      }
-
-      // Post-uninstall: offer to remove uninstalled skills from skills.json
-      if (readManifest()) {
-        const manifestSkills = getManifestSkillNames();
-        const newFolderNames = new Set(newSkills.map(s => s.folderName));
-        const removed = oldSkills.filter(s =>
-          !newFolderNames.has(s.folderName) && manifestSkills.has(s.folderName)
-          && !updating.has(s.name),
-        );
-        for (const skill of removed) {
+        if (shouldNotify('info')) {
           vscode.window.showInformationMessage(
-            `You uninstalled "${skill.name}". Remove it from this project's skills.json?`,
-            'Remove from skills.json',
-            'Keep in skills.json',
-          ).then(action => {
-            if (action === 'Remove from skills.json') {
-              removeSkillFromManifest(skill.folderName);
-              treeProvider.refresh();
-              if (shouldNotify('info')) {
-                vscode.window.showInformationMessage(`Removed "${skill.name}" from skills.json`);
+            `Skills.sh: ${removedNames.length} skill(s) removed.`,
+          );
+        }
+
+        // Post-uninstall: offer to remove uninstalled skills from skills.json
+        if (readManifest()) {
+          const manifestSkills = getManifestSkillNames();
+          const newFolderNames = new Set(newSkills.map(s => s.folderName));
+          const removed = oldSkills.filter(s =>
+            !newFolderNames.has(s.folderName) && manifestSkills.has(s.folderName)
+            && !updating.has(s.name),
+          );
+          for (const skill of removed) {
+            vscode.window.showInformationMessage(
+              `You uninstalled "${skill.name}". Remove it from this project's skills.json?`,
+              'Remove from skills.json',
+              'Keep in skills.json',
+            ).then(action => {
+              if (action === 'Remove from skills.json') {
+                removeSkillFromManifest(skill.folderName);
+                treeProvider.refresh();
+                if (shouldNotify('info')) {
+                  vscode.window.showInformationMessage(`Removed "${skill.name}" from skills.json`);
+                }
               }
-            }
-          });
+            });
+          }
         }
       }
-    }
     }
 
     previousSkillNames = newNames;

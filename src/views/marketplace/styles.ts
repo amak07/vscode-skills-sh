@@ -317,6 +317,10 @@ export function getStyles(fontUri: string): string {
       background: var(--amber-700, #b45309);
       color: var(--bg-200, #fff);
     }
+    .btn-updating {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
 
     /* === Detail View === */
     .detail-view { padding: 1.5rem 0 0; }
