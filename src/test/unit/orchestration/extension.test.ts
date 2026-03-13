@@ -25,6 +25,7 @@ const {
   mockOpenWelcomePage,
   operationCompletedEmitter, installDetectedEmitter,
   getMockLastUpdateResult, setMockLastUpdateResult,
+  mockUpdatingNames,
 } = vi.hoisted(() => {
   // Lightweight event emitter (vscode.EventEmitter not available at hoist time)
   function createEvent<T>() {
@@ -60,6 +61,7 @@ const {
     installDetectedEmitter: createEvent<string>(),
     getMockLastUpdateResult: () => _lastUpdateResult,
     setMockLastUpdateResult: (v: any) => { _lastUpdateResult = v; },
+    mockUpdatingNames: { value: new Set<string>() },
   };
 });
 
@@ -87,7 +89,7 @@ vi.mock('../../../install/installer', () => ({
   notifyInstallDetected: (name: string) => mockNotifyInstallDetected(name),
   onInstallDetected: installDetectedEmitter.event,
   onOperationCompleted: operationCompletedEmitter.event,
-  getUpdatingSkillNames: () => new Set<string>(),
+  getUpdatingSkillNames: () => mockUpdatingNames.value,
 }));
 
 // Search API
@@ -214,6 +216,7 @@ beforeEach(async () => {
   (workspace as any).__setConfigValue('skills-sh.promptSkillsJson', false);
 
   setMockLastUpdateResult(null);
+  mockUpdatingNames.value = new Set<string>();
 
   // Default window mocks — user cancels everything unless overridden
   (window.showInformationMessage as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
@@ -885,6 +888,107 @@ describe('handleSkillChanges (via watcher/operation triggers)', () => {
     operationCompletedEmitter.fire();
     await vi.waitFor(() => {
       expect(mockClearUpdateForSkill).toHaveBeenCalledWith('Freshly Installed');
+    });
+  });
+
+  it('does NOT show "removed" notification when skill is in updatingSkillNames', async () => {
+    // Set up initial state with two skills.
+    // Use name === folderName (e.g., "skill-two") to match production behavior where
+    // updatingSkillNames contains u.name which equals the folder name for skills.sh installs.
+    sandbox.createSkill(sandbox.globalSkillsDir, 'skill-one', {
+      frontmatter: { name: 'skill-one', description: '' },
+    });
+    sandbox.createSkill(sandbox.globalSkillsDir, 'skill-two', {
+      frontmatter: { name: 'skill-two', description: '' },
+    });
+
+    operationCompletedEmitter.fire();
+    await vi.waitFor(() => {
+      expect(mockSetInstalledNames).toHaveBeenCalled();
+    });
+
+    // Clear and mark skill-two as updating
+    mockSetInstalledNames.mockClear();
+    (window.showInformationMessage as ReturnType<typeof vi.fn>).mockClear();
+    (window.showInformationMessage as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
+    mockUpdatingNames.value = new Set(['skill-two']);
+
+    // Remove skill-two from the filesystem (simulates the remove step of update)
+    const fs = await import('fs');
+    fs.rmSync(`${sandbox.globalSkillsDir}/skill-two`, { recursive: true, force: true });
+
+    operationCompletedEmitter.fire();
+
+    await vi.waitFor(() => {
+      expect(mockSetInstalledNames).toHaveBeenCalled();
+    });
+
+    // "removed" notification should NOT be shown because skill-two is updating
+    const removedCalls = (window.showInformationMessage as ReturnType<typeof vi.fn>).mock.calls
+      .filter((c: any[]) => typeof c[0] === 'string' && c[0].includes('removed'));
+    expect(removedCalls.length).toBe(0);
+  });
+
+  it('does NOT call clearUpdateForSkill when re-added skill is in updatingSkillNames', async () => {
+    // First populate with one skill
+    sandbox.createSkill(sandbox.globalSkillsDir, 'old-skill', {
+      frontmatter: { name: 'old-skill', description: '' },
+    });
+
+    operationCompletedEmitter.fire();
+    await vi.waitFor(() => {
+      expect(mockSetInstalledNames).toHaveBeenCalled();
+    });
+    mockClearUpdateForSkill.mockClear();
+
+    // Mark the new skill as updating (name === folderName for skills.sh installs)
+    mockUpdatingNames.value = new Set(['new-skill']);
+
+    // Add a new skill that is in the updating set
+    sandbox.createSkill(sandbox.globalSkillsDir, 'new-skill', {
+      frontmatter: { name: 'new-skill', description: '' },
+    });
+
+    operationCompletedEmitter.fire();
+    await vi.waitFor(() => {
+      expect(mockSetInstalledNames).toHaveBeenCalled();
+    });
+
+    // clearUpdateForSkill should NOT be called for the updating skill
+    const clearCalls = mockClearUpdateForSkill.mock.calls
+      .filter((c: any[]) => c[0] === 'new-skill');
+    expect(clearCalls.length).toBe(0);
+  });
+
+  it('normal uninstall still triggers "removed" notification (regression guard)', async () => {
+    // Set up initial state with two skills
+    sandbox.createSkill(sandbox.globalSkillsDir, 'skill-one', {
+      frontmatter: { name: 'Skill One', description: '' },
+    });
+    sandbox.createSkill(sandbox.globalSkillsDir, 'skill-two', {
+      frontmatter: { name: 'Skill Two', description: '' },
+    });
+
+    operationCompletedEmitter.fire();
+    await vi.waitFor(() => {
+      expect(mockSetInstalledNames).toHaveBeenCalled();
+    });
+
+    // Clear — updatingNames stays empty (normal uninstall, not update)
+    mockSetInstalledNames.mockClear();
+    (window.showInformationMessage as ReturnType<typeof vi.fn>).mockClear();
+    (window.showInformationMessage as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
+
+    // Remove one skill from the filesystem
+    const fs = await import('fs');
+    fs.rmSync(`${sandbox.globalSkillsDir}/skill-two`, { recursive: true, force: true });
+
+    operationCompletedEmitter.fire();
+
+    await vi.waitFor(() => {
+      expect(window.showInformationMessage).toHaveBeenCalledWith(
+        expect.stringContaining('skill(s) removed'),
+      );
     });
   });
 });
