@@ -11,6 +11,7 @@ All notable changes to the Skills.sh Agent Skills Manager extension will be docu
 
 ### Fixed
 
+- **Update button flicker** — when updating a skill, the button briefly showed "Install" between "Updating..." and "✓ Installed" because the remove+add workaround (for [skills#371](https://github.com/vercel-labs/skills/issues/371)) triggered a mid-cycle rescan. Added an `updatingSkillNames` guard in the extension host that suppresses spurious "removed" notifications, "Add to skills.json?" prompts, and button state resets during the update cycle.
 - **Detail page action buttons broken** — "Add to Skills.json", "Update", and "Uninstall" buttons on the skill detail page were non-functional since the scroll-position-preserving overlay refactor (`c414c09`). Root cause: click delegation was attached to `resultsEl` but the detail overlay lives on `document.body`. Extracted shared `handleActionButtons()` helper and wired it into the overlay's click listener.
 
 ### Changed
