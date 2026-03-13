@@ -2,6 +2,48 @@ import { AuditListingResponse, AuditListingSkill, SkillAuditResult } from '../ty
 import { SingleCache } from '../utils/api-cache';
 import { SKILLS_SH_BASE, CACHE_TTL_AUDITS } from '../utils/constants';
 
+// ── Composite audit score ────────────────────────────────────────────
+
+export type AuditCompositeScore = 'pass' | 'warn' | 'fail' | 'unknown';
+
+export interface AuditMapEntry {
+  score: AuditCompositeScore;
+  audits: SkillAuditResult[];
+}
+
+export type AuditMap = Map<string, AuditMapEntry>;
+
+/**
+ * Roll up per-partner statuses into a single composite score.
+ * Uses the same classification as getAuditBadgeClass() in webview-script.ts.
+ */
+export function computeAuditScore(audits: SkillAuditResult[]): AuditCompositeScore {
+  if (audits.length === 0) { return 'unknown'; }
+
+  const mapped = audits.map(a => {
+    const s = (a.status || '').toLowerCase().trim();
+    if (s === 'fail' || s === 'critical' || s === 'high risk') { return 'fail' as const; }
+    if (s === 'pass' || s === 'safe' || s === '0 alerts' || s === 'low risk') { return 'pass' as const; }
+    return 'warn' as const;
+  });
+
+  if (mapped.includes('fail')) { return 'fail'; }
+  if (mapped.includes('warn')) { return 'warn'; }
+  return 'pass';
+}
+
+/** Build a skill-ID-keyed lookup map from a bulk audit listing. */
+export function buildAuditMap(listing: AuditListingResponse): AuditMap {
+  const map: AuditMap = new Map();
+  for (const skill of listing.skills) {
+    map.set(skill.skillId, {
+      score: computeAuditScore(skill.audits),
+      audits: skill.audits,
+    });
+  }
+  return map;
+}
+
 const cache = new SingleCache<AuditListingResponse>(CACHE_TTL_AUDITS);
 
 export async function fetchAuditListing(): Promise<AuditListingResponse> {

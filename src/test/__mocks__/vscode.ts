@@ -64,11 +64,19 @@ export class TreeItem {
   }
 }
 
+// --- ThemeColor ---
+
+export class ThemeColor {
+  id: string;
+  constructor(id: string) { this.id = id; }
+}
+
 // --- ThemeIcon ---
 
 export class ThemeIcon {
   id: string;
-  constructor(id: string) { this.id = id; }
+  color?: ThemeColor;
+  constructor(id: string, color?: ThemeColor) { this.id = id; this.color = color; }
 }
 
 // --- RelativePattern ---

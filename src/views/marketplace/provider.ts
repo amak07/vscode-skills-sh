@@ -5,7 +5,7 @@ import { searchSkills, getLeaderboard } from '../../api/search';
 import { fetchSkillDetail } from '../../api/detail-scraper';
 import { fetchSkillMd } from '../../api/github';
 import { fetchDocsPage } from '../../api/docs-scraper';
-import { fetchAuditListing } from '../../api/audits-scraper';
+import { fetchAuditListing, computeAuditScore, type AuditMapEntry } from '../../api/audits-scraper';
 import * as path from 'path';
 import { installSkill, updateSkills, uninstallSkill } from '../../install/installer';
 import { updateSkillFrontmatter } from '../../local/parser';
@@ -46,6 +46,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
   private detailRequestId = 0;
   private pendingNavigation?: { source: string; skillId: string };
 
+  private auditMap = new Map<string, AuditMapEntry>();
   private onManifestChanged?: () => void;
 
   constructor(private readonly extensionUri: vscode.Uri, onManifestChanged?: () => void) {
@@ -74,6 +75,15 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
     this._view?.webview.postMessage({ command: 'installedSkillsData', payload });
     for (const panel of this.panels) {
       panel.webview.postMessage({ command: 'installedSkillsData', payload });
+    }
+  }
+
+  setAuditMap(map: Map<string, AuditMapEntry>): void {
+    this.auditMap = map;
+    const payload = Object.fromEntries(map);
+    this._view?.webview.postMessage({ command: 'auditMapData', payload });
+    for (const panel of this.panels) {
+      panel.webview.postMessage({ command: 'auditMapData', payload });
     }
   }
 
@@ -269,6 +279,13 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
           const installedSkill = this.installedSkills.find(s => s.folderName === skillId);
           const agents = installedSkill?.agents ?? [];
           targetWebview.postMessage({ command: 'detailResult', payload: { ...detail, isInstalled, inManifest, hasUpdate, agents } });
+
+          // Backfill audit map from detail-page security audits
+          if (detail?.securityAudits && !this.auditMap.has(skillId)) {
+            const audits = detail.securityAudits.map(a => ({ partner: a.partner, status: a.status }));
+            this.auditMap.set(skillId, { score: computeAuditScore(audits), audits });
+            this.setAuditMap(this.auditMap);
+          }
         } catch (e: unknown) {
           if (requestId !== this.detailRequestId) { break; }
           targetWebview.postMessage({ command: 'error', payload: toErrorMessage(e) });
@@ -403,6 +420,12 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
           manifestSkillNames: [...getManifestSkillNames()],
         };
         targetWebview.postMessage({ command: 'updateButtonStates', payload: readyPayload });
+        if (this.auditMap.size > 0) {
+          targetWebview.postMessage({
+            command: 'auditMapData',
+            payload: Object.fromEntries(this.auditMap),
+          });
+        }
         // Flush pending navigation (e.g., from "View Skill" toast)
         if (this.pendingNavigation) {
           const nav = this.pendingNavigation;

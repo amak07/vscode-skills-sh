@@ -3,6 +3,7 @@ import { InstalledSkill } from '../types';
 import { SkillScanner } from '../local/scanner';
 import { getLastUpdateResult } from '../api/updates';
 import { getManifestSkillNames } from '../manifest/manifest';
+import { type AuditCompositeScore, type AuditMapEntry } from '../api/audits-scraper';
 
 type TreeItem = GroupItem | SkillItem | QuickLinkItem;
 
@@ -39,6 +40,8 @@ class SkillItem extends vscode.TreeItem {
     public readonly skill: InstalledSkill,
     hasUpdate: boolean = false,
     inManifest: boolean = false,
+    auditScore?: AuditCompositeScore,
+    auditAudits?: { partner: string; status: string }[],
   ) {
     super(skill.name, vscode.TreeItemCollapsibleState.None);
 
@@ -48,6 +51,15 @@ class SkillItem extends vscode.TreeItem {
     if (hasUpdate) {
       this.description = 'Update available';
       this.iconPath = new vscode.ThemeIcon('arrow-up');
+    } else if (auditScore === 'pass') {
+      this.description = skill.description;
+      this.iconPath = new vscode.ThemeIcon('circle-filled', new vscode.ThemeColor('testing.iconPassed'));
+    } else if (auditScore === 'warn') {
+      this.description = skill.description;
+      this.iconPath = new vscode.ThemeIcon('circle-filled', new vscode.ThemeColor('list.warningForeground'));
+    } else if (auditScore === 'fail') {
+      this.description = skill.description;
+      this.iconPath = new vscode.ThemeIcon('circle-filled', new vscode.ThemeColor('testing.iconFailed'));
     } else if (skill.isCustom) {
       this.description = skill.description;
       this.iconPath = new vscode.ThemeIcon('file-code');
@@ -72,6 +84,12 @@ class SkillItem extends vscode.TreeItem {
       tooltipLines.push('\nCustom skill (user-created)');
     } else {
       tooltipLines.push('\nUntracked: re-install via Marketplace to enable updates');
+    }
+    if (auditAudits && auditAudits.length > 0) {
+      tooltipLines.push('\nSecurity Audits:');
+      for (const a of auditAudits) {
+        tooltipLines.push(`  ${a.partner}: ${a.status}`);
+      }
     }
     if (inManifest) {
       tooltipLines.push('\n📋 In skills.json');
@@ -113,8 +131,14 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
   private globalSkills: InstalledSkill[] = [];
   private projectSkills: InstalledSkill[] = [];
   private hasInitiallyScanned = false;
+  private auditMap = new Map<string, AuditMapEntry>();
 
   constructor(private scanner: SkillScanner) {}
+
+  setAuditMap(map: Map<string, AuditMapEntry>): void {
+    this.auditMap = map;
+    this.refresh();
+  }
 
   refresh(): void {
     this._onDidChangeTreeData.fire(undefined);
@@ -172,7 +196,7 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
         const updatableSkills = allSkills.filter(s => updatableNames.has(s.name));
         if (updatableSkills.length > 0) {
           const children = updatableSkills.map(s =>
-            new SkillItem(s, true, manifestNames.has(s.folderName)),
+            new SkillItem(s, true, manifestNames.has(s.folderName), this.auditMap.get(s.folderName)?.score, this.auditMap.get(s.folderName)?.audits),
           );
           groups.push(new GroupItem(
             `Updates Available (${updatableSkills.length})`,
@@ -204,7 +228,7 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
       if (custom.length > 0) {
         const sorted = this.sortSkills(custom);
         const children = sorted.map(s =>
-          new SkillItem(s, false, manifestNames.has(s.folderName)),
+          new SkillItem(s, false, manifestNames.has(s.folderName), this.auditMap.get(s.folderName)?.score, this.auditMap.get(s.folderName)?.audits),
         );
         groups.push(new GroupItem(
           `Custom Skills (${custom.length})`,
@@ -219,7 +243,7 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
       for (const [source, skills] of sortedSources) {
         const sorted = this.sortSkills(skills);
         const children = sorted.map(s =>
-          new SkillItem(s, updatableNames.has(s.name), manifestNames.has(s.folderName)),
+          new SkillItem(s, updatableNames.has(s.name), manifestNames.has(s.folderName), this.auditMap.get(s.folderName)?.score, this.auditMap.get(s.folderName)?.audits),
         );
         groups.push(new GroupItem(
           `${source} (${skills.length})`,
@@ -232,7 +256,7 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
       if (untracked.length > 0) {
         const sorted = this.sortSkills(untracked);
         const children = sorted.map(s =>
-          new SkillItem(s, false, manifestNames.has(s.folderName)),
+          new SkillItem(s, false, manifestNames.has(s.folderName), this.auditMap.get(s.folderName)?.score, this.auditMap.get(s.folderName)?.audits),
         );
         groups.push(new GroupItem(
           `Untracked (${untracked.length})`,
@@ -245,7 +269,7 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
       if (this.projectSkills.length > 0) {
         const sorted = this.sortSkills(this.projectSkills);
         const children = sorted.map(s =>
-          new SkillItem(s, updatableNames.has(s.name), manifestNames.has(s.folderName)),
+          new SkillItem(s, updatableNames.has(s.name), manifestNames.has(s.folderName), this.auditMap.get(s.folderName)?.score, this.auditMap.get(s.folderName)?.audits),
         );
         groups.push(new GroupItem(
           `Project Skills (${this.projectSkills.length})`,

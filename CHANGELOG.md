@@ -6,6 +6,7 @@ All notable changes to the Skills.sh Agent Skills Manager extension will be docu
 
 ### Added
 
+- **At-a-glance security audit badges** — skill cards (search, leaderboard, installed tab) now show a composite shield badge (green "Audited" / yellow "Caution" / red "Risk") based on the 3 security audit partners (Gen Agent Trust Hub, Socket, Snyk). Hover for per-partner breakdown. TreeView sidebar shows colored circle icons. Audit data pre-fetched on activation (single request); detail-page visits backfill any missing skills.
 - **Custom welcome page** — rich branded welcome tab with SKILLS ASCII art, agent showcase, 9 feature highlight cards covering all major capabilities, and quick-action CTAs — auto-opens on first activation
 - **Docs in editor tab** — "Read Documentation" now opens in a full editor tab instead of the sidebar
 
