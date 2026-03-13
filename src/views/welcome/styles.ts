@@ -6,7 +6,7 @@ export function getWelcomeStyles(fontUri: string): string {
     /* === Welcome Page === */
 
     .welcome-page {
-      max-width: 720px;
+      max-width: 800px;
       margin: 0 auto;
       padding: 3rem 2rem 2rem;
     }
@@ -92,6 +92,19 @@ export function getWelcomeStyles(fontUri: string): string {
       width: 100%;
       height: 100%;
       display: block;
+    }
+
+    /* Section Labels */
+
+    .welcome-section-label {
+      font-family: var(--font-sans);
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--gray-600);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      text-align: center;
+      margin-bottom: 1rem;
     }
 
     /* Feature Cards */

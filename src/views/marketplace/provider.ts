@@ -156,11 +156,18 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
 
     panel.webview.html = this.getHtml(panel.webview, panelFontsUri, true);
 
-    // If an initialTab is specified, wait for the webview to send 'ready' then switch
+    // If an initialTab is specified, wait for the webview to send 'ready' then navigate
     if (initialTab) {
       const disposable = panel.webview.onDidReceiveMessage((msg: WebviewMessage) => {
         if (msg.command === 'ready') {
-          panel.webview.postMessage({ command: 'switchTab', payload: { tab: initialTab } });
+          if (initialTab === 'docs' || initialTab === 'audits') {
+            const payload = initialTab === 'docs'
+              ? { view: 'docs', page: 'overview' }
+              : { view: 'audits' };
+            panel.webview.postMessage({ command: 'navigateTo', payload });
+          } else {
+            panel.webview.postMessage({ command: 'switchTab', payload: { tab: initialTab } });
+          }
           disposable.dispose();
         }
       });

@@ -553,6 +553,7 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
     updateNavLinks();
     const container = document.querySelector('.container');
     if (container) container.innerHTML = '<div class="empty-state">Loading security audits...</div>';
+    fadeIn(container);
     api.postMessage({ command: 'audits' });
   }
 
@@ -566,6 +567,7 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
     updateNavLinks();
     const container = document.querySelector('.container');
     if (container) container.innerHTML = '<div class="empty-state">Loading documentation...</div>';
+    fadeIn(container);
     api.postMessage({ command: 'docs', payload: { page: currentDocsPage } });
   }
 
@@ -702,6 +704,7 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
           loadLeaderboard(currentTab, 0);
         }
       }
+      fadeIn(document.querySelector('.container'));
       saveState();
     });
   });
@@ -846,62 +849,7 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
       return;
     }
 
-    // Handle manifest toggle via delegation
-    const manifestBtn = target.closest('.btn-manifest, .btn-action-manifest') as HTMLButtonElement | null;
-    if (manifestBtn) {
-      toggleManifest(manifestBtn);
-      return;
-    }
-
-    // Handle "Install Missing" banner button
-    if (target.closest('.btn-install-missing')) {
-      api.postMessage({ command: 'installFromManifest' });
-      return;
-    }
-
-    // Handle remove button
-    const removeBtn = target.closest('.btn-action-remove') as HTMLButtonElement | null;
-    if (removeBtn) {
-      const rmName = removeBtn.dataset.skillName;
-      if (rmName) {
-        api.postMessage({ command: 'uninstall', payload: { skillName: rmName } });
-        const rmLabel = removeBtn.querySelector('span');
-        if (rmLabel) rmLabel.textContent = 'Removing...';
-        removeBtn.disabled = true;
-      }
-      return;
-    }
-
-    // Handle update button
-    const updateActionBtn = target.closest('.btn-action-update') as HTMLButtonElement | null;
-    if (updateActionBtn) {
-      const upName = updateActionBtn.dataset.skillName;
-      if (upName) {
-        api.postMessage({ command: 'update', payload: { skillName: upName } });
-        const upLabel = updateActionBtn.querySelector('span');
-        if (upLabel) upLabel.textContent = 'Updating...';
-        updateActionBtn.disabled = true;
-      }
-      return;
-    }
-
-    // Handle install button (leaderboard grid rows + detail page)
-    const installBtn = target.closest('.btn-install') as HTMLButtonElement | null;
-    if (installBtn) {
-      if (installBtn.classList.contains('btn-updatable')) {
-        api.postMessage({ command: 'update', payload: { skillName: installBtn.dataset.skillName } });
-        installBtn.textContent = 'Updating...';
-        installBtn.disabled = true;
-      } else if (!installBtn.classList.contains('btn-installed')) {
-        const source = installBtn.dataset.install;
-        const skillName = installBtn.dataset.skillName;
-        api.postMessage({ command: 'install', payload: { source, skillName } });
-        installBtn.textContent = 'Installing...';
-        installBtn.disabled = true;
-        installBtn.dataset.pending = 'true';
-      }
-      return;
-    }
+    if (handleActionButtons(target)) return;
 
     const row = target.closest('.grid-row') as HTMLElement | null;
     if (!row) return;
@@ -949,6 +897,7 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
 
         if (page === 0) {
           resultsEl.innerHTML = html;
+          fadeIn(resultsEl);
         } else {
           resultsEl.insertAdjacentHTML('beforeend', html);
         }
@@ -975,6 +924,7 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
           });
           resultsEl.innerHTML = html;
         }
+        fadeIn(resultsEl);
         break;
       }
 
@@ -1088,6 +1038,7 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
       case 'auditsResult': {
         const container = document.querySelector('.container');
         if (container) container.innerHTML = renderAuditsView(msg.payload);
+        fadeIn(container);
         attachAuditsListeners();
         break;
       }
@@ -1098,6 +1049,7 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
           currentDocsPage = docsData.page;
           const container = document.querySelector('.container');
           if (container) container.innerHTML = renderDocsView(docsData);
+          fadeIn(container);
           attachDocsListeners();
         }
         break;
@@ -1126,6 +1078,7 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
           showLeaderboardChrome(true);
           loadLeaderboard(switchTo, 0);
         }
+        fadeIn(document.querySelector('.container'));
         saveState();
         break;
       }
@@ -1151,6 +1104,75 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
   });
 
   // === Helpers ===
+
+  /** Re-trigger a short fade-in animation on an element */
+  function fadeIn(el: Element | null): void {
+    if (!el) return;
+    el.classList.remove('content-fade-in');
+    // Force reflow so removing + re-adding the class triggers the animation
+    void (el as HTMLElement).offsetWidth;
+    el.classList.add('content-fade-in');
+  }
+
+  /** Shared action-button click handler used by both resultsEl and detail overlay. Returns true if handled. */
+  function handleActionButtons(target: HTMLElement): boolean {
+    // Manifest toggle
+    const manifestBtn = target.closest('.btn-manifest, .btn-action-manifest') as HTMLButtonElement | null;
+    if (manifestBtn) { toggleManifest(manifestBtn); return true; }
+
+    // "Install Missing" banner button
+    if (target.closest('.btn-install-missing')) {
+      api.postMessage({ command: 'installFromManifest' });
+      return true;
+    }
+
+    // Remove / Uninstall
+    const removeBtn = target.closest('.btn-action-remove') as HTMLButtonElement | null;
+    if (removeBtn) {
+      const rmName = removeBtn.dataset.skillName;
+      if (rmName) {
+        api.postMessage({ command: 'uninstall', payload: { skillName: rmName } });
+        const rmLabel = removeBtn.querySelector('span');
+        if (rmLabel) rmLabel.textContent = 'Removing...';
+        removeBtn.disabled = true;
+      }
+      return true;
+    }
+
+    // Update (action-style button)
+    const updateActionBtn = target.closest('.btn-action-update') as HTMLButtonElement | null;
+    if (updateActionBtn) {
+      const upName = updateActionBtn.dataset.skillName;
+      if (upName) {
+        api.postMessage({ command: 'update', payload: { skillName: upName } });
+        const upLabel = updateActionBtn.querySelector('span');
+        if (upLabel) upLabel.textContent = 'Updating...';
+        updateActionBtn.disabled = true;
+      }
+      return true;
+    }
+
+    // Install button (leaderboard grid rows + detail page)
+    const installBtn = target.closest('.btn-install') as HTMLButtonElement | null;
+    if (installBtn) {
+      if (installBtn.classList.contains('btn-updatable')) {
+        api.postMessage({ command: 'update', payload: { skillName: installBtn.dataset.skillName } });
+        installBtn.textContent = 'Updating...';
+        installBtn.disabled = true;
+      } else if (!installBtn.classList.contains('btn-installed')) {
+        const source = installBtn.dataset.install;
+        const skillName = installBtn.dataset.skillName;
+        api.postMessage({ command: 'install', payload: { source, skillName } });
+        installBtn.textContent = 'Installing...';
+        installBtn.disabled = true;
+        installBtn.dataset.pending = 'true';
+      }
+      return true;
+    }
+
+    return false;
+  }
+
   function goBack(): void {
     const prev = navStack.pop();
     if (!prev) {
@@ -1341,6 +1363,14 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
           navigator.clipboard.writeText(text);
           showCopyFeedback(copyCmd.querySelector('.copy-icon'));
         }
+      });
+    }
+
+    // Action button delegation for the detail overlay (manifest, update, remove, install)
+    const overlay = document.getElementById('detail-overlay');
+    if (overlay) {
+      overlay.addEventListener('click', (e) => {
+        handleActionButtons(e.target as HTMLElement);
       });
     }
   }

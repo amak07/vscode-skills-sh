@@ -682,6 +682,16 @@ export function getStyles(fontUri: string): string {
     }
     .back-btn svg { width: 14px; height: 14px; }
 
+    /* === Content fade transition === */
+    @keyframes contentFadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .content-fade-in {
+      animation: contentFadeIn 0.2s ease-out;
+    }
+
     /* === Scroll container === */
     .container {
       padding: 0 0.5rem;

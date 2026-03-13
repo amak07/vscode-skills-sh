@@ -1213,10 +1213,10 @@ describe('UI navigation commands', () => {
     expect(mockNavigateTo).toHaveBeenCalledWith('audits');
   });
 
-  it('skills-sh.openDocs navigates to docs', async () => {
+  it('skills-sh.openDocs opens docs in editor tab', async () => {
     await exec('skills-sh.openDocs');
 
-    expect(mockNavigateTo).toHaveBeenCalledWith('docs');
+    expect(mockOpenInTab).toHaveBeenCalledWith('docs');
   });
 
   it('skills-sh.openSettings opens VS Code settings', async () => {

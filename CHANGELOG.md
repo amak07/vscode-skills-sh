@@ -6,9 +6,20 @@ All notable changes to the Skills.sh Agent Skills Manager extension will be docu
 
 ### Added
 
-- **Custom welcome page** — rich branded welcome tab (like GitLens) with SKILLS ASCII art, agent showcase, feature highlights, and quick-action CTAs — auto-opens on first activation
-- **Onboarding walkthrough** — 3-step Getting Started walkthrough that introduces the Agent Skills open standard and guides users to install their first skill
-- **Walkthrough completion tracking** — "Install Your First Skill" step auto-completes when any skill is installed via new `hasInstalledSkill` context variable
+- **Custom welcome page** — rich branded welcome tab with SKILLS ASCII art, agent showcase, 9 feature highlight cards covering all major capabilities, and quick-action CTAs — auto-opens on first activation
+- **Docs in editor tab** — "Read Documentation" now opens in a full editor tab instead of the sidebar
+
+### Fixed
+
+- **Detail page action buttons broken** — "Add to Skills.json", "Update", and "Uninstall" buttons on the skill detail page were non-functional since the scroll-position-preserving overlay refactor (`c414c09`). Root cause: click delegation was attached to `resultsEl` but the detail overlay lives on `document.body`. Extracted shared `handleActionButtons()` helper and wired it into the overlay's click listener.
+
+### Changed
+
+- **Smooth content transitions** — marketplace tab/view switches now use a subtle fade-in animation instead of instant content swaps
+
+### Removed
+
+- **Onboarding walkthrough** — replaced by the custom welcome page (the built-in VS Code walkthrough wizard has been removed)
 
 ## [0.2.0] - 2026-03-12
 

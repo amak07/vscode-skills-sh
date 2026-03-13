@@ -452,7 +452,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand('skills-sh.openDocs', () => {
-      marketplaceProvider.navigateTo('docs');
+      marketplaceProvider.openInTab('docs');
     })
   );
 

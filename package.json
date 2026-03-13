@@ -359,48 +359,6 @@
         }
       ]
     },
-    "walkthroughs": [
-      {
-        "id": "skills-sh.gettingStarted",
-        "title": "Get Started with Skills.sh",
-        "description": "Manage your agent skills across Claude Code, Cursor, Copilot, Windsurf, and more.",
-        "steps": [
-          {
-            "id": "skills-sh.welcome",
-            "title": "Welcome to Skills.sh",
-            "description": "Manage your agent skills, all in one place.\n\n[Agent Skills](https://docs.anthropic.com/en/docs/agents-and-tools/agent-skills) are the open standard for extending AI coding assistants — adopted by Claude Code, Cursor, Windsurf, GitHub Copilot, and more.\n\nSkills.sh is a visual manager for the [skills.sh](https://skills.sh) ecosystem by Vercel. Browse, install, and keep your skills up to date across every agent you use.",
-            "media": {
-              "svg": "media/walkthrough/welcome.svg"
-            },
-            "completionEvents": [
-              "onStepSelected"
-            ]
-          },
-          {
-            "id": "skills-sh.installFirst",
-            "title": "Install Your First Skill",
-            "description": "Browse the marketplace and install skills with one click. Find skills for your favorite frameworks, tools, and workflows.\n\n[Browse Marketplace](command:skills-sh.openMarketplaceTab)",
-            "media": {
-              "svg": "media/walkthrough/install.svg"
-            },
-            "completionEvents": [
-              "onContext:skills-sh.hasInstalledSkill"
-            ]
-          },
-          {
-            "id": "skills-sh.allSet",
-            "title": "You're All Set!",
-            "description": "Your skills are ready! Here's what you can do next:\n\n- View your installed skills in the sidebar\n- Check for updates — we'll notify you when skills have new versions\n- Add skills to your project's skills.json to share with your team\n\n[Open Welcome Page](command:skills-sh.openWelcome) | [Open Settings](command:skills-sh.openSettings) | [Read Documentation](command:skills-sh.openDocs)",
-            "media": {
-              "svg": "media/walkthrough/complete.svg"
-            },
-            "completionEvents": [
-              "onStepSelected"
-            ]
-          }
-        ]
-      }
-    ],
     "viewsWelcome": [
       {
         "view": "skills-sh.installedSkills",
