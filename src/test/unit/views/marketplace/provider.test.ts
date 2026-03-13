@@ -46,6 +46,7 @@ vi.mock('../../../../install/installer', () => ({
   installSkill: (...args: unknown[]) => mockInstallSkill(...args),
   updateSkills: (...args: unknown[]) => mockUpdateSkills(...args),
   uninstallSkill: (...args: unknown[]) => mockUninstallSkill(...args),
+  getUpdatingSkillNames: () => new Set<string>(),
 }));
 
 // Mock the updates module

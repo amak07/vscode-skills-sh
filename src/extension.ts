@@ -4,7 +4,7 @@ import { SkillWatcher } from './local/watcher';
 import { InstalledSkillsTreeProvider } from './views/installed-tree';
 import { MarketplaceViewProvider } from './views/marketplace/provider';
 import { WelcomeViewProvider } from './views/welcome/provider';
-import { updateSkills, uninstallSkill, disposeTerminal, notifyInstallDetected, onOperationCompleted } from './install/installer';
+import { updateSkills, uninstallSkill, disposeTerminal, notifyInstallDetected, onOperationCompleted, getUpdatingSkillNames } from './install/installer';
 import { checkUpdates, getLastUpdateResult, clearUpdateForSkill } from './api/updates';
 import { InstalledSkill, InstalledSkillCard } from './types';
 import { getLog } from './logger';
@@ -115,6 +115,7 @@ export function activate(context: vscode.ExtensionContext) {
     const log = getLog();
     const oldNames = previousSkillNames;
     const oldSkills = previousSkillsList;
+    const updating = getUpdatingSkillNames();
 
     await treeProvider.rescan();
     syncAllState(); // updates previousSkillNames/previousSkillsList
@@ -128,14 +129,14 @@ export function activate(context: vscode.ExtensionContext) {
     // Notify install listeners + clear update cache for new skills
     for (const name of newNames) {
       notifyInstallDetected(name);
-      if (!oldNames.has(name)) {
+      if (!oldNames.has(name) && !updating.has(name)) {
         log.info(`[${source}] New skill: "${name}", clearing update cache`);
         clearUpdateForSkill(name);
       }
     }
 
-    const added = newNames.size - oldNames.size;
-    if (oldNames.size > 0 && added > 0) {
+    const addedNames = [...newNames].filter(n => !oldNames.has(n) && !updating.has(n));
+    if (oldNames.size > 0 && addedNames.length > 0) {
       // TODO: "View Skill" toast navigation is broken — webview may not receive
       // the navigateToDetail message when content was destroyed while hidden.
       // Filed as bug. Re-enable once fixed. See navigateToDetail() in provider.ts.
@@ -160,7 +161,8 @@ export function activate(context: vscode.ExtensionContext) {
         const manifestSkills = getManifestSkillNames();
         const oldFolderNames = new Set(oldSkills.map(s => s.folderName));
         const newlyAdded = newSkills.filter(s =>
-          !oldFolderNames.has(s.folderName) && s.source && !manifestSkills.has(s.folderName),
+          !oldFolderNames.has(s.folderName) && s.source && !manifestSkills.has(s.folderName)
+          && !updating.has(s.name),
         );
         for (const skill of newlyAdded) {
           vscode.window.showInformationMessage(
@@ -178,10 +180,13 @@ export function activate(context: vscode.ExtensionContext) {
           });
         }
       }
-    } else if (oldNames.size > 0 && newNames.size < oldNames.size) {
+    } else {
+      // Compute effective removed count (excluding skills that are just updating)
+      const removedNames = [...oldNames].filter(n => !newNames.has(n) && !updating.has(n));
+      if (oldNames.size > 0 && removedNames.length > 0) {
       if (shouldNotify('info')) {
         vscode.window.showInformationMessage(
-          `Skills.sh: ${oldNames.size - newNames.size} skill(s) removed.`,
+          `Skills.sh: ${removedNames.length} skill(s) removed.`,
         );
       }
 
@@ -190,7 +195,8 @@ export function activate(context: vscode.ExtensionContext) {
         const manifestSkills = getManifestSkillNames();
         const newFolderNames = new Set(newSkills.map(s => s.folderName));
         const removed = oldSkills.filter(s =>
-          !newFolderNames.has(s.folderName) && manifestSkills.has(s.folderName),
+          !newFolderNames.has(s.folderName) && manifestSkills.has(s.folderName)
+          && !updating.has(s.name),
         );
         for (const skill of removed) {
           vscode.window.showInformationMessage(
@@ -208,6 +214,7 @@ export function activate(context: vscode.ExtensionContext) {
           });
         }
       }
+    }
     }
 
     previousSkillNames = newNames;

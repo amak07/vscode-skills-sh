@@ -87,6 +87,7 @@ vi.mock('../../../install/installer', () => ({
   notifyInstallDetected: (name: string) => mockNotifyInstallDetected(name),
   onInstallDetected: installDetectedEmitter.event,
   onOperationCompleted: operationCompletedEmitter.event,
+  getUpdatingSkillNames: () => new Set<string>(),
 }));
 
 // Search API

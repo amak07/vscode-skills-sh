@@ -8,6 +8,12 @@ import { removeLockEntryByFolder } from '../utils/lock-file';
 import { getAgentsSkillsDir } from '../utils/constants';
 import { toErrorMessage } from '../utils/errors';
 
+const updatingSkillNames = new Set<string>();
+
+export function getUpdatingSkillNames(): ReadonlySet<string> {
+  return updatingSkillNames;
+}
+
 let sharedTerminal: vscode.Terminal | undefined;
 
 function getTerminal(): vscode.Terminal {
@@ -180,6 +186,9 @@ export async function updateSkills(
   const terminal = getTerminal();
   terminal.show();
 
+  // Mark skills as updating so file-watcher rescans don't cause UI flicker
+  for (const u of updates) { updatingSkillNames.add(u.name); }
+
   // Send remove+add commands individually (cross-shell compatible — no && or ;)
   for (const u of updates) {
     const removeCmd = `npx skills remove ${u.name} -g -y`;
@@ -207,6 +216,8 @@ export async function updateSkills(
         const cleanup = (source: string) => {
           if (resolved) { return; }
           resolved = true;
+          // Clear updating guard BEFORE firing events so downstream handlers see clean state
+          for (const u of updates) { updatingSkillNames.delete(u.name); }
           log.info(`[installer] update: detected completion via ${source} for "${names}"`);
           clearTimeout(timeoutId);
           disposables.forEach(d => d.dispose());
