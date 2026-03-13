@@ -54,9 +54,9 @@ class SkillItem extends vscode.TreeItem {
     } else if (auditScore === 'pass') {
       this.description = skill.description;
       this.iconPath = new vscode.ThemeIcon('circle-filled', new vscode.ThemeColor('testing.iconPassed'));
-    } else if (auditScore === 'warn') {
+    } else if (auditScore === 'partial') {
       this.description = skill.description;
-      this.iconPath = new vscode.ThemeIcon('circle-filled', new vscode.ThemeColor('list.warningForeground'));
+      this.iconPath = new vscode.ThemeIcon('circle-filled', new vscode.ThemeColor('descriptionForeground'));
     } else if (auditScore === 'fail') {
       this.description = skill.description;
       this.iconPath = new vscode.ThemeIcon('circle-filled', new vscode.ThemeColor('testing.iconFailed'));

@@ -4,32 +4,37 @@ import { SKILLS_SH_BASE, CACHE_TTL_AUDITS } from '../utils/constants';
 
 // ── Composite audit score ────────────────────────────────────────────
 
-export type AuditCompositeScore = 'pass' | 'warn' | 'fail' | 'unknown';
+export type AuditCompositeScore = 'pass' | 'partial' | 'fail' | 'unknown';
 
 export interface AuditMapEntry {
   score: AuditCompositeScore;
+  passCount: number;
   audits: SkillAuditResult[];
 }
 
 export type AuditMap = Map<string, AuditMapEntry>;
 
+/** Check if a status string counts as "pass" (safe / no alerts). */
+export function isPassStatus(status: string): boolean {
+  const s = (status || '').toLowerCase().trim();
+  return s === 'pass' || s === 'safe' || s === '0 alerts';
+}
+
+/** Count how many audits pass. */
+export function countPasses(audits: SkillAuditResult[]): number {
+  return audits.filter(a => isPassStatus(a.status)).length;
+}
+
 /**
  * Roll up per-partner statuses into a single composite score.
- * Uses the same classification as getAuditBadgeClass() in webview-script.ts.
+ * All pass = 'pass', some pass = 'partial', none pass = 'fail'.
  */
 export function computeAuditScore(audits: SkillAuditResult[]): AuditCompositeScore {
   if (audits.length === 0) { return 'unknown'; }
-
-  const mapped = audits.map(a => {
-    const s = (a.status || '').toLowerCase().trim();
-    if (s === 'fail' || s === 'critical' || s === 'high risk') { return 'fail' as const; }
-    if (s === 'pass' || s === 'safe' || s === '0 alerts' || s === 'low risk') { return 'pass' as const; }
-    return 'warn' as const;
-  });
-
-  if (mapped.includes('fail')) { return 'fail'; }
-  if (mapped.includes('warn')) { return 'warn'; }
-  return 'pass';
+  const passed = countPasses(audits);
+  if (passed === audits.length) { return 'pass'; }
+  if (passed === 0) { return 'fail'; }
+  return 'partial';
 }
 
 /** Build a skill-ID-keyed lookup map from a bulk audit listing. */
@@ -38,6 +43,7 @@ export function buildAuditMap(listing: AuditListingResponse): AuditMap {
   for (const skill of listing.skills) {
     map.set(skill.skillId, {
       score: computeAuditScore(skill.audits),
+      passCount: countPasses(skill.audits),
       audits: skill.audits,
     });
   }

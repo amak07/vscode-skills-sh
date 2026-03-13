@@ -1402,23 +1402,24 @@ export function getStyles(fontUri: string): string {
       border-radius: var(--radius-sm);
       white-space: nowrap;
       flex-shrink: 0;
-      cursor: default;
+      cursor: pointer;
+      vertical-align: middle;
     }
-    .audit-shield svg { width: 10px; height: 12px; flex-shrink: 0; }
+    .audit-shield svg { width: 10px; height: 12px; flex-shrink: 0; position: relative; top: -0.5px; }
     .audit-shield-pass {
       color: #22c55e;
       background: rgba(34, 197, 94, 0.08);
     }
-    .audit-shield-warn {
-      color: #eab308;
-      background: rgba(234, 179, 8, 0.12);
+    .audit-shield-partial {
+      color: #9ca3af;
+      background: rgba(156, 163, 175, 0.1);
     }
     .audit-shield-fail {
       color: #ef4444;
       background: rgba(239, 68, 68, 0.12);
     }
     .light-theme .audit-shield-pass { background: rgba(34, 197, 94, 0.12); }
-    .light-theme .audit-shield-warn { background: rgba(234, 179, 8, 0.15); }
+    .light-theme .audit-shield-partial { background: rgba(156, 163, 175, 0.12); }
     .light-theme .audit-shield-fail { background: rgba(239, 68, 68, 0.15); }
 
     /* === Nav Bar (Audits / Docs links) === */

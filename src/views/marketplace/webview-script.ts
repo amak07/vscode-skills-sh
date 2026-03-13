@@ -105,7 +105,8 @@ export function getAuditBadgeClass(status: string): string {
 // ── Audit shield badge (at-a-glance security) ───────────────────────
 
 export interface AuditShieldData {
-  score: 'pass' | 'warn' | 'fail' | 'unknown';
+  score: 'pass' | 'partial' | 'fail' | 'unknown';
+  passCount: number;
   audits: { partner: string; status: string }[];
 }
 
@@ -117,7 +118,7 @@ export function setAuditMap(map: Record<string, AuditShieldData>): void {
 
 function shieldSvg(score: string): string {
   const colors: Record<string, string> = {
-    pass: '#22c55e', warn: '#eab308', fail: '#ef4444',
+    pass: '#22c55e', partial: '#9ca3af', fail: '#ef4444',
   };
   const c = colors[score] || '#888';
   return '<svg viewBox="0 0 12 14" fill="none" xmlns="http://www.w3.org/2000/svg">'
@@ -128,13 +129,16 @@ function shieldSvg(score: string): string {
 export function renderAuditShieldBadge(
   skillId: string,
   data?: AuditShieldData,
+  source?: string,
 ): string {
   if (!data || data.score === 'unknown') { return ''; }
-  const labels: Record<string, string> = { pass: 'Audited', warn: 'Caution', fail: 'Risk' };
-  const label = labels[data.score] || '';
+  const label = data.passCount + '/' + data.audits.length + ' audits passed';
   const tooltip = data.audits.map(a => a.partner + ': ' + a.status).join('\n');
+  const securityUrl = source
+    ? ' data-security-url="' + escapeHtml('https://skills.sh/' + source + '/' + skillId + '/security') + '"'
+    : '';
   return '<span class="audit-shield audit-shield-' + data.score
-    + '" title="' + escapeHtml(tooltip) + '">'
+    + '" title="' + escapeHtml(tooltip) + '"' + securityUrl + '>'
     + shieldSvg(data.score) + ' ' + label + '</span>';
 }
 
@@ -191,7 +195,7 @@ export function renderRow(
     + '<div class="row-right">'
     + '<span class="row-installs">' + formatInstalls(installs) + '</span>'
     + changeHtml
-    + renderAuditShieldBadge(skillId || '', _auditMap[skillId || ''])
+    + renderAuditShieldBadge(skillId || '', _auditMap[skillId || ''], source)
     + '<button class="' + btnClass + '"'
     + ' data-install="' + source + '" data-skill-name="' + skillId + '"'
     + ' onclick="event.stopPropagation()">'
@@ -248,7 +252,7 @@ export function renderInstalledCard(
     + '<div class="card-meta">'
     + '<span class="scope-badge scope-' + scopeLabel + '">' + scopeLabel + '</span>'
     + (agentCount > 0 ? ' &middot; ' + agentCount + ' agent' + (agentCount > 1 ? 's' : '') : '')
-    + renderAuditShieldBadge(skill.folderName, _auditMap[skill.folderName])
+    + renderAuditShieldBadge(skill.folderName, _auditMap[skill.folderName], skill.source)
     + '</div>'
     // Actions
     + '<div class="card-actions">'
@@ -446,22 +450,26 @@ export function renderDocsView(data: DocsData): string {
 function updateAuditBadgesOnCards(): void {
   // Leaderboard / search rows
   document.querySelectorAll('.grid-row').forEach(row => {
-    const skillId = (row as HTMLElement).dataset.skill;
+    const el = row as HTMLElement;
+    const skillId = el.dataset.skill;
+    const source = el.dataset.source;
     if (!skillId || !_auditMap[skillId]) { return; }
     if (row.querySelector('.audit-shield')) { return; }
     const rightDiv = row.querySelector('.row-right');
     if (rightDiv) {
       const btn = rightDiv.querySelector('.btn-install');
-      if (btn) { btn.insertAdjacentHTML('beforebegin', renderAuditShieldBadge(skillId, _auditMap[skillId])); }
+      if (btn) { btn.insertAdjacentHTML('beforebegin', renderAuditShieldBadge(skillId, _auditMap[skillId], source)); }
     }
   });
   // Installed cards
   document.querySelectorAll('.installed-card').forEach(card => {
-    const skillId = (card as HTMLElement).dataset.skill;
+    const el = card as HTMLElement;
+    const skillId = el.dataset.skill;
+    const source = el.dataset.source;
     if (!skillId || !_auditMap[skillId]) { return; }
     if (card.querySelector('.audit-shield')) { return; }
     const meta = card.querySelector('.card-meta');
-    if (meta) { meta.insertAdjacentHTML('beforeend', renderAuditShieldBadge(skillId, _auditMap[skillId])); }
+    if (meta) { meta.insertAdjacentHTML('beforeend', renderAuditShieldBadge(skillId, _auditMap[skillId], source)); }
   });
 }
 
@@ -813,6 +821,15 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
       infoBannerDismissed = true;
       const banner = dismissBtn.closest('.info-banner');
       if (banner) banner.remove();
+      return;
+    }
+
+    // Handle audit shield badge click → open security page
+    const shieldEl = target.closest('[data-security-url]') as HTMLElement | null;
+    if (shieldEl) {
+      e.stopPropagation();
+      const url = shieldEl.dataset.securityUrl;
+      if (url) { api.postMessage({ command: 'openExternal', payload: { url } }); }
       return;
     }
 

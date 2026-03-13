@@ -552,18 +552,18 @@ describe('InstalledSkillsTreeProvider', () => {
       expect((skillItem.iconPath as any).color.id).toBe('testing.iconPassed');
     });
 
-    it('shows yellow circle-filled icon for warn score', async () => {
+    it('shows neutral circle-filled icon for partial score', async () => {
       const scanner = createMockScanner({
-        globalSkills: [makeSkill({ name: 'warn-skill', source: 'org/repo', hash: 'abc' })],
+        globalSkills: [makeSkill({ name: 'partial-skill', source: 'org/repo', hash: 'abc' })],
       });
       const provider = new InstalledSkillsTreeProvider(scanner);
-      provider.setAuditMap(makeAuditMap({ 'warn-skill': 'warn' }));
+      provider.setAuditMap(makeAuditMap({ 'partial-skill': 'partial' }));
 
       const children = await provider.getChildren();
       const sourceGroup = children.find((c: any) => c.groupType === 'source') as any;
       const skillItem = sourceGroup.children[0];
       expect((skillItem.iconPath as any).id).toBe('circle-filled');
-      expect((skillItem.iconPath as any).color.id).toBe('list.warningForeground');
+      expect((skillItem.iconPath as any).color.id).toBe('descriptionForeground');
     });
 
     it('shows red circle-filled icon for fail score', async () => {

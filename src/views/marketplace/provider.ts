@@ -5,7 +5,7 @@ import { searchSkills, getLeaderboard } from '../../api/search';
 import { fetchSkillDetail } from '../../api/detail-scraper';
 import { fetchSkillMd } from '../../api/github';
 import { fetchDocsPage } from '../../api/docs-scraper';
-import { fetchAuditListing, computeAuditScore, type AuditMapEntry } from '../../api/audits-scraper';
+import { fetchAuditListing, computeAuditScore, countPasses, type AuditMapEntry } from '../../api/audits-scraper';
 import * as path from 'path';
 import { installSkill, updateSkills, uninstallSkill, getUpdatingSkillNames } from '../../install/installer';
 import { updateSkillFrontmatter } from '../../local/parser';
@@ -284,7 +284,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
           // Backfill audit map from detail-page security audits
           if (detail?.securityAudits && !this.auditMap.has(skillId)) {
             const audits = detail.securityAudits.map(a => ({ partner: a.partner, status: a.status }));
-            this.auditMap.set(skillId, { score: computeAuditScore(audits), audits });
+            this.auditMap.set(skillId, { score: computeAuditScore(audits), passCount: countPasses(audits), audits });
             this.setAuditMap(this.auditMap);
           }
         } catch (e: unknown) {
