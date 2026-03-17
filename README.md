@@ -38,7 +38,7 @@
 <h3 align="center">Explore the marketplace — leaderboards, search, and skill details</h3>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/amak07/vscode-skills-sh/master/docs/demo-marketplace.webp" alt="Explore the marketplace — leaderboards, search, and skill details" width="100%" />
+  <img src="https://raw.githubusercontent.com/amak07/vscode-skills-sh/master/docs/explore_marketplace.webp" alt="Explore the marketplace — leaderboards, search, and skill details" width="100%" />
 </p>
 
 <h3 align="center">Share skills with your team via skills.json</h3>

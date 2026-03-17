@@ -4,6 +4,8 @@ All notable changes to the Skills.sh Agent Skills Manager extension will be docu
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-03-16
+
 ### Added
 
 - **At-a-glance security audit badges** — skill cards (search, leaderboard, installed tab) now show a composite shield badge with pass ratio (e.g., "2/3 audits passed"). All pass = green, partial pass = neutral gray, none pass = red. Hover for per-partner breakdown; click opens the skill's security page on skills.sh. TreeView sidebar shows colored circle icons. Audit data pre-fetched on activation (single request); detail-page visits backfill any missing skills.
@@ -18,6 +20,7 @@ All notable changes to the Skills.sh Agent Skills Manager extension will be docu
 ### Changed
 
 - **Smooth content transitions** — marketplace tab/view switches now use a subtle fade-in animation instead of instant content swaps
+- **Updated README demos** — replaced hero and marketplace demo images with fresh recordings
 
 ### Removed
 
