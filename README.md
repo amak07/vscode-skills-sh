@@ -32,7 +32,7 @@
 <h3 align="center">Find and install a skill in seconds</h3>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/amak07/vscode-skills-sh/master/docs/demo.webp" alt="Find and install a skill in seconds" width="100%" />
+  <img src="https://raw.githubusercontent.com/amak07/vscode-skills-sh/master/docs/hero.webp" alt="Find and install a skill in seconds" width="100%" />
 </p>
 
 <h3 align="center">Explore the marketplace — leaderboards, search, and skill details</h3>
