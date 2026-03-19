@@ -65,6 +65,9 @@ function parseRenderedHtml(
     // Per-agent breakdown from the "Installed on" section
     const perAgent = extractPerAgentData(html);
 
+    // Summary card content (prose inside the Summary section)
+    const summaryHtml = extractSummaryContent(html);
+
     // SKILL.md rendered content from the prose div
     const skillMdHtml = extractSkillMdContent(html);
 
@@ -80,6 +83,7 @@ function parseRenderedHtml(
       installCommand,
       perAgent,
       skillMdHtml,
+      summaryHtml: summaryHtml || undefined,
       githubStars,
       securityAudits: securityAudits.length > 0 ? securityAudits : undefined,
     };
@@ -141,26 +145,34 @@ function extractSecurityAudits(html: string): SkillSecurityAudit[] {
   return audits;
 }
 
-function extractSkillMdContent(html: string): string {
-  // The SKILL.md content is inside a div with class="prose prose-invert max-w-none ..."
-  // The content column uses lg:col-span-9 and sidebar uses lg:col-span-3
+function extractSummaryContent(html: string): string {
+  // Summary card: <div>Summary</div><div class="..."><div class="prose ...">CONTENT</div></div></div>
+  const match = html.match(/Summary<\/div>\s*<div[^>]*>\s*<div class="prose[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>/);
+  return match ? match[1] : '';
+}
 
-  // Primary: capture prose content, stopping before the sidebar column (col-span-3)
-  const proseMatch = html.match(/class="prose[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>\s*<div[^>]*col-span-3/);
-  if (proseMatch) {
-    return proseMatch[1];
+function extractSkillMdContent(html: string): string {
+  // The SKILL.md content is inside a prose div that follows the "SKILL.md" label.
+  // skills.sh also has a Summary card with its own prose div earlier in the page,
+  // so we anchor to the SKILL.md label to avoid matching the wrong prose div.
+  // The content column uses lg:col-span-9 and sidebar uses lg:col-span-3.
+
+  // Primary: match the prose div after the "SKILL.md" label, stop before sidebar
+  const skillMdMatch = html.match(/SKILL\.md<\/span><\/div>\s*<div class="prose[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>\s*<div[^>]*col-span-3/);
+  if (skillMdMatch) {
+    return skillMdMatch[1];
   }
 
-  // Fallback: stop before <aside> tag (older page layouts)
-  const asideMatch = html.match(/class="prose[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>\s*<aside/);
+  // Fallback: match prose after SKILL.md label, stop before <aside>
+  const asideMatch = html.match(/SKILL\.md<\/span><\/div>\s*<div class="prose[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>\s*<aside/);
   if (asideMatch) {
     return asideMatch[1];
   }
 
-  // Last resort: stop before "Weekly Installs" sidebar section
-  const weeklyMatch = html.match(/class="prose[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>[\s\S]*?(?=Weekly Installs<\/span>)/);
-  if (weeklyMatch) {
-    return weeklyMatch[1];
+  // Legacy fallback: first prose div before col-span-3 (pre-Summary card layouts)
+  const legacyMatch = html.match(/class="prose[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>\s*<div[^>]*col-span-3/);
+  if (legacyMatch) {
+    return legacyMatch[1];
   }
 
   return '';
