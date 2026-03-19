@@ -60,6 +60,7 @@ export interface SkillDetail {
   installCommand: string;
   perAgent: { agent: string; installs: string }[];
   skillMdHtml: string;
+  summaryHtml?: string;
   githubStars?: string;
   securityAudits?: SkillSecurityAudit[];
 }

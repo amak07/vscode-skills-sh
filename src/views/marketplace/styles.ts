@@ -464,6 +464,46 @@ export function getStyles(fontUri: string): string {
       .detail-grid > aside { order: -1; }
       .detail-grid > .detail-content { order: 1; }
     }
+    .detail-summary-card {
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.03);
+      padding: 1.25rem 1.25rem 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .light-theme .detail-summary-card {
+      background: rgba(0, 0, 0, 0.02);
+    }
+    .detail-summary-label {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--gray-600);
+      margin-bottom: 0.75rem;
+    }
+    .detail-summary-body {
+      font-size: 0.875rem;
+      color: var(--gray-900);
+      line-height: 1.6;
+    }
+    .detail-summary-body p:first-child {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--gray-1000);
+      margin: 0 0 0.625rem;
+    }
+    .detail-summary-body ul {
+      margin: 0.5rem 0 0;
+      padding-left: 1.25rem;
+    }
+    .detail-summary-body li {
+      margin-bottom: 0.375rem;
+    }
+    .detail-summary-body li:last-child {
+      margin-bottom: 0;
+    }
     .detail-content { min-width: 0; overflow: hidden; }
     .detail-grid > aside { align-self: start; }
     .detail-skillmd-header {

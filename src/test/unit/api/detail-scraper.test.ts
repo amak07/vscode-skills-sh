@@ -18,6 +18,7 @@ function buildDetailHtml(opts: {
   installCommand?: string;
   agents?: { name: string; installs: string }[];
   skillMdBody?: string;
+  summaryBody?: string;
   securityAudits?: { partner: string; status: string; slug: string }[];
 } = {}): string {
   const weeklyInstalls = opts.weeklyInstalls ?? '121.0K';
@@ -29,6 +30,7 @@ function buildDetailHtml(opts: {
     { name: 'cursor', installs: '23.1K' },
   ];
   const skillMdBody = opts.skillMdBody ?? '<h1>My Skill</h1><p>Great skill.</p>';
+  const summaryBody = opts.summaryBody ?? '<p><strong>Short summary.</strong></p>';
   const securityAudits = opts.securityAudits ?? [];
 
   const agentRows = agents.map(a =>
@@ -53,7 +55,8 @@ function buildDetailHtml(opts: {
 <span>GitHub Stars</span></div><div class="sidebar-value"><svg class="icon"></svg><span>${githubStars}</span></div>
 <code>${installCommand}</code>
 ${installedSection}
-<div class="prose prose-invert max-w-none">${skillMdBody}</div></div></div><div class="col-span-3">sidebar</div>
+<div class="summary-card"><div class="text-xs">Summary</div><div class="prose-wrapper"><div class="prose prose-invert max-w-none">${summaryBody}</div></div></div>
+<svg class="icon"></svg><span>SKILL.md</span></div><div class="prose prose-invert max-w-none">${skillMdBody}</div></div></div><div class=" lg:col-span-3">sidebar</div>
 ${securitySection}
 </body></html>`;
 }
@@ -121,6 +124,15 @@ describe('fetchSkillDetail', () => {
     expect(detail).not.toBeNull();
     expect(detail!.skillMdHtml).toContain('<h2>Usage</h2>');
     expect(detail!.skillMdHtml).toContain('<p>Run this.</p>');
+  });
+
+  it('extracts summary card content', async () => {
+    const summary = '<p><strong>A great tool.</strong></p><ul><li>Feature one</li></ul>';
+    mockFetch({ 'skills.sh/acme/tools/summary': htmlResponse(buildDetailHtml({ summaryBody: summary })) });
+    const detail = await fetchSkillDetail('acme', 'tools', 'summary');
+    expect(detail).not.toBeNull();
+    expect(detail!.summaryHtml).toContain('<strong>A great tool.</strong>');
+    expect(detail!.summaryHtml).toContain('<li>Feature one</li>');
   });
 
   it('extracts security audits when present', async () => {
