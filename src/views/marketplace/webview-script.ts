@@ -60,6 +60,7 @@ export interface DetailData {
   inManifest?: boolean;
   hasUpdate?: boolean;
   skillMdHtml?: string;
+  summaryHtml?: string;
   githubStars?: string;
   firstSeen?: string;
   securityAudits?: { partner: string; status: string; url: string }[];
@@ -365,6 +366,12 @@ export function renderDetailHtml(detail: DetailData): string {
     + '<span class="detail-cmd-text"><span class="dollar">$</span> ' + escapeHtml(detail.installCommand) + '</span>'
     + '<span class="copy-icon">' + _icons.copy + '</span></div>'
     + '<div class="detail-grid"><div class="detail-content">'
+    + (detail.summaryHtml
+      ? '<div class="detail-summary-card">'
+        + '<div class="detail-summary-label">Summary</div>'
+        + '<div class="detail-summary-body">' + detail.summaryHtml + '</div>'
+        + '</div>'
+      : '')
     + '<div class="detail-skillmd-header">' + _icons.file + ' <span>SKILL.md</span></div>'
     + '<div class="prose">' + (detail.skillMdHtml || '') + '</div>'
     + '</div><aside>'
