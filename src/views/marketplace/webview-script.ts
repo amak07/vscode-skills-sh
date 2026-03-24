@@ -92,8 +92,81 @@ export function escapeHtml(str: string): string {
 }
 
 export function formatInstalls(n: number): string {
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
   if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
   return n.toLocaleString();
+}
+
+// ── Publisher grouping (leaderboard) ────────────────────────────────
+
+export interface SkillGroup {
+  source: string;
+  skills: SkillData[];
+  totalInstalls: number;
+}
+
+const PUBLISHER_GROUP_THRESHOLD = 4;
+
+export function groupConsecutiveSkills(skills: SkillData[]): SkillGroup[] {
+  const groups: SkillGroup[] = [];
+  for (const skill of skills) {
+    const last = groups[groups.length - 1];
+    if (last && last.source === skill.source) {
+      last.skills.push(skill);
+      last.totalInstalls += (skill.installs || 0);
+    } else {
+      groups.push({ source: skill.source, skills: [skill], totalInstalls: skill.installs || 0 });
+    }
+  }
+  return groups;
+}
+
+export function renderLeaderboardWithGroups(
+  skills: SkillData[], startRank: number, page: number,
+  installed: Set<string>, updatable: Set<string>,
+): string {
+  const groups = groupConsecutiveSkills(skills);
+  let rank = startRank;
+  let html = '';
+
+  groups.forEach((group, gi) => {
+    if (group.skills.length < PUBLISHER_GROUP_THRESHOLD) {
+      for (const s of group.skills) {
+        const sid = s.skillId || s.name;
+        html += renderRow(s, rank++, installed.has(sid!), updatable.has(sid!));
+      }
+      return;
+    }
+
+    // First skill shown normally
+    const first = group.skills[0];
+    const firstSid = first.skillId || first.name;
+    html += renderRow(first, rank++, installed.has(firstSid!), updatable.has(firstSid!));
+
+    // Summary row
+    const hiddenCount = group.skills.length - 1;
+    const groupId = 'p' + page + '-' + gi;
+    html += '<div class="grid-row publisher-summary-row" data-publisher-group="' + groupId + '">'
+      + '<span class="row-rank"></span>'
+      + '<div class="row-info">'
+      + '<span class="publisher-chevron">&#x25B8;</span>'
+      + '+' + hiddenCount + ' more from ' + escapeHtml(group.source)
+      + ' (' + formatInstalls(group.totalInstalls) + ' total)'
+      + '</div>'
+      + '<div class="row-right"></div>'
+      + '</div>';
+
+    // Hidden skills container
+    html += '<div class="publisher-group-body" data-publisher-group="' + groupId + '">';
+    for (let i = 1; i < group.skills.length; i++) {
+      const s = group.skills[i];
+      const sid = s.skillId || s.name;
+      html += renderRow(s, rank++, installed.has(sid!), updatable.has(sid!));
+    }
+    html += '</div>';
+  });
+
+  return html;
 }
 
 export function getAuditBadgeClass(status: string): string {
@@ -937,6 +1010,18 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
 
     if (handleActionButtons(target)) return;
 
+    // Handle publisher group expand/collapse
+    const summaryRow = target.closest('.publisher-summary-row') as HTMLElement | null;
+    if (summaryRow) {
+      const groupId = summaryRow.dataset.publisherGroup;
+      const body = resultsEl.querySelector('.publisher-group-body[data-publisher-group="' + groupId + '"]') as HTMLElement | null;
+      if (body) {
+        body.classList.toggle('open');
+        summaryRow.classList.toggle('expanded');
+      }
+      return;
+    }
+
     const row = target.closest('.grid-row') as HTMLElement | null;
     if (!row) return;
 
@@ -974,12 +1059,8 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
           updateTabCount(total);
         }
 
-        let html = '';
-        skills.forEach((s: SkillData, i: number) => {
-          const rank = page * skills.length + i + 1;
-          const sid = s.skillId || s.name;
-          html += renderRow(s, rank, installed.has(sid!), updatable.has(sid!));
-        });
+        const startRank = page * skills.length + 1;
+        const html = renderLeaderboardWithGroups(skills, startRank, page, installed, updatable);
 
         if (page === 0) {
           resultsEl.innerHTML = html;

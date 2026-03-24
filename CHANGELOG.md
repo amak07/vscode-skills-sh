@@ -6,8 +6,14 @@ All notable changes to the Skills.sh Agent Skills Manager extension will be docu
 
 ### Added
 
-- **Rating prompt** — after 3+ skill installs and 3+ days of use, a non-intrusive notification invites users to rate the extension on the Marketplace. Options: "Rate", "Remind Me Later" (14 days), or "No Thanks" (permanent dismiss). Respects the `showNotifications` setting.
+- **Rating prompt** — after 3+ skill installs/updates and 3+ days of use, a non-intrusive notification invites users to rate the extension on the Marketplace. Options: "Rate", "Remind Me Later" (14 days), or "No Thanks" (permanent dismiss). Silent dismiss snoozes for 7 days. Respects the `showNotifications` setting.
 - **"Rate this Extension" command** — available in the command palette (`Skills.sh: Rate this Extension`) for user-initiated marketplace reviews
+- **"Reset Rating State" debug command** — available in command palette for testing the rating prompt flow
+- **Collapsible publisher groups** — leaderboard groups consecutive skills from the same source repo when 4+ appear in a row. First skill shown normally, rest collapsed as "+N more from {source} ({total} total)". Click to expand/collapse. Matches skills.sh website UX.
+
+### Fixed
+
+- **Skill detail page two-column layout** — the detail scraper was matching the wrong `prose` div after skills.sh added a Summary card, producing broken HTML that collapsed the CSS grid. Anchored the SKILL.md regex to the correct label; added Summary card rendering; added belt-and-suspenders CSS override inside the narrow-viewport media query to preserve two-column grid in editor tab view.
 
 ## [0.2.1] - 2026-03-16
 

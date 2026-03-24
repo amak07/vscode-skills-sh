@@ -282,6 +282,26 @@ export function getStyles(fontUri: string): string {
       white-space: nowrap;
     }
 
+    /* === Publisher Group (Leaderboard) === */
+    .publisher-summary-row {
+      cursor: pointer;
+      user-select: none;
+      color: var(--gray-600);
+      font-size: 0.8125rem;
+    }
+    .publisher-summary-row:hover { color: var(--fg); }
+    .publisher-chevron {
+      display: inline-block;
+      transition: transform 150ms;
+      font-size: 0.625rem;
+      margin-right: 0.35rem;
+    }
+    .publisher-summary-row.expanded .publisher-chevron {
+      transform: rotate(90deg);
+    }
+    .publisher-group-body { display: none; }
+    .publisher-group-body.open { display: block; }
+
     /* === Install Button === */
     .btn-install {
       font-family: var(--font-mono);
@@ -463,6 +483,13 @@ export function getStyles(fontUri: string): string {
       }
       .detail-grid > aside { order: -1; }
       .detail-grid > .detail-content { order: 1; }
+      /* Preserve two-column in tab view even at narrow viewport */
+      .tab-view .detail-grid {
+        grid-template-columns: 9fr 3fr;
+        gap: 4rem;
+      }
+      .tab-view .detail-grid > aside { order: unset; }
+      .tab-view .detail-grid > .detail-content { order: unset; }
     }
     .detail-summary-card {
       border: 1px solid var(--gray-200);
