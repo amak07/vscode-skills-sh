@@ -4,6 +4,11 @@ All notable changes to the Skills.sh Agent Skills Manager extension will be docu
 
 ## [Unreleased]
 
+### Added
+
+- **Rating prompt** — after 3+ skill installs and 3+ days of use, a non-intrusive notification invites users to rate the extension on the Marketplace. Options: "Rate", "Remind Me Later" (14 days), or "No Thanks" (permanent dismiss). Respects the `showNotifications` setting.
+- **"Rate this Extension" command** — available in the command palette (`Skills.sh: Rate this Extension`) for user-initiated marketplace reviews
+
 ## [0.2.1] - 2026-03-16
 
 ### Added

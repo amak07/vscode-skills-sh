@@ -203,10 +203,25 @@
         "command": "skills-sh.openWelcome",
         "title": "Open Welcome Page",
         "category": "Skills.sh"
+      },
+      {
+        "command": "skills-sh.rateExtension",
+        "title": "Rate this Extension",
+        "category": "Skills.sh",
+        "icon": "$(star-full)"
+      },
+      {
+        "command": "skills-sh.resetRatingState",
+        "title": "Reset Rating State (Debug)",
+        "category": "Skills.sh"
       }
     ],
     "menus": {
       "commandPalette": [
+        {
+          "command": "skills-sh.resetRatingState",
+          "when": "false"
+        },
         {
           "command": "skills-sh.openSkillFile",
           "when": "false"

@@ -11,6 +11,7 @@ import { InstalledSkill, InstalledSkillCard } from './types';
 import { getLog } from './logger';
 import { addSkillToManifest, removeSkillFromManifest, readManifest, writeManifest, getManifestPath, getMissingSkills, getManifestSkillNames } from './manifest/manifest';
 import { toErrorMessage } from './utils/errors';
+import { initRatingState, recordInstallAndMaybePrompt, checkDeferredPrompt, openReviewPage, resetRatingState } from './rating';
 
 /** Check whether a notification at the given level should be shown, per user config. */
 function shouldNotify(level: 'info' | 'error'): boolean {
@@ -34,6 +35,7 @@ export function activate(context: vscode.ExtensionContext) {
   const treeProvider = new InstalledSkillsTreeProvider(scanner);
   marketplaceProvider = new MarketplaceViewProvider(context.extensionUri, () => treeProvider.refresh());
   const welcomeProvider = new WelcomeViewProvider(context.extensionUri);
+  initRatingState(context.globalState);
 
   // Register TreeView
   const treeView = vscode.window.createTreeView('skills-sh.installedSkills', {
@@ -157,6 +159,11 @@ export function activate(context: vscode.ExtensionContext) {
       //   });
       // }
 
+      // Record installs for rating prompt (increments counter, may show prompt)
+      for (const _name of addedNames) {
+        recordInstallAndMaybePrompt(context.globalState, shouldNotify('info'));
+      }
+
       // Post-install: offer to add newly installed skills to skills.json
       if (oldSkills.length > 0 && readManifest()) {
         const manifestSkills = getManifestSkillNames();
@@ -216,6 +223,12 @@ export function activate(context: vscode.ExtensionContext) {
           }
         }
       }
+    }
+
+    // Record updates for rating prompt (skills in the updating set that are still present)
+    const updatedNames = [...newNames].filter(n => updating.has(n));
+    for (const _name of updatedNames) {
+      recordInstallAndMaybePrompt(context.globalState, shouldNotify('info'));
     }
 
     previousSkillNames = newNames;
@@ -447,6 +460,20 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
+    vscode.commands.registerCommand('skills-sh.rateExtension', () => {
+      openReviewPage();
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('skills-sh.resetRatingState', async () => {
+      await resetRatingState(context.globalState);
+      initRatingState(context.globalState);
+      vscode.window.showInformationMessage('Skills.sh: Rating state has been reset.');
+    })
+  );
+
+  context.subscriptions.push(
     vscode.commands.registerCommand('skills-sh.viewInstalledInEditor', () => {
       marketplaceProvider.openInTab('installed');
     })
@@ -654,6 +681,9 @@ export function activate(context: vscode.ExtensionContext) {
       context.globalState.update('skills-sh.hasSeenOnboarding', true);
       welcomeProvider.openWelcomePage();
     }
+
+    // Check if a deferred rating prompt is now due
+    checkDeferredPrompt(context.globalState, shouldNotify('info'));
 
     // Show diagnostic notification if no skills found
     if (treeProvider.getInstalledSkillNames().size === 0) {
