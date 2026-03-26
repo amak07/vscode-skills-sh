@@ -4,6 +4,8 @@ All notable changes to the Skills.sh Agent Skills Manager extension will be docu
 
 ## [Unreleased]
 
+## [0.2.3] - 2026-03-26
+
 ### Added
 
 - **Official skills tab** — new "Official" link in the marketplace nav bar (alongside Audits and Docs) showcasing skills from the companies that build the technology. Table layout with CREATOR / REPOS / SKILLS columns matching skills.sh/official UX. Click an org to drill into repos, then individual skills with install counts.
