@@ -85,6 +85,33 @@ export interface AuditListingResponse {
   total: number;
 }
 
+// === Official listing (scraped from /official) ===
+
+export interface OfficialSkill {
+  name: string;
+  installs: number;
+}
+
+export interface OfficialRepo {
+  repo: string;        // "owner/repo-name"
+  totalInstalls: number;
+  skills: OfficialSkill[];
+}
+
+export interface OfficialOwner {
+  owner: string;       // GitHub org/user
+  repos: OfficialRepo[];
+  totalInstalls: number;
+  repoCount: number;
+  skillCount: number;
+  featuredRepo?: string;  // e.g. "skills" (short name shown next to owner)
+}
+
+export interface OfficialListingResponse {
+  owners: OfficialOwner[];
+  total: number;
+}
+
 // === Docs (scraped from /docs, /docs/cli, /docs/faq) ===
 
 export type DocsPage = 'overview' | 'cli' | 'faq';
@@ -165,6 +192,7 @@ export type WebviewCommand =
   | 'installFromManifest'
   | 'uninstall'
   | 'audits'
+  | 'official'
   | 'docs'
   | 'toggleAutoInvoke'
   | 'openSkillFile'
@@ -175,7 +203,7 @@ export interface WebviewMessage {
   payload?: unknown;
 }
 
-export type ViewState = 'leaderboard' | 'search-results' | 'detail' | 'installed' | 'audits' | 'docs';
+export type ViewState = 'leaderboard' | 'search-results' | 'detail' | 'installed' | 'audits' | 'official' | 'docs';
 
 // === Project skills manifest (skills.json) ===
 

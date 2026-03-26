@@ -6,6 +6,7 @@ import { fetchSkillDetail } from '../../api/detail-scraper';
 import { fetchSkillMd } from '../../api/github';
 import { fetchDocsPage } from '../../api/docs-scraper';
 import { fetchAuditListing, computeAuditScore, countPasses, type AuditMapEntry } from '../../api/audits-scraper';
+import { fetchOfficialListing, fetchOfficialOwner, fetchOfficialRepo } from '../../api/official-scraper';
 import * as path from 'path';
 import { installSkill, updateSkills, uninstallSkill, getUpdatingSkillNames } from '../../install/installer';
 import { updateSkillFrontmatter } from '../../local/parser';
@@ -171,10 +172,12 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
     if (initialTab) {
       const disposable = panel.webview.onDidReceiveMessage((msg: WebviewMessage) => {
         if (msg.command === 'ready') {
-          if (initialTab === 'docs' || initialTab === 'audits') {
+          if (initialTab === 'docs' || initialTab === 'audits' || initialTab === 'official') {
             const payload = initialTab === 'docs'
               ? { view: 'docs', page: 'overview' }
-              : { view: 'audits' };
+              : initialTab === 'official'
+                ? { view: 'official' }
+                : { view: 'audits' };
             panel.webview.postMessage({ command: 'navigateTo', payload });
           } else {
             panel.webview.postMessage({ command: 'switchTab', payload: { tab: initialTab } });
@@ -191,10 +194,12 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
     this.panels.push(panel);
   }
 
-  navigateTo(view: 'audits' | 'docs'): void {
+  navigateTo(view: 'audits' | 'docs' | 'official'): void {
     const payload = view === 'audits'
       ? { view: 'audits' }
-      : { view: 'docs', page: 'overview' };
+      : view === 'official'
+        ? { view: 'official' }
+        : { view: 'docs', page: 'overview' };
 
     this._view?.webview.postMessage({ command: 'navigateTo', payload });
     for (const panel of this.panels) {
@@ -362,6 +367,45 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
         break;
       }
 
+      case 'official': {
+        try {
+          const data = await fetchOfficialListing();
+          targetWebview.postMessage({ command: 'officialResult', payload: data });
+        } catch (e: unknown) {
+          targetWebview.postMessage({ command: 'error', payload: toErrorMessage(e) });
+        }
+        break;
+      }
+
+      case 'officialOwner': {
+        try {
+          const { ownerName } = message.payload as { ownerName: string };
+          const data = await fetchOfficialOwner(ownerName);
+          targetWebview.postMessage({ command: 'officialOwnerResult', payload: data });
+        } catch {
+          targetWebview.postMessage({ command: 'officialOwnerResult', payload: null });
+        }
+        break;
+      }
+
+      case 'officialRepo': {
+        try {
+          const { ownerName, repoName } = message.payload as { ownerName: string; repoName: string };
+          const data = await fetchOfficialRepo(ownerName, repoName);
+          targetWebview.postMessage({
+            command: 'officialRepoResult',
+            payload: {
+              repo: data,
+              installedNames: [...this.installedNames],
+              updatableNames: [...this.updatableNames],
+            },
+          });
+        } catch {
+          targetWebview.postMessage({ command: 'officialRepoResult', payload: null });
+        }
+        break;
+      }
+
       case 'removeFromManifest': {
         const { skillName: rmSkill } = message.payload as { skillName: string };
         if (rmSkill) {
@@ -502,7 +546,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy"
-        content="default-src 'none'; style-src 'nonce-${nonce}' 'unsafe-inline'; script-src 'nonce-${nonce}'; font-src ${webview.cspSource}; img-src ${webview.cspSource} data:;">
+        content="default-src 'none'; style-src 'nonce-${nonce}' 'unsafe-inline'; script-src 'nonce-${nonce}'; font-src ${webview.cspSource}; img-src ${webview.cspSource} https://github.com https://avatars.githubusercontent.com data:;">
   <style nonce="${nonce}">${getStyles(fontUri)}</style>
 </head>
 <body${isTab ? ' class="tab-view"' : ''}>

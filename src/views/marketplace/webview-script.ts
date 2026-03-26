@@ -84,6 +84,31 @@ export interface DocsData {
   html: string;
 }
 
+export interface OfficialSkillData {
+  name: string;
+  installs: number;
+}
+
+export interface OfficialRepoData {
+  repo: string;
+  totalInstalls: number;
+  skills: OfficialSkillData[];
+}
+
+export interface OfficialOwnerData {
+  owner: string;
+  repos: OfficialRepoData[];
+  totalInstalls: number;
+  repoCount: number;
+  skillCount: number;
+  featuredRepo?: string;
+}
+
+export interface OfficialData {
+  owners: OfficialOwnerData[];
+  total: number;
+}
+
 // ── Pure utility functions ───────────────────────────────────────────
 
 export function escapeHtml(str: string): string {
@@ -525,6 +550,127 @@ export function renderDocsView(data: DocsData): string {
     + '</div></div>';
 }
 
+// ── Official views ──────────────────────────────────────────────────
+
+export function renderOfficialView(data: OfficialData): string {
+  const rows = (data.owners || []).map(function (owner: OfficialOwnerData) {
+    const avatarUrl = 'https://github.com/' + encodeURIComponent(owner.owner) + '.png?size=64';
+    const repoLabel = owner.featuredRepo ? ' <span class="official-row-repo">' + escapeHtml(owner.featuredRepo) + '</span>' : '';
+    return '<div class="official-row" data-owner="' + escapeHtml(owner.owner) + '">'
+      + '<div class="official-row-creator">'
+      + '<img class="official-avatar" src="' + escapeHtml(avatarUrl) + '" alt="' + escapeHtml(owner.owner) + '" loading="lazy" />'
+      + '<span class="official-row-name">' + escapeHtml(owner.owner) + '</span>'
+      + repoLabel
+      + '</div>'
+      + '<span class="official-row-stat">' + owner.repoCount + '</span>'
+      + '<span class="official-row-stat">' + owner.skillCount + '</span>'
+      + '</div>';
+  }).join('');
+
+  return '<div class="official-view">'
+    + '<button class="back-btn" id="backBtn">' + _icons.back + ' Back</button>'
+    + '<h1 class="detail-title">Official</h1>'
+    + '<p class="official-subtitle">Official skills from the companies and organizations that build the technology \u2014 the makers teaching you how to use their products.</p>'
+    + '<div class="official-table">'
+    + '<div class="official-table-header">'
+    + '<span>CREATOR</span>'
+    + '<span class="official-row-stat">REPOS</span>'
+    + '<span class="official-row-stat">SKILLS</span>'
+    + '</div>'
+    + rows
+    + '</div>'
+    + '</div>';
+}
+
+export function renderOfficialOwnerView(owner: OfficialOwnerData): string {
+  const avatarUrl = 'https://github.com/' + encodeURIComponent(owner.owner) + '.png?size=64';
+
+  const sortedRepos = (owner.repos || []).slice().sort(function (a, b) { return b.totalInstalls - a.totalInstalls; });
+  const repoRows = sortedRepos.map(function (repo) {
+    const shortName = repo.repo.split('/').pop() || repo.repo;
+    const skills = repo.skills || [];
+    const preview = skills.slice(0, 3).map(function (s) { return s.name; }).join(', ');
+    const remaining = skills.length - 3;
+    const subtitle = skills.length === 0 ? ''
+      : skills.length + (skills.length === 1 ? ' skill: ' : ' skills: ')
+        + preview + (remaining > 0 ? ' +' + remaining + ' more' : '');
+
+    return '<div class="official-repo-row" data-repo="' + escapeHtml(repo.repo) + '">'
+      + '<div>'
+      + '<div class="official-repo-row-name">' + escapeHtml(shortName) + '</div>'
+      + (subtitle ? '<div class="official-repo-row-subtitle">' + escapeHtml(subtitle) + '</div>' : '')
+      + '</div>'
+      + '<span class="official-row-stat">' + formatInstalls(repo.totalInstalls) + '</span>'
+      + '</div>';
+  }).join('');
+
+  return '<div class="official-owner-view">'
+    + '<button class="back-btn" id="backBtn">' + _icons.back + ' Back</button>'
+    + '<div class="official-owner-header">'
+    + '<img class="official-avatar" src="' + escapeHtml(avatarUrl) + '" alt="' + escapeHtml(owner.owner) + '" />'
+    + '<h1 class="detail-title">' + escapeHtml(owner.owner) + '</h1>'
+    + '</div>'
+    + '<p class="official-owner-stats">'
+    + owner.repoCount + (owner.repoCount === 1 ? ' source' : ' sources')
+    + ' \u00B7 ' + owner.skillCount + (owner.skillCount === 1 ? ' skill' : ' skills')
+    + ' \u00B7 ' + formatInstalls(owner.totalInstalls) + ' total installs'
+    + '</p>'
+    + '<div class="official-table">'
+    + '<div class="official-table-header">'
+    + '<span>SOURCE</span>'
+    + '<span class="official-row-stat">INSTALLS</span>'
+    + '</div>'
+    + repoRows
+    + '</div>'
+    + '</div>';
+}
+
+export function renderOfficialRepoView(owner: OfficialOwnerData, repo: OfficialRepoData, installedNames: string[], updatableNames: string[]): string {
+  const avatarUrl = 'https://github.com/' + encodeURIComponent(owner.owner) + '.png?size=64';
+  const shortName = repo.repo.split('/').pop() || repo.repo;
+
+  const skillRows = (repo.skills || []).map(function (skill) {
+    const skillId = skill.name;
+    const source = repo.repo;
+    const isUpdatable = updatableNames.indexOf(skillId) !== -1;
+    const isInstalled = installedNames.indexOf(skillId) !== -1;
+    let btnClass = 'btn-install';
+    let btnLabel = 'Install';
+    if (isUpdatable) {
+      btnClass = 'btn-install btn-updatable';
+      btnLabel = 'Update';
+    } else if (isInstalled) {
+      btnClass = 'btn-install btn-installed';
+      btnLabel = '✓ Installed';
+    }
+
+    return '<div class="official-skill-row" data-source="' + escapeHtml(source) + '" data-skill="' + escapeHtml(skillId) + '">'
+      + '<div class="row-info">'
+      + '<div class="row-name">' + escapeHtml(skillId) + '</div>'
+      + '<div class="row-source">' + escapeHtml(source) + '</div>'
+      + '</div>'
+      + '<span class="official-skill-installs">' + formatInstalls(skill.installs) + '</span>'
+      + '<button class="' + btnClass + '"'
+      + ' data-install="' + escapeHtml(source) + '" data-skill-name="' + escapeHtml(skillId) + '"'
+      + ' onclick="event.stopPropagation()">'
+      + btnLabel + '</button>'
+      + '</div>';
+  }).join('');
+
+  return '<div class="official-repo-view">'
+    + '<button class="back-btn" id="backBtn">' + _icons.back + ' Back</button>'
+    + '<div class="official-owner-header">'
+    + '<img class="official-avatar" src="' + escapeHtml(avatarUrl) + '" alt="' + escapeHtml(owner.owner) + '" />'
+    + '<div>'
+    + '<h1 class="detail-title">' + escapeHtml(shortName) + '</h1>'
+    + '<div class="official-repo-source">' + escapeHtml(repo.repo) + '</div>'
+    + '</div>'
+    + '</div>'
+    + '<p class="official-repo-stats">' + formatInstalls(repo.totalInstalls) + ' installs</p>'
+    + skillRows
+    + '</div>';
+}
+
 // ── DOM patching for async audit data ────────────────────────────────
 
 function updateAuditBadgesOnCards(): void {
@@ -570,6 +716,8 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
   const pendingToggles = new Map<string, boolean>(); // folderName → expected disableModelInvocation
   const pendingToggleTimers = new Map<string, ReturnType<typeof setTimeout>>();
   let manifestSkillNames = new Set<string>();
+  let _installedNames = new Set<string>();
+  let _updatableNames = new Set<string>();
   let infoBannerDismissed = false;
   let navStack: Array<{
     view: string; tab: string; query: string; scrollY: number;
@@ -688,13 +836,30 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
   document.querySelectorAll('[data-nav-page]').forEach(function (link) {
     link.addEventListener('click', function () {
       const page = link.getAttribute('data-nav-page');
-      if (page === 'audits') {
+      if (page === 'official') {
+        navigateToOfficial();
+      } else if (page === 'audits') {
         navigateToAudits();
       } else if (page === 'docs') {
         navigateToDocs('overview');
       }
     });
   });
+
+  let _officialData: OfficialData | null = null;
+  let _currentOfficialOwner: OfficialOwnerData | null = null;
+  let _currentOfficialRepo: OfficialRepoData | null = null;
+
+  function navigateToOfficial(): void {
+    navigationStack.push(currentView);
+    currentView = 'official';
+    setHeroVisible(false);
+    updateNavLinks();
+    const container = document.querySelector('.container');
+    if (container) container.innerHTML = '<div class="empty-state">Loading official skills...</div>';
+    fadeIn(container);
+    api.postMessage({ command: 'official' });
+  }
 
   function navigateToAudits(): void {
     navigationStack.push(currentView);
@@ -730,7 +895,37 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
 
   function navigateBack(): void {
     const prev = navigationStack.pop() || 'leaderboard';
-    if (prev === 'audits') {
+    if (prev === 'official-repo') {
+      setHeroVisible(false);
+      updateNavLinks();
+      const container = document.querySelector('.container');
+      if (_currentOfficialOwner && _currentOfficialRepo) {
+        if (container) container.innerHTML = renderOfficialRepoView(_currentOfficialOwner, _currentOfficialRepo, [..._installedNames], [..._updatableNames]);
+        fadeIn(container);
+        attachOfficialRepoListeners();
+      }
+    } else if (prev === 'official-owner') {
+      setHeroVisible(false);
+      updateNavLinks();
+      const container = document.querySelector('.container');
+      if (_currentOfficialOwner) {
+        if (container) container.innerHTML = renderOfficialOwnerView(_currentOfficialOwner);
+        fadeIn(container);
+        attachOfficialOwnerListeners();
+      }
+    } else if (prev === 'official') {
+      currentView = 'official';
+      setHeroVisible(false);
+      updateNavLinks();
+      const container = document.querySelector('.container');
+      if (_officialData) {
+        if (container) container.innerHTML = renderOfficialView(_officialData);
+        attachOfficialListeners();
+      } else {
+        if (container) container.innerHTML = '<div class="empty-state">Loading official skills...</div>';
+        api.postMessage({ command: 'official' });
+      }
+    } else if (prev === 'audits') {
       currentView = 'audits';
       setHeroVisible(false);
       updateNavLinks();
@@ -1112,7 +1307,9 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
 
       case 'updateButtonStates': {
         const installed = new Set<string>(msg.payload.installedNames || []);
+        _installedNames = installed;
         const updatable = new Set<string>(msg.payload.updatableNames || []);
+        _updatableNames = updatable;
         const updating = new Set<string>(msg.payload.updatingNames || []);
         manifestSkillNames = new Set<string>(msg.payload.manifestSkillNames || []);
         document.querySelectorAll('.btn-install').forEach(function (btn) {
@@ -1228,6 +1425,57 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
         break;
       }
 
+      case 'officialResult': {
+        _officialData = msg.payload as OfficialData;
+        const container = document.querySelector('.container');
+        if (container) container.innerHTML = renderOfficialView(_officialData);
+        fadeIn(container);
+        attachOfficialListeners();
+        break;
+      }
+
+      case 'officialOwnerResult': {
+        const freshOwner = msg.payload as OfficialOwnerData | null;
+        if (freshOwner) {
+          _currentOfficialOwner = freshOwner;
+        }
+        const ownerContainer = document.querySelector('.container');
+        if (_currentOfficialOwner && ownerContainer) {
+          ownerContainer.innerHTML = renderOfficialOwnerView(_currentOfficialOwner);
+          fadeIn(ownerContainer);
+          attachOfficialOwnerListeners();
+        }
+        break;
+      }
+
+      case 'officialRepoResult': {
+        const repoPayload = msg.payload as { repo: OfficialRepoData | null; installedNames?: string[]; updatableNames?: string[] } | null;
+        const freshRepo = repoPayload?.repo ?? null;
+        if (repoPayload?.installedNames) { _installedNames = new Set(repoPayload.installedNames); }
+        if (repoPayload?.updatableNames) { _updatableNames = new Set(repoPayload.updatableNames); }
+        if (freshRepo && _currentOfficialOwner) {
+          _currentOfficialRepo = freshRepo;
+          // Update the repo in the cached owner data with real skill info
+          const idx = _currentOfficialOwner.repos.findIndex(function (r) { return r.repo === freshRepo.repo; });
+          if (idx !== -1) {
+            _currentOfficialOwner.repos[idx] = freshRepo;
+          }
+          const repoContainer = document.querySelector('.container');
+          if (repoContainer) {
+            repoContainer.innerHTML = renderOfficialRepoView(_currentOfficialOwner, freshRepo, [..._installedNames], [..._updatableNames]);
+            fadeIn(repoContainer);
+            attachOfficialRepoListeners();
+          }
+        } else {
+          // Fallback: render with placeholder data if fetch failed
+          const fallbackContainer = document.querySelector('.container');
+          if (fallbackContainer) {
+            fallbackContainer.innerHTML = '<div class="empty-state">Failed to load repo details.</div>';
+          }
+        }
+        break;
+      }
+
       case 'docsResult': {
         const docsData = msg.payload;
         if (docsData) {
@@ -1242,7 +1490,9 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
 
       case 'navigateTo': {
         const nav = msg.payload;
-        if (nav.view === 'audits') {
+        if (nav.view === 'official') {
+          navigateToOfficial();
+        } else if (nav.view === 'audits') {
           navigateToAudits();
         } else if (nav.view === 'docs') {
           navigateToDocs(nav.page || 'overview');
@@ -1603,6 +1853,76 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
     document.querySelectorAll('.docs-content [data-nav="home"]').forEach(function (link) {
       link.addEventListener('click', function () { navigateBack(); });
     });
+  }
+
+  function attachOfficialListeners(): void {
+    const backBtn = document.getElementById('backBtn');
+    if (backBtn) {
+      backBtn.addEventListener('click', function () { navigateBack(); });
+    }
+    document.querySelectorAll('.official-row').forEach(function (card) {
+      card.addEventListener('click', function () {
+        const ownerName = card.getAttribute('data-owner');
+        if (!ownerName) { return; }
+        // Store /official data as fallback
+        const fallbackOwner = _officialData
+          ? _officialData.owners.find(function (o) { return o.owner === ownerName; }) || null
+          : null;
+        _currentOfficialOwner = fallbackOwner;
+        navigationStack.push('official');
+        currentView = 'official';
+        const container = document.querySelector('.container');
+        if (container) container.innerHTML = '<div class="empty-state">Loading...</div>';
+        fadeIn(container);
+        // Fetch fresh data from individual owner page
+        api.postMessage({ command: 'officialOwner', payload: { ownerName: ownerName } });
+      });
+    });
+  }
+
+  function attachOfficialOwnerListeners(): void {
+    const backBtn = document.getElementById('backBtn');
+    if (backBtn) {
+      backBtn.addEventListener('click', function () { navigateBack(); });
+    }
+    document.querySelectorAll('.official-repo-row').forEach(function (row) {
+      row.addEventListener('click', function () {
+        const repoFullName = row.getAttribute('data-repo');
+        if (!repoFullName || !_currentOfficialOwner) { return; }
+        const parts = repoFullName.split('/');
+        if (parts.length < 2) { return; }
+        navigationStack.push('official-owner');
+        const container = document.querySelector('.container');
+        if (container) container.innerHTML = '<div class="empty-state">Loading...</div>';
+        fadeIn(container);
+        api.postMessage({ command: 'officialRepo', payload: { ownerName: parts[0], repoName: parts[1] } });
+      });
+    });
+  }
+
+  function attachOfficialRepoListeners(): void {
+    const backBtn = document.getElementById('backBtn');
+    if (backBtn) {
+      backBtn.addEventListener('click', function () { navigateBack(); });
+    }
+    document.querySelectorAll('.official-skill-row').forEach(function (row) {
+      row.addEventListener('click', function (e) {
+        if ((e.target as HTMLElement).closest('.btn-install')) { return; }
+        const source = row.getAttribute('data-source');
+        const skillId = row.getAttribute('data-skill');
+        if (source && skillId) {
+          navigationStack.push('official-repo');
+          currentView = 'detail';
+          currentDetailSkillName = skillId;
+          api.postMessage({ command: 'detail', payload: { source, skillId } });
+          const container = document.querySelector('.container');
+          if (container) container.innerHTML = '<div class="empty-state">Loading skill details...</div>';
+        }
+      });
+    });
+    // Install/Update buttons use the standard data-install/data-skill-name
+    // attributes and are handled by the global click handler — no custom
+    // handler needed here.
   }
 
   function showCopyFeedback(iconEl: Element | null): void {

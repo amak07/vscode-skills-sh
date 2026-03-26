@@ -1663,5 +1663,162 @@ export function getStyles(fontUri: string): string {
       max-width: 1152px;
       margin: 0 auto;
     }
+
+    /* === Official view === */
+    .official-view, .official-owner-view, .official-repo-view {
+      max-width: 1152px;
+      margin: 0 auto;
+      padding: 1.5rem 0 0;
+    }
+    .official-subtitle {
+      color: var(--gray-600);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .official-table {
+      display: flex;
+      flex-direction: column;
+    }
+    .official-table-header {
+      display: grid;
+      grid-template-columns: 1fr 4.5rem 4.5rem;
+      gap: 0.75rem;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.6875rem;
+      font-weight: 500;
+      color: var(--gray-600);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    .official-row {
+      display: grid;
+      grid-template-columns: 1fr 4.5rem 4.5rem;
+      gap: 0.75rem;
+      align-items: center;
+      padding: 0.625rem 0.75rem;
+      border-bottom: 1px solid var(--gray-100);
+      cursor: pointer;
+      transition: background 150ms;
+    }
+    .official-row:hover {
+      background: var(--gray-100);
+    }
+    .official-row-creator {
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+      min-width: 0;
+    }
+    .official-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: var(--gray-200);
+    }
+    .official-row-name {
+      font-weight: 600;
+      font-size: 0.8125rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .official-row-repo {
+      font-size: 0.8125rem;
+      color: var(--gray-600);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .official-row-stat {
+      font-size: 0.8125rem;
+      color: var(--gray-900);
+      font-family: var(--font-mono);
+      text-align: right;
+    }
+
+    /* Official owner detail */
+    .official-owner-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
+    }
+    .official-owner-header .official-avatar {
+      width: 40px;
+      height: 40px;
+    }
+    .official-owner-header .detail-title {
+      margin: 0;
+    }
+    .official-owner-stats {
+      color: var(--gray-600);
+      font-size: 0.8125rem;
+      margin-bottom: 1.5rem;
+    }
+    .official-owner-view .official-table-header,
+    .official-owner-view .official-repo-row {
+      grid-template-columns: 1fr 5.5rem;
+    }
+    .official-repo-row {
+      display: grid;
+      grid-template-columns: 1fr 5.5rem;
+      gap: 0.75rem;
+      align-items: center;
+      padding: 0.625rem 0.75rem;
+      border-bottom: 1px solid var(--gray-100);
+      cursor: pointer;
+      transition: background 150ms;
+    }
+    .official-repo-row:hover {
+      background: var(--gray-100);
+    }
+    .official-repo-row-name {
+      font-weight: 600;
+      font-size: 0.8125rem;
+    }
+    .official-repo-row-subtitle {
+      font-size: 0.75rem;
+      color: var(--gray-600);
+      margin-top: 0.125rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Official repo detail (drill-down to individual skills) */
+    .official-repo-source {
+      font-size: 0.75rem;
+      color: var(--gray-600);
+      font-family: var(--font-mono);
+    }
+    .official-repo-stats {
+      color: var(--gray-600);
+      font-size: 0.8125rem;
+      margin-bottom: 1rem;
+    }
+    .official-skill-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 0.75rem;
+      align-items: center;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--gray-100);
+      cursor: pointer;
+      transition: background 150ms;
+    }
+    .official-skill-row:hover {
+      background: rgba(26, 26, 26, 0.3);
+    }
+    .light-theme .official-skill-row:hover {
+      background: rgba(0, 0, 0, 0.03);
+    }
+    .official-skill-installs {
+      font-size: 0.75rem;
+      color: var(--gray-600);
+      font-family: var(--font-mono);
+      text-align: right;
+    }
   `;
 }

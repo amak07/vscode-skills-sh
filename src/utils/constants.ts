@@ -24,4 +24,5 @@ export const CACHE_TTL_SEARCH = 3600 * 1000;  // 1 hour (default, overridden by 
 export const CACHE_TTL_GITHUB = 3600 * 1000;  // 1 hour
 export const CACHE_TTL_DETAIL = 1800 * 1000;  // 30 minutes
 export const CACHE_TTL_AUDITS = 1800 * 1000;  // 30 minutes
-export const CACHE_TTL_DOCS   = 3600 * 1000;  // 1 hour
+export const CACHE_TTL_DOCS     = 3600 * 1000;  // 1 hour
+export const CACHE_TTL_OFFICIAL = 1800 * 1000;  // 30 minutes

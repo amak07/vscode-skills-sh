@@ -4,6 +4,19 @@ All notable changes to the Skills.sh Agent Skills Manager extension will be docu
 
 ## [Unreleased]
 
+### Added
+
+- **Official skills tab** — new "Official" link in the marketplace nav bar (alongside Audits and Docs) showcasing skills from the companies that build the technology. Table layout with CREATOR / REPOS / SKILLS columns matching skills.sh/official UX. Click an org to drill into repos, then individual skills with install counts.
+- **Per-repo skill detail** — clicking a repo in the Official owner view fetches the repo page from skills.sh to show real skill names and install counts (not stale /official snapshot data). Individual skills are clickable for full detail view.
+- **Fresh install counts** — owner and repo pages are scraped individually to show up-to-date install numbers instead of the stale /official listing cache.
+
+### Fixed
+
+- **Official view back-button spacing** — added top padding to Official/Owner/Repo views matching Audits/Docs layout.
+- **Official navigation stack** — drilling Official → Owner → Repo → Skill Detail and pressing Back now returns through each level correctly (was requiring 5+ clicks).
+- **Official install/update buttons** — repo skill rows now use the standard button pattern (`data-install`/`data-skill-name`) so the global `updateButtonStates` handler, install, and update flows all work. Update buttons render immediately on first paint (no 3-4s flash from "✓ Installed" to "Update").
+- **RSC parser for owner pages** — skills.sh changed from embedding JSON to pre-rendered RSC virtual DOM; rewrote `parseOwnerPage` to extract data from component tree.
+
 ## [0.2.2] - 2026-03-24
 
 ### Added
