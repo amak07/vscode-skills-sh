@@ -144,6 +144,11 @@ describe('fetchSkillDetail', () => {
     expect(detail).not.toBeNull();
     expect(detail!.skillMdHtml).toContain('<h2>When to Use</h2>');
     expect(detail!.skillMdHtml).toContain('<h3>1. Why Monorepos?</h3>');
+    // The extracted prose must stop at the prose div close — no below-the-fold
+    // gradient / "Show more" button or sidebar bleed.
+    expect(detail!.skillMdHtml).not.toContain('Show more');
+    expect(detail!.skillMdHtml).not.toContain('lg:col-span-3');
+    expect(detail!.skillMdHtml).not.toContain('bg-gradient-to-t');
   });
 
   it('extracts SKILL.md HTML content (prose)', async () => {
