@@ -138,17 +138,20 @@ describe('fetchSkillDetail', () => {
   });
 
   it('extracts above-the-fold SKILL.md prose on the new (truncated) layout', async () => {
+    // Isolate above-the-fold extraction: a truncated page (Show more present) but
+    // no flight chunk, so skillMdHtml must equal the visible prose body exactly —
+    // even after Task 2 wires in the chunk concat (no chunk → nothing appended).
     const body = '<h2>When to Use</h2><p>Visible part.</p><h3>1. Why Monorepos?</h3>';
-    mockFetch({ 'skills.sh/acme/tools/newlayout': htmlResponse(buildDetailHtml({ truncated: true, skillMdBody: body, hiddenChunkBody: '<p>hidden</p>' })) });
+    mockFetch({ 'skills.sh/acme/tools/newlayout': htmlResponse(buildDetailHtml({ truncated: true, skillMdBody: body })) });
     const detail = await fetchSkillDetail('acme', 'tools', 'newlayout');
     expect(detail).not.toBeNull();
     expect(detail!.skillMdHtml).toContain('<h2>When to Use</h2>');
     expect(detail!.skillMdHtml).toContain('<h3>1. Why Monorepos?</h3>');
-    // The extracted prose must stop at the prose div close — no below-the-fold
-    // gradient / "Show more" button or sidebar bleed.
-    expect(detail!.skillMdHtml).not.toContain('Show more');
-    expect(detail!.skillMdHtml).not.toContain('lg:col-span-3');
-    expect(detail!.skillMdHtml).not.toContain('bg-gradient-to-t');
+    // Must stop at the prose div close — no below-the-fold gradient / "Show more"
+    // button or sidebar bleed. Exact-equality makes this a true regression guard:
+    // the pre-fix extractor fell through to the legacy fallback and returned the
+    // gradient + Show more + sidebar markup (verified red).
+    expect(detail!.skillMdHtml).toBe(body);
   });
 
   it('extracts SKILL.md HTML content (prose)', async () => {

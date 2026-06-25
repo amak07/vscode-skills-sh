@@ -156,8 +156,14 @@ function extractSkillMdContent(html: string): string {
   // prose div), then capture the prose div content up to the first closing
   // </div>. skills.sh's current layout wraps the prose in an extra <div> and
   // appends a gradient + "Show more" button before the sidebar, so we no longer
-  // anchor the end on the sidebar. Markdown-rendered prose contains no <div>
-  // elements, so the first </div> reliably closes the prose block.
+  // anchor the end on the sidebar.
+  //
+  // Accepted tradeoff: markdown-rendered prose from skills.sh contains no <div>
+  // elements, so the first </div> reliably closes the prose block. A SKILL.md
+  // that embeds a raw <div> would be truncated at that div — not observed in
+  // sampled skills. The below-the-fold remainder is recovered separately from
+  // the RSC flight data (see extractHiddenReadmeChunk), so a truncated tail here
+  // is also partially covered there on truncated pages.
   const primary = html.match(
     /SKILL\.md<\/span><\/div>[\s\S]*?<div class="prose[^"]*"[^>]*>([\s\S]*?)<\/div>/
   );
@@ -165,7 +171,9 @@ function extractSkillMdContent(html: string): string {
     return primary[1];
   }
 
-  // Legacy fallback: first prose div before the col-span-3 sidebar (older layouts).
+  // Legacy fallback: first prose div before the col-span-3 sidebar. Intentionally
+  // un-anchored on the SKILL.md label to support old pre-Summary-card layouts;
+  // only reached when the primary (anchored) match fails.
   const legacy = html.match(
     /class="prose[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>\s*<div[^>]*col-span-3/
   );
