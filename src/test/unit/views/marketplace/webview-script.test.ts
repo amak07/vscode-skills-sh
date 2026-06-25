@@ -14,6 +14,7 @@ import {
   renderInstalledCard,
   renderInstalledGroup,
   renderDetailHtml,
+  setupReadmeCollapsible,
   renderAuditsView,
   renderDocsView,
   initializeWebview,
@@ -651,6 +652,63 @@ describe('renderDetailHtml', () => {
     const html = renderDetailHtml(detail);
     expect(html).toContain('btn-action-active');
     expect(html).toContain('Remove from Skills.json');
+  });
+});
+
+describe('setupReadmeCollapsible', () => {
+  // happy-dom has no layout engine, so scrollHeight/clientHeight are 0 unless
+  // stubbed. Stub them to drive the overflow vs. fits branches deterministically.
+  function mountReadme(): { collapsible: HTMLElement; toggle: HTMLButtonElement } {
+    document.body.innerHTML =
+      '<div class="readme-collapsible" id="readmeCollapsible">' +
+      '<div class="prose readme-prose"><h2>Body</h2></div>' +
+      '<div class="readme-fade" aria-hidden="true"></div>' +
+      '</div>' +
+      '<button type="button" class="readme-toggle" id="readmeToggle" hidden>Show more</button>';
+    return {
+      collapsible: document.getElementById('readmeCollapsible')!,
+      toggle: document.getElementById('readmeToggle') as HTMLButtonElement,
+    };
+  }
+
+  function stubHeights(el: HTMLElement, scrollH: number, clientH: number): void {
+    Object.defineProperty(el, 'scrollHeight', { value: scrollH, configurable: true });
+    Object.defineProperty(el, 'clientHeight', { value: clientH, configurable: true });
+  }
+
+  afterEach(() => { document.body.innerHTML = ''; });
+
+  it('reveals the toggle and toggles expand/collapse when content overflows', () => {
+    const { collapsible, toggle } = mountReadme();
+    stubHeights(collapsible, 1000, 100); // overflows
+
+    setupReadmeCollapsible(document);
+
+    expect(toggle.hidden).toBe(false);
+    expect(collapsible.classList.contains('expanded')).toBe(false);
+
+    toggle.dispatchEvent(new Event('click'));
+    expect(collapsible.classList.contains('expanded')).toBe(true);
+    expect(toggle.textContent).toBe('Show less');
+
+    toggle.dispatchEvent(new Event('click'));
+    expect(collapsible.classList.contains('expanded')).toBe(false);
+    expect(toggle.textContent).toBe('Show more');
+  });
+
+  it('expands fully and keeps the toggle hidden when content fits', () => {
+    const { collapsible, toggle } = mountReadme();
+    stubHeights(collapsible, 80, 100); // fits
+
+    setupReadmeCollapsible(document);
+
+    expect(toggle.hidden).toBe(true);
+    expect(collapsible.classList.contains('expanded')).toBe(true);
+  });
+
+  it('is a no-op when the collapsible markup is absent', () => {
+    document.body.innerHTML = '<div>no readme here</div>';
+    expect(() => setupReadmeCollapsible(document)).not.toThrow();
   });
 });
 
