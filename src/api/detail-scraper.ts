@@ -68,8 +68,12 @@ function parseRenderedHtml(
     // Summary card content (prose inside the Summary section)
     const summaryHtml = extractSummaryContent(html);
 
-    // SKILL.md rendered content from the prose div
-    const skillMdHtml = extractSkillMdContent(html);
+    // SKILL.md content: above-the-fold prose, plus the below-the-fold RSC chunk
+    // when skills.sh has truncated the page behind a "Show more" button.
+    const visible = extractSkillMdContent(html);
+    const isTruncated = html.includes('>Show more</button>');
+    const hidden = isTruncated ? extractHiddenReadmeChunk(html) : null;
+    const skillMdHtml = visible + (hidden ?? '');
 
     // Security audit badges (Gen Agent Trust Hub, Socket, Snyk)
     const securityAudits = extractSecurityAudits(html);
@@ -182,4 +186,55 @@ function extractSkillMdContent(html: string): string {
   }
 
   return '';
+}
+
+/**
+ * Extract the below-the-fold SKILL.md content from the RSC flight data.
+ *
+ * skills.sh truncates the rendered prose and ships the remainder as a standalone
+ * React Server Component text chunk pushed via `self.__next_f.push([1,"…"])`.
+ * Each payload is a JS string; `JSON.parse` decodes the `<`/`\n`/`\"`
+ * escapes. The readme remainder is the longest payload whose decoded body starts
+ * with `<` (HTML) — distinct from JSON-LD `__html` blobs, which start with `{`.
+ *
+ * Known limitation: if the remainder is split across multiple text chunks, only
+ * the largest is returned. Not observed in sampled skills.
+ */
+export function extractHiddenReadmeChunk(html: string): string | null {
+  const PUSH = 'self.__next_f.push([1,';
+  let idx = 0;
+  let best: string | null = null;
+
+  while ((idx = html.indexOf(PUSH, idx)) !== -1) {
+    const open = html.indexOf('"', idx + PUSH.length);
+    if (open === -1) {
+      break;
+    }
+    // Walk to the closing unescaped quote, respecting backslash escapes.
+    let i = open + 1;
+    let escaped = false;
+    for (; i < html.length; i++) {
+      const ch = html[i];
+      if (escaped) { escaped = false; continue; }
+      if (ch === '\\') { escaped = true; continue; }
+      if (ch === '"') { break; }
+    }
+    const token = html.slice(open, i + 1);
+    idx = i + 1;
+
+    let payload: string;
+    try {
+      payload = JSON.parse(token) as string;
+    } catch {
+      continue;
+    }
+
+    // Strip a leading RSC text-chunk prefix like "2a:T4ce6,".
+    const body = payload.replace(/^[0-9a-f]+:T[0-9a-f]+,/i, '');
+    if (body.trimStart().startsWith('<') && (best === null || body.length > best.length)) {
+      best = body;
+    }
+  }
+
+  return best;
 }

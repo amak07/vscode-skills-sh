@@ -4,7 +4,7 @@ import { mockFetch, htmlResponse, errorResponse } from '../../helpers/fetch-mock
 // The module caches results in a module-level Map, so we need a fresh import each test suite.
 // We clear the cache by manipulating time or using unique owner/repo/skillId combos.
 
-import { fetchSkillDetail } from '../../../api/detail-scraper';
+import { fetchSkillDetail, extractHiddenReadmeChunk } from '../../../api/detail-scraper';
 
 // ---------------------------------------------------------------------------
 // HTML fixtures — match the regex patterns the scraper actually uses
@@ -154,6 +154,28 @@ describe('fetchSkillDetail', () => {
     expect(detail!.skillMdHtml).toBe(body);
   });
 
+  it('appends the hidden RSC chunk to the visible prose when truncated', async () => {
+    const body = '<h3>1. Why Monorepos?</h3>';
+    const hidden = '<p><strong>Advantages:</strong></p><h2>Common Pitfalls</h2><p>Circular deps.</p>';
+    mockFetch({ 'skills.sh/acme/tools/full': htmlResponse(buildDetailHtml({ truncated: true, skillMdBody: body, hiddenChunkBody: hidden })) });
+    const detail = await fetchSkillDetail('acme', 'tools', 'full');
+    expect(detail).not.toBeNull();
+    expect(detail!.skillMdHtml).toContain('<h3>1. Why Monorepos?</h3>'); // above the fold
+    expect(detail!.skillMdHtml).toContain('<h2>Common Pitfalls</h2>');    // below the fold
+  });
+
+  it('does not append a chunk when the page is not truncated', async () => {
+    // A stray HTML push exists but there is no Show more button.
+    const stray = '<script>self.__next_f.push([1,"<p>unrelated chunk body that is long</p>"])</script>';
+    let html = buildDetailHtml({ skillMdBody: '<h2>Short</h2><p>All visible.</p>' });
+    html = html.replace('</body>', stray + '</body>');
+    mockFetch({ 'skills.sh/acme/tools/short': htmlResponse(html) });
+    const detail = await fetchSkillDetail('acme', 'tools', 'short');
+    expect(detail).not.toBeNull();
+    expect(detail!.skillMdHtml).toContain('<h2>Short</h2>');
+    expect(detail!.skillMdHtml).not.toContain('unrelated chunk body');
+  });
+
   it('extracts SKILL.md HTML content (prose)', async () => {
     const body = '<h2>Usage</h2><p>Run this.</p>';
     mockFetch({ 'skills.sh/acme/tools/prose': htmlResponse(buildDetailHtml({ skillMdBody: body })) });
@@ -271,5 +293,21 @@ describe('fetchSkillDetail', () => {
     expect(second).toEqual(first);
     // fetch should only have been called once
     expect(fetchFn).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('extractHiddenReadmeChunk', () => {
+  it('decodes the longest HTML push and strips the RSC text-chunk prefix', () => {
+    const html =
+      '<script>self.__next_f.push([1,"2a:T100,"])</script>' +
+      '<script>self.__next_f.push([1,"2a:T100,\\u003ch2\\u003eHidden\\u003c/h2\\u003e\\n\\u003cp\\u003eBody.\\u003c/p\\u003e"])</script>' +
+      '<script>self.__next_f.push([1,"{\\"@context\\":\\"https://schema.org\\"}"])</script>';
+    const out = extractHiddenReadmeChunk(html);
+    expect(out).toBe('<h2>Hidden</h2>\n<p>Body.</p>');
+  });
+
+  it('returns null when no HTML payload qualifies', () => {
+    const html = '<script>self.__next_f.push([1,"{\\"a\\":1}"])</script>';
+    expect(extractHiddenReadmeChunk(html)).toBeNull();
   });
 });
