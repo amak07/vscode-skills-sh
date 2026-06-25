@@ -517,6 +517,22 @@ describe('renderDetailHtml', () => {
     expect(html).toContain('copyCmd');
   });
 
+  it('wraps SKILL.md in a collapsible container with a Show more toggle', () => {
+    const detail: DetailData = {
+      name: 'my-skill',
+      source: 'a/b',
+      installCommand: 'npx skills add a/b --skill my-skill',
+      skillMdHtml: '<h2>Body</h2><p>Lots of content.</p>',
+    };
+    const html = renderDetailHtml(detail);
+    expect(html).toContain('id="readmeCollapsible"');
+    expect(html).toContain('readme-prose');
+    expect(html).toContain('readme-fade');
+    expect(html).toContain('id="readmeToggle"');
+    expect(html).toContain('Show more');
+    expect(html).toContain('<h2>Body</h2>'); // raw HTML preserved
+  });
+
   it('renders weekly installs', () => {
     const detail: DetailData = {
       name: 'test', source: 'a/b',

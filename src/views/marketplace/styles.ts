@@ -627,6 +627,42 @@ export function getStyles(fontUri: string): string {
       color: var(--gray-900);
       line-height: 1.625;
     }
+    .readme-collapsible {
+      position: relative;
+      max-height: 32rem;
+      overflow: hidden;
+    }
+    .readme-collapsible.expanded {
+      max-height: none;
+    }
+    .readme-fade {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 6rem;
+      pointer-events: none;
+      background: linear-gradient(to top, var(--bg-200), transparent);
+    }
+    .readme-collapsible.expanded .readme-fade {
+      display: none;
+    }
+    .readme-toggle {
+      width: 100%;
+      margin-top: 1rem;
+      padding: 0.75rem;
+      text-align: center;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--gray-600);
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: color 150ms;
+    }
+    .readme-toggle:hover {
+      color: var(--gray-1000);
+    }
     .prose h1 {
       font-size: 2.25rem;
       font-weight: 600;
@@ -683,6 +719,13 @@ export function getStyles(fontUri: string): string {
       border-radius: 0;
       font-size: 0.8125rem;
     }
+    /* Prism syntax tokens carried in skills.sh's pre-rendered SKILL.md HTML */
+    .prose .token.comment, .prose .token.prolog, .prose .token.doctype, .prose .token.cdata { color: var(--gray-600); font-style: italic; }
+    .prose .token.punctuation { color: var(--gray-900); }
+    .prose .token.keyword, .prose .token.boolean, .prose .token.tag { color: #c678dd; }
+    .prose .token.string, .prose .token.attr-value { color: #98c379; }
+    .prose .token.function, .prose .token.class-name { color: #61afef; }
+    .prose .token.number, .prose .token.constant { color: #d19a66; }
     .prose table {
       width: 100%;
       border-collapse: collapse;

@@ -471,7 +471,11 @@ export function renderDetailHtml(detail: DetailData): string {
         + '</div>'
       : '')
     + '<div class="detail-skillmd-header">' + _icons.file + ' <span>SKILL.md</span></div>'
-    + '<div class="prose">' + (detail.skillMdHtml || '') + '</div>'
+    + '<div class="readme-collapsible" id="readmeCollapsible">'
+    +   '<div class="prose readme-prose">' + (detail.skillMdHtml || '') + '</div>'
+    +   '<div class="readme-fade" aria-hidden="true"></div>'
+    + '</div>'
+    + '<button type="button" class="readme-toggle" id="readmeToggle" hidden>Show more</button>'
     + '</div><aside>'
     + actionsSection
     + '<div class="sidebar-section"><div class="sidebar-label">Weekly Installs</div>'
