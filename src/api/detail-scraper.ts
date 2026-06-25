@@ -152,27 +152,25 @@ function extractSummaryContent(html: string): string {
 }
 
 function extractSkillMdContent(html: string): string {
-  // The SKILL.md content is inside a prose div that follows the "SKILL.md" label.
-  // skills.sh also has a Summary card with its own prose div earlier in the page,
-  // so we anchor to the SKILL.md label to avoid matching the wrong prose div.
-  // The content column uses lg:col-span-9 and sidebar uses lg:col-span-3.
-
-  // Primary: match the prose div after the "SKILL.md" label, stop before sidebar
-  const skillMdMatch = html.match(/SKILL\.md<\/span><\/div>\s*<div class="prose[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>\s*<div[^>]*col-span-3/);
-  if (skillMdMatch) {
-    return skillMdMatch[1];
+  // Anchor on the "SKILL.md" label (which appears after the Summary card's own
+  // prose div), then capture the prose div content up to the first closing
+  // </div>. skills.sh's current layout wraps the prose in an extra <div> and
+  // appends a gradient + "Show more" button before the sidebar, so we no longer
+  // anchor the end on the sidebar. Markdown-rendered prose contains no <div>
+  // elements, so the first </div> reliably closes the prose block.
+  const primary = html.match(
+    /SKILL\.md<\/span><\/div>[\s\S]*?<div class="prose[^"]*"[^>]*>([\s\S]*?)<\/div>/
+  );
+  if (primary) {
+    return primary[1];
   }
 
-  // Fallback: match prose after SKILL.md label, stop before <aside>
-  const asideMatch = html.match(/SKILL\.md<\/span><\/div>\s*<div class="prose[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>\s*<aside/);
-  if (asideMatch) {
-    return asideMatch[1];
-  }
-
-  // Legacy fallback: first prose div before col-span-3 (pre-Summary card layouts)
-  const legacyMatch = html.match(/class="prose[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>\s*<div[^>]*col-span-3/);
-  if (legacyMatch) {
-    return legacyMatch[1];
+  // Legacy fallback: first prose div before the col-span-3 sidebar (older layouts).
+  const legacy = html.match(
+    /class="prose[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>\s*<div[^>]*col-span-3/
+  );
+  if (legacy) {
+    return legacy[1];
   }
 
   return '';

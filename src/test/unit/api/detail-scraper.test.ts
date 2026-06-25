@@ -19,6 +19,8 @@ function buildDetailHtml(opts: {
   agents?: { name: string; installs: string }[];
   skillMdBody?: string;
   summaryBody?: string;
+  truncated?: boolean;
+  hiddenChunkBody?: string;
   securityAudits?: { partner: string; status: string; slug: string }[];
 } = {}): string {
   const weeklyInstalls = opts.weeklyInstalls ?? '121.0K';
@@ -32,6 +34,23 @@ function buildDetailHtml(opts: {
   const skillMdBody = opts.skillMdBody ?? '<h1>My Skill</h1><p>Great skill.</p>';
   const summaryBody = opts.summaryBody ?? '<p><strong>Short summary.</strong></p>';
   const securityAudits = opts.securityAudits ?? [];
+  const truncated = opts.truncated ?? false;
+  const hiddenChunkBody = opts.hiddenChunkBody ?? '';
+
+  // New skills.sh layout wraps the prose in an extra <div> and inserts a
+  // gradient + "Show more" button between the prose and the sidebar.
+  const skillMdBlock = truncated
+    ? `<svg class="icon"></svg><span>SKILL.md</span></div><div><div class="prose prose-invert max-w-none">${skillMdBody}</div>` +
+      `<div class="relative"><div class="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background to-transparent" aria-hidden="true"></div></div>` +
+      `<button type="button" class="mt-4 w-full py-3 text-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer">Show more</button>` +
+      `</div></div></div><div class=" lg:col-span-3">sidebar</div>`
+    : `<svg class="icon"></svg><span>SKILL.md</span></div><div class="prose prose-invert max-w-none">${skillMdBody}</div></div></div><div class=" lg:col-span-3">sidebar</div>`;
+
+  // The below-the-fold remainder ships as a standalone RSC text chunk.
+  const chunkScripts = truncated && hiddenChunkBody
+    ? `<script>self.__next_f.push([1,"2a:T100,"])</script>` +
+      `<script>self.__next_f.push([1,${JSON.stringify(hiddenChunkBody)}])</script>`
+    : '';
 
   const agentRows = agents.map(a =>
     `<div class="flex"><span class="text-foreground">${a.name}</span><span class="text-muted-foreground font-mono">${a.installs}</span></div>`
@@ -56,8 +75,9 @@ function buildDetailHtml(opts: {
 <code>${installCommand}</code>
 ${installedSection}
 <div class="summary-card"><div class="text-xs">Summary</div><div class="prose-wrapper"><div class="prose prose-invert max-w-none">${summaryBody}</div></div></div>
-<svg class="icon"></svg><span>SKILL.md</span></div><div class="prose prose-invert max-w-none">${skillMdBody}</div></div></div><div class=" lg:col-span-3">sidebar</div>
+${skillMdBlock}
 ${securitySection}
+${chunkScripts}
 </body></html>`;
 }
 
@@ -115,6 +135,15 @@ describe('fetchSkillDetail', () => {
     expect(detail!.perAgent).toHaveLength(2);
     expect(detail!.perAgent[0]).toEqual({ agent: 'claude-code', installs: '50.0K' });
     expect(detail!.perAgent[1]).toEqual({ agent: 'windsurf', installs: '10.0K' });
+  });
+
+  it('extracts above-the-fold SKILL.md prose on the new (truncated) layout', async () => {
+    const body = '<h2>When to Use</h2><p>Visible part.</p><h3>1. Why Monorepos?</h3>';
+    mockFetch({ 'skills.sh/acme/tools/newlayout': htmlResponse(buildDetailHtml({ truncated: true, skillMdBody: body, hiddenChunkBody: '<p>hidden</p>' })) });
+    const detail = await fetchSkillDetail('acme', 'tools', 'newlayout');
+    expect(detail).not.toBeNull();
+    expect(detail!.skillMdHtml).toContain('<h2>When to Use</h2>');
+    expect(detail!.skillMdHtml).toContain('<h3>1. Why Monorepos?</h3>');
   });
 
   it('extracts SKILL.md HTML content (prose)', async () => {
