@@ -206,10 +206,14 @@ export function extractHiddenReadmeChunk(html: string): string | null {
   let best: string | null = null;
 
   while ((idx = html.indexOf(PUSH, idx)) !== -1) {
-    const open = html.indexOf('"', idx + PUSH.length);
-    if (open === -1) {
-      break;
+    // The push's second argument is always a quoted JS string in Next.js RSC. If
+    // the next non-space char isn't a quote, skip — avoids a runaway indexOf.
+    const argStart = idx + PUSH.length;
+    if (html[argStart] !== '"') {
+      idx = argStart;
+      continue;
     }
+    const open = argStart;
     // Walk to the closing unescaped quote, respecting backslash escapes.
     let i = open + 1;
     let escaped = false;
@@ -229,8 +233,8 @@ export function extractHiddenReadmeChunk(html: string): string | null {
       continue;
     }
 
-    // Strip a leading RSC text-chunk prefix like "2a:T4ce6,".
-    const body = payload.replace(/^[0-9a-f]+:T[0-9a-f]+,/i, '');
+    // Strip a leading RSC text-chunk prefix like "2a:T4ce6," (lowercase hex).
+    const body = payload.replace(/^[0-9a-f]+:T[0-9a-f]+,/, '');
     if (body.trimStart().startsWith('<') && (best === null || body.length > best.length)) {
       best = body;
     }

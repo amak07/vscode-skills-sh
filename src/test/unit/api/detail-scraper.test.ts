@@ -310,4 +310,19 @@ describe('extractHiddenReadmeChunk', () => {
     const html = '<script>self.__next_f.push([1,"{\\"a\\":1}"])</script>';
     expect(extractHiddenReadmeChunk(html)).toBeNull();
   });
+
+  it('returns the longest HTML payload when several compete', () => {
+    const html =
+      '<script>self.__next_f.push([1,"<p>short</p>"])</script>' +
+      '<script>self.__next_f.push([1,"<h2>the longer below-the-fold readme body</h2>"])</script>' +
+      '<script>self.__next_f.push([1,"<p>mid</p>"])</script>';
+    expect(extractHiddenReadmeChunk(html)).toBe('<h2>the longer below-the-fold readme body</h2>');
+  });
+
+  it('ignores a non-string push argument without latching onto a later quote', () => {
+    const html =
+      '<script>self.__next_f.push([1,42])</script>' +
+      '<script>self.__next_f.push([1,"<p>real body</p>"])</script>';
+    expect(extractHiddenReadmeChunk(html)).toBe('<p>real body</p>');
+  });
 });
