@@ -687,11 +687,11 @@ describe('setupReadmeCollapsible', () => {
     expect(toggle.hidden).toBe(false);
     expect(collapsible.classList.contains('expanded')).toBe(false);
 
-    toggle.dispatchEvent(new Event('click'));
+    toggle.click();
     expect(collapsible.classList.contains('expanded')).toBe(true);
     expect(toggle.textContent).toBe('Show less');
 
-    toggle.dispatchEvent(new Event('click'));
+    toggle.click();
     expect(collapsible.classList.contains('expanded')).toBe(false);
     expect(toggle.textContent).toBe('Show more');
   });

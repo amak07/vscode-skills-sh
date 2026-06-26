@@ -510,6 +510,7 @@ export function setupReadmeCollapsible(doc: Document = document): void {
   const toggle = doc.getElementById('readmeToggle') as HTMLButtonElement | null;
   if (!collapsible || !toggle) { return; }
 
+  // +8px rounding buffer: ignore sub-pixel/rounding overflow that isn't real.
   if (collapsible.scrollHeight > collapsible.clientHeight + 8) {
     toggle.hidden = false; // content overflows — offer Show more
   } else {
