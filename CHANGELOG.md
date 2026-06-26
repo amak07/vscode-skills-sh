@@ -4,6 +4,14 @@ All notable changes to the Skills.sh Agent Skills Manager extension will be docu
 
 ## [Unreleased]
 
+### Fixed
+
+- **Detail page SKILL.md is complete again** — skills.sh's new detail layout truncates the SKILL.md behind a "Show more" control and ships the below-the-fold content in the page's RSC flight data, which left the extension's panel blank. The scraper now reconstructs the full document (above-the-fold prose + the flight-data remainder), including skills.sh's syntax highlighting.
+
+### Added
+
+- **"Show more / Show less" on the detail page** — long SKILL.md content is collapsed with a gradient fade and expands on click, mirroring skills.sh. Short skills render fully with no button.
+
 ## [0.2.3] - 2026-03-26
 
 ### Added
