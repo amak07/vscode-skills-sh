@@ -1,4 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import { mockFetch, htmlResponse, errorResponse } from '../../helpers/fetch-mock';
 
 // The module caches results in a module-level Map, so we need a fresh import each test suite.
@@ -152,6 +154,19 @@ describe('fetchSkillDetail', () => {
     // the pre-fix extractor fell through to the legacy fallback and returned the
     // gradient + Show more + sidebar markup (verified red).
     expect(detail!.skillMdHtml).toBe(body);
+  });
+
+  it('captures full SKILL.md (above + below fold) from a real skills.sh page', async () => {
+    const fixture = readFileSync(
+      join(process.cwd(), 'src/test/fixtures/detail-monorepo-management.html'),
+      'utf8'
+    );
+    mockFetch({ 'skills.sh/wshobson/agents/monorepo-management': htmlResponse(fixture) });
+    const detail = await fetchSkillDetail('wshobson', 'agents', 'monorepo-management');
+    expect(detail).not.toBeNull();
+    expect(detail!.skillMdHtml).toContain('Why Monorepos?');   // above the fold (visible prose)
+    expect(detail!.skillMdHtml).toContain('Common Pitfalls');  // below the fold (RSC chunk)
+    expect(detail!.skillMdHtml).toContain('Best Practices');   // below the fold
   });
 
   it('appends the hidden RSC chunk to the visible prose when truncated', async () => {
