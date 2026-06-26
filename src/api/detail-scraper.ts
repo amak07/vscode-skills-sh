@@ -73,6 +73,11 @@ function parseRenderedHtml(
     const visible = extractSkillMdContent(html);
     const isTruncated = html.includes('>Show more</button>');
     const hidden = isTruncated ? extractHiddenReadmeChunk(html) : null;
+    if (isTruncated && hidden === null) {
+      // Page is truncated but no flight chunk was recovered — surfaces the
+      // multi-chunk-split limitation or a skills.sh payload change in the field.
+      console.warn(`[detail-scraper] truncated page but no RSC chunk recovered: ${owner}/${repo}/${skillId}`);
+    }
     const skillMdHtml = visible + (hidden ?? '');
 
     // Security audit badges (Gen Agent Trust Hub, Socket, Snyk)
