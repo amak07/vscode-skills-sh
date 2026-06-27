@@ -23,7 +23,7 @@ const {
   mockClearUpdateForSkill, mockSetInstalledNames, mockSetUpdatableNames,
   mockSetInstalledSkills, mockNavigateTo, mockOpenInTab, mockMarketplaceDispose,
   mockOpenWelcomePage,
-  operationCompletedEmitter, installDetectedEmitter,
+  operationCompletedEmitter, installDetectedEmitter, operationStartedEmitter,
   getMockLastUpdateResult, setMockLastUpdateResult,
   mockUpdatingNames,
 } = vi.hoisted(() => {
@@ -59,6 +59,7 @@ const {
     mockOpenWelcomePage: vi.fn(),
     operationCompletedEmitter: createEvent<void>(),
     installDetectedEmitter: createEvent<string>(),
+    operationStartedEmitter: createEvent<{ kind: string; skillNames: string[] }>(),
     getMockLastUpdateResult: () => _lastUpdateResult,
     setMockLastUpdateResult: (v: any) => { _lastUpdateResult = v; },
     mockUpdatingNames: { value: new Set<string>() },
@@ -89,6 +90,7 @@ vi.mock('../../../install/installer', () => ({
   notifyInstallDetected: (name: string) => mockNotifyInstallDetected(name),
   onInstallDetected: installDetectedEmitter.event,
   onOperationCompleted: operationCompletedEmitter.event,
+  onOperationStarted: operationStartedEmitter.event,
   getUpdatingSkillNames: () => mockUpdatingNames.value,
 }));
 

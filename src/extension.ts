@@ -4,7 +4,8 @@ import { SkillWatcher } from './local/watcher';
 import { InstalledSkillsTreeProvider } from './views/installed-tree';
 import { MarketplaceViewProvider } from './views/marketplace/provider';
 import { WelcomeViewProvider } from './views/welcome/provider';
-import { updateSkills, uninstallSkill, disposeTerminal, notifyInstallDetected, onOperationCompleted, getUpdatingSkillNames } from './install/installer';
+import { updateSkills, uninstallSkill, disposeTerminal, notifyInstallDetected, onOperationCompleted, onOperationStarted, getUpdatingSkillNames } from './install/installer';
+import { startOperationPoll, type OperationPollHandle } from './local/operation-poll';
 import { checkUpdates, getLastUpdateResult, clearUpdateForSkill } from './api/updates';
 import { fetchAuditListing, buildAuditMap } from './api/audits-scraper';
 import { InstalledSkill, InstalledSkillCard } from './types';
@@ -114,7 +115,15 @@ export function activate(context: vscode.ExtensionContext) {
   let previousSkillNames = new Set<string>();
   let previousSkillsList: InstalledSkill[] = [];
 
+  let skillChangesInFlight = false;
   async function handleSkillChanges(source: string): Promise<void> {
+    // Re-entrancy guard: the WSL poll and the file watcher can both call this,
+    // and two concurrent runs would diff against the same stale snapshot and
+    // double-fire toasts / rating prompts. A skipped call is harmless — the
+    // poll re-ticks and the watcher re-fires.
+    if (skillChangesInFlight) { return; }
+    skillChangesInFlight = true;
+    try {
     const log = getLog();
     const oldNames = previousSkillNames;
     const oldSkills = previousSkillsList;
@@ -233,6 +242,9 @@ export function activate(context: vscode.ExtensionContext) {
 
     previousSkillNames = newNames;
     previousSkillsList = newSkills;
+    } finally {
+      skillChangesInFlight = false;
+    }
   }
 
   watcher.onDidChange(() => {
@@ -244,10 +256,45 @@ export function activate(context: vscode.ExtensionContext) {
   // When a terminal install/uninstall command completes (via shell integration),
   // trigger a rescan so the tree view and marketplace update even if the
   // filesystem watcher didn't fire (common on Windows with symlinks).
+  // WSL-aware completion poll handle (see onOperationStarted wiring below).
+  let activeWslPoll: OperationPollHandle | undefined;
+
   context.subscriptions.push(
     onOperationCompleted(() => {
       getLog().info('[operation] Terminal command completed, rescanning...');
       handleSkillChanges('operation');
+      // The op finished via the normal detectors — the WSL poll is now redundant.
+      activeWslPoll?.cancel();
+      activeWslPoll = undefined;
+    }),
+  );
+
+  // WSL-aware completion poll: WSL skill dirs aren't file-watched, and WSL
+  // terminals often don't emit shell-integration completion events. So when an
+  // extension-initiated op begins, bounded-poll a rescan (which includes WSL)
+  // until the change is observed — this clears the "Installing…" notification
+  // (handleSkillChanges fires notifyInstallDetected) and refreshes the tree/badge
+  // without needing window focus. Windows + skills-sh.scanWsl only.
+  context.subscriptions.push(
+    onOperationStarted((op) => {
+      // Only installs can produce a WSL skill (installed via the marketplace into
+      // a WSL terminal). Extension-initiated uninstall/update never target WSL
+      // skills (WSL tree items are read-only and excluded from update detection),
+      // so they're already covered by the file watcher — no poll needed.
+      if (op.kind !== 'install') { return; }
+      const wslEnabled = vscode.workspace.getConfiguration('skills-sh').get<boolean>('scanWsl', true);
+      if (process.platform !== 'win32' || !wslEnabled) { return; }
+      activeWslPoll?.cancel();
+      const targets = op.skillNames;
+      activeWslPoll = startOperationPoll({
+        intervalMs: 2000,
+        budgetMs: 24000, // resolves before the installer's 30s timeout
+        tick: () => handleSkillChanges('wsl-poll'),
+        isResolved: () => {
+          const names = treeProvider.getInstalledSkillNames();
+          return targets.every(n => names.has(n));
+        },
+      });
     }),
   );
 

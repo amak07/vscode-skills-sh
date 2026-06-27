@@ -66,6 +66,16 @@ export function notifyInstallDetected(skillName: string): void {
 const _onOperationCompleted = new vscode.EventEmitter<void>();
 export const onOperationCompleted = _onOperationCompleted.event;
 
+// Fired when an install/uninstall/update operation BEGINS. extension.ts uses this
+// to start a bounded WSL completion poll (WSL skill dirs aren't file-watched, so
+// the normal watcher/shell-integration detection can't see WSL-side changes).
+export interface OperationStarted {
+  kind: 'install' | 'uninstall' | 'update';
+  skillNames: string[];
+}
+const _onOperationStarted = new vscode.EventEmitter<OperationStarted>();
+export const onOperationStarted = _onOperationStarted.event;
+
 export async function installSkill(
   source: string,
   options?: { skill?: string; global?: boolean }
@@ -124,6 +134,7 @@ export async function installSkill(
   terminal.show();
   terminal.sendText(cmd);
   log.info(`[installer] install: sent command for "${skillName}": ${cmd}`);
+  _onOperationStarted.fire({ kind: 'install', skillNames: [skillName] });
 
   // Show progress notification until terminal completes, watcher detects the skill, or timeout
   const displaySource = source.replace('https://github.com/', '');
@@ -227,6 +238,8 @@ export async function updateSkills(
     clearUpdateForSkill(u.name);
   }
 
+  _onOperationStarted.fire({ kind: 'update', skillNames: updates.map(u => u.name) });
+
   // Show progress notification until terminal completes or timeout
   vscode.window.withProgress(
     { location: vscode.ProgressLocation.Notification, title: `Updating ${updates.length} skill(s)...`, cancellable: false },
@@ -315,6 +328,7 @@ export async function uninstallSkill(
   }
 
   const log = getLog();
+  _onOperationStarted.fire({ kind: 'uninstall', skillNames: [options?.folderName ?? skillName] });
 
   // Project-scoped skills: delete directly (the skills.sh CLI only manages
   // global installs and doesn't know about project-level directories).
@@ -375,6 +389,8 @@ export async function uninstallSkill(
       const msg = toErrorMessage(e);
       log.error(`[installer] uninstall: failed for "${skillName}": ${msg}`);
       vscode.window.showErrorMessage(`Failed to uninstall "${skillName}": ${msg}`);
+      // Still signal completion so listeners (e.g. rescan) run and any poll stops.
+      _onOperationCompleted.fire();
     }
     return;
   }

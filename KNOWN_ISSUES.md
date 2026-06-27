@@ -32,16 +32,17 @@ watcher. So a skill installed or removed **inside WSL** (e.g. `npx skills add` i
 a WSL terminal) may not appear/disappear in the `WSL: <distro>` group or update
 its marketplace "Installed" badge until the next scan.
 
-A rescan that picks up WSL changes happens on:
+**Extension-initiated installs** (the marketplace Install button) now auto-resolve:
+a bounded WSL completion poll re-scans until the new skill is observed, so the WSL
+group/badge refresh and the "Installing…" notification clears promptly (instead of
+waiting for the ~30s timeout). Uninstall/update from the extension never target WSL
+skills (WSL tree items are read-only), so they don't need the poll.
+
+A **manual** `npx skills add/remove` typed directly in a terminal is not polled,
+so it still picks up via:
 - **Window focus** (`skills-sh.autoRefreshOnFocus`),
 - the manual **Refresh** button in the Installed view, or
 - the next extension startup.
-
-Related: when an install is launched from the extension into a **WSL terminal**,
-VS Code shell-integration often doesn't emit a completion event, so the
-"Installing…" progress notification falls back to its ~30s timeout instead of
-clearing as soon as the install finishes. A WSL-aware completion poll is a
-planned follow-up.
 
 ## `npx skills update` does not update the lock file hash
 
