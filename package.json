@@ -493,6 +493,12 @@
             "scope": "window",
             "markdownDescription": "Automatically re-scan your skills directories when the VS Code window regains focus. Keeps the installed skills list up to date when you install or remove skills outside of VS Code (e.g., via `npx skills add` in a terminal)."
           },
+          "skills-sh.scanWsl": {
+            "type": "boolean",
+            "default": true,
+            "scope": "window",
+            "markdownDescription": "**Windows only.** Also scan **running** WSL distros for installed skills, shown as a collapsed `WSL: <distro>` group. Skills installed inside WSL (e.g. `npx skills add` run in a WSL terminal) live on a separate filesystem the Windows host can't otherwise see. Only running distros are scanned to avoid auto-starting stopped ones. Disable to skip WSL entirely."
+          },
           "skills-sh.checkUpdatesOnStartup": {
             "type": "boolean",
             "default": true,

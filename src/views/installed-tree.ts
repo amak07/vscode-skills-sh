@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { InstalledSkill } from '../types';
+import { InstalledSkill, WslSkillGroup } from '../types';
 import { SkillScanner } from '../local/scanner';
 import { getLastUpdateResult } from '../api/updates';
 import { getManifestSkillNames } from '../manifest/manifest';
@@ -14,12 +14,23 @@ const GROUP_ICONS: Record<string, string> = {
   project: 'folder-library',
   updates: 'cloud-upload',
   'quick-links': 'link',
+  wsl: 'terminal-linux',
+  host: 'device-desktop',
 };
+
+/** Display label for the host OS, used as the parent group when WSL is also shown. */
+function hostOsLabel(): string {
+  switch (process.platform) {
+    case 'win32': return 'Windows';
+    case 'darwin': return 'macOS';
+    default: return 'Linux';
+  }
+}
 
 class GroupItem extends vscode.TreeItem {
   constructor(
     public readonly label: string,
-    public readonly groupType: 'source' | 'custom' | 'untracked' | 'project' | 'updates' | 'quick-links',
+    public readonly groupType: 'source' | 'custom' | 'untracked' | 'project' | 'updates' | 'quick-links' | 'wsl' | 'host',
     public readonly children: TreeItem[],
     collapsibleState = vscode.TreeItemCollapsibleState.Collapsed,
   ) {
@@ -77,6 +88,9 @@ class SkillItem extends vscode.TreeItem {
     if (agentNames.length > 0) {
       tooltipLines.push(`\nAgents: ${agentNames.join(', ')}`);
     }
+    if (skill.origin?.startsWith('wsl:')) {
+      tooltipLines.push(`\nLocation: WSL · ${skill.origin.slice('wsl:'.length)}`);
+    }
     tooltipLines.push(`\nPath: ${skill.path}`);
     if (skill.source) {
       tooltipLines.push(`Source: ${skill.source}`);
@@ -96,14 +110,23 @@ class SkillItem extends vscode.TreeItem {
     }
     this.tooltip = tooltipLines.join('\n');
 
-    // Context value scheme: skill / skill_manifest / skill_updatable / skill_updatable_manifest
-    const base = hasUpdate ? 'skill_updatable' : 'skill';
-    this.contextValue = inManifest ? `${base}_manifest` : base;
-    this.command = {
-      command: 'skills-sh.previewSkillFile',
-      title: 'Preview SKILL.md',
-      arguments: [skill],
-    };
+    if (skill.origin?.startsWith('wsl:')) {
+      // WSL skills are read-only/informational from the Windows host: uninstall,
+      // open, copy-path, etc. would target the Windows filesystem (wrong distro)
+      // and silently fail. A contextValue that does NOT start with "skill"
+      // excludes them from every `viewItem =~ /^skill/` context menu. No click
+      // command either — the UNC path to SKILL.md isn't reliably openable.
+      this.contextValue = 'wslSkill';
+    } else {
+      // Context value scheme: skill / skill_manifest / skill_updatable / skill_updatable_manifest
+      const base = hasUpdate ? 'skill_updatable' : 'skill';
+      this.contextValue = inManifest ? `${base}_manifest` : base;
+      this.command = {
+        command: 'skills-sh.previewSkillFile',
+        title: 'Preview SKILL.md',
+        arguments: [skill],
+      };
+    }
   }
 }
 
@@ -130,6 +153,7 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
 
   private globalSkills: InstalledSkill[] = [];
   private projectSkills: InstalledSkill[] = [];
+  private wslGroups: WslSkillGroup[] = [];
   private hasInitiallyScanned = false;
   private auditMap = new Map<string, AuditMapEntry>();
 
@@ -145,13 +169,16 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
   }
 
   async rescan(): Promise<void> {
-    const { globalSkills, projectSkills } = await this.scanner.scan();
+    const { globalSkills, projectSkills, wslGroups } = await this.scanner.scan();
     this.globalSkills = globalSkills;
     this.projectSkills = projectSkills;
+    this.wslGroups = wslGroups ?? [];
     this.hasInitiallyScanned = true;
 
+    const wslSkillCount = this.wslGroups.reduce((n, g) => n + g.skills.length, 0);
     const noSkills = this.globalSkills.length === 0
-      && this.projectSkills.length === 0;
+      && this.projectSkills.length === 0
+      && wslSkillCount === 0;
     vscode.commands.executeCommand('setContext', 'skills-sh.noSkillsFound', noSkills);
     // Inverse of noSkillsFound — needed as a truthy context for walkthrough completion events
     vscode.commands.executeCommand('setContext', 'skills-sh.hasInstalledSkill', !noSkills);
@@ -161,7 +188,8 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
 
   getInstalledSkillNames(): Set<string> {
     const names = new Set<string>();
-    for (const skill of [...this.globalSkills, ...this.projectSkills]) {
+    const wslSkills = this.wslGroups.flatMap(g => g.skills);
+    for (const skill of [...this.globalSkills, ...this.projectSkills, ...wslSkills]) {
       names.add(skill.name);
       names.add(skill.folderName);
     }
@@ -208,6 +236,9 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
       }
 
       // --- Skill groups: by source / custom / untracked ---
+      // Collected separately so they can be nested under a host-OS group when
+      // WSL skills are also present (env symmetry).
+      const nativeGroups: TreeItem[] = [];
       const bySource = new Map<string, InstalledSkill[]>();
       const custom: InstalledSkill[] = [];
       const untracked: InstalledSkill[] = [];
@@ -230,7 +261,7 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
         const children = sorted.map(s =>
           new SkillItem(s, false, manifestNames.has(s.folderName), this.auditMap.get(s.folderName)?.score, this.auditMap.get(s.folderName)?.audits),
         );
-        groups.push(new GroupItem(
+        nativeGroups.push(new GroupItem(
           `Custom Skills (${custom.length})`,
           'custom',
           children,
@@ -245,7 +276,7 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
         const children = sorted.map(s =>
           new SkillItem(s, updatableNames.has(s.name), manifestNames.has(s.folderName), this.auditMap.get(s.folderName)?.score, this.auditMap.get(s.folderName)?.audits),
         );
-        groups.push(new GroupItem(
+        nativeGroups.push(new GroupItem(
           `${source} (${skills.length})`,
           'source',
           children,
@@ -258,7 +289,7 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
         const children = sorted.map(s =>
           new SkillItem(s, false, manifestNames.has(s.folderName), this.auditMap.get(s.folderName)?.score, this.auditMap.get(s.folderName)?.audits),
         );
-        groups.push(new GroupItem(
+        nativeGroups.push(new GroupItem(
           `Untracked (${untracked.length})`,
           'untracked',
           children,
@@ -271,11 +302,41 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
         const children = sorted.map(s =>
           new SkillItem(s, updatableNames.has(s.name), manifestNames.has(s.folderName), this.auditMap.get(s.folderName)?.score, this.auditMap.get(s.folderName)?.audits),
         );
-        groups.push(new GroupItem(
+        nativeGroups.push(new GroupItem(
           `Project Skills (${this.projectSkills.length})`,
           'project',
           children,
         ));
+      }
+
+      // --- WSL distro groups (Windows host; collapsed by default) ---
+      const wslGroupItems = this.wslGroups.map(group => {
+        const sorted = this.sortSkills(group.skills);
+        const children = sorted.map(s =>
+          new SkillItem(s, false, manifestNames.has(s.folderName), this.auditMap.get(s.folderName)?.score, this.auditMap.get(s.folderName)?.audits),
+        );
+        return new GroupItem(
+          `WSL: ${group.distro} (${group.skills.length})`,
+          'wsl',
+          children,
+          vscode.TreeItemCollapsibleState.Collapsed,
+        );
+      });
+
+      // --- Assemble: nest native groups under a host-OS group ONLY when WSL is
+      // also present (env symmetry); otherwise keep native groups top-level. ---
+      if (wslGroupItems.length > 0) {
+        if (nativeGroups.length > 0) {
+          groups.push(new GroupItem(
+            hostOsLabel(),
+            'host',
+            nativeGroups,
+            vscode.TreeItemCollapsibleState.Expanded,
+          ));
+        }
+        groups.push(...wslGroupItems);
+      } else {
+        groups.push(...nativeGroups);
       }
 
       // --- Quick Links (pinned at top) ---

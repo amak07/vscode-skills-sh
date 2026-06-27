@@ -26,6 +26,11 @@ export class SkillWatcher implements vscode.Disposable {
     this.watchLockFile();
     this.watchLocalLockFile();
     this.watchManifestFile();
+
+    // Note: WSL distro skill dirs (\\wsl$\<distro>\...) are intentionally NOT
+    // watched — FileSystemWatcher over WSL UNC paths is unreliable and would
+    // risk auto-starting distros. WSL groups refresh on manual Refresh and on
+    // window focus (skills-sh.autoRefreshOnFocus).
   }
 
   /** Watch ~/.agents/.skill-lock.json — a regular file that npx skills always updates */

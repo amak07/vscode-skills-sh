@@ -1,5 +1,48 @@
 # Known Issues
 
+## "PromptScript: does not support global skill installation" on install
+
+Installing a skill globally may print, near the end of the CLI output:
+
+```
+✗ <skill> → PromptScript: PromptScript does not support global skill installation
+■  Failed to install 1
+```
+
+This is **cosmetic**. PromptScript (and "Eve") are agents in the upstream
+`vercel-labs/skills` registry whose `globalSkillsDir` is `undefined` — they only
+support project-level skills. When you do a global install, the CLI can't target
+them and reports a per-agent `✗` plus a non-zero exit code, **even though the
+skill installed successfully to every other agent** (Claude Code, Cursor, etc.).
+
+PromptScript only gets involved when the current directory contains a
+`.promptscript` folder or a `promptscript.yaml` file (that's how the CLI detects
+it). Run the install from a different directory to avoid the line entirely.
+
+**In this extension:** we no longer surface a false "Install failed" notification
+for this case — a non-zero CLI exit is only reported as a failure when the skill
+is genuinely missing from `~/.agents/skills/` afterward.
+
+## WSL skills don't auto-refresh instantly after install/uninstall
+
+WSL distro skill directories are read via `wsl.exe` and are **not** watched by a
+`FileSystemWatcher` (watching `\\wsl$` UNC paths is unreliable, and we avoid
+auto-starting distros). They also can't be detected by the Windows-side lock-file
+watcher. So a skill installed or removed **inside WSL** (e.g. `npx skills add` in
+a WSL terminal) may not appear/disappear in the `WSL: <distro>` group or update
+its marketplace "Installed" badge until the next scan.
+
+A rescan that picks up WSL changes happens on:
+- **Window focus** (`skills-sh.autoRefreshOnFocus`),
+- the manual **Refresh** button in the Installed view, or
+- the next extension startup.
+
+Related: when an install is launched from the extension into a **WSL terminal**,
+VS Code shell-integration often doesn't emit a completion event, so the
+"Installing…" progress notification falls back to its ~30s timeout instead of
+clearing as soon as the install finishes. A WSL-aware completion poll is a
+planned follow-up.
+
 ## `npx skills update` does not update the lock file hash
 
 The skills.sh CLI's `update` command fails to write the updated `skillFolderHash` back to `~/.agents/.skill-lock.json`, causing subsequent checks to always flag the same skills as outdated.
