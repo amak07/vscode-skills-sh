@@ -4,6 +4,8 @@ All notable changes to the Skills.sh Agent Skills Manager extension will be docu
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-06-27
+
 ### Added
 
 - **WSL skill detection (Windows).** On a Windows host, the extension now also scans **running** WSL distros for installed skills (read via `wsl.exe`, not the unreliable `\\wsl$` share) and shows them in a collapsed `WSL: <distro>` group. Skills installed inside WSL (e.g. `npx skills add` run in a WSL terminal) live on a separate filesystem the Windows host couldn't previously see. When WSL skills are present, your host skills are grouped under a parallel `Windows` (or `macOS`/`Linux`) heading for symmetry; with no WSL present the view is unchanged. Controlled by the new `skills-sh.scanWsl` setting (default on).
