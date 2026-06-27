@@ -3,12 +3,12 @@ import * as path from 'path';
 import * as os from 'os';
 import * as vscode from 'vscode';
 import { InstalledSkill, SkillScope, SkillLockFile, LocalLockFile, ScanResult, WslSkillGroup } from '../types';
-import { parseSkillMd, parseSkillMdAsync } from './parser';
+import { parseSkillMd, parseSkillMdAsync, parseSkillMdContent } from './parser';
 import { getLog } from '../logger';
 import { findLockEntryByFolder } from '../utils/lock-file';
 import { getGlobalLockPath } from '../utils/constants';
 import { KNOWN_AGENTS, KnownAgent } from './known-agents';
-import { getWslRoots } from './wsl';
+import { getRunningWslDistros, dumpWslSkills, parseWslDump } from './wsl';
 
 export interface ScanDiagnostic {
   globalDirs: { path: string; exists: boolean; skillCount: number; agent?: string }[];
@@ -296,33 +296,62 @@ export class SkillScanner {
   }
 
   /**
-   * Scan running WSL distros (Windows host only) for installed skills. Each
-   * distro is scanned with its own `~/.agents/.skill-lock.json`, mirroring the
-   * native global scan. Returns one group per distro that has any skills.
+   * Scan running WSL distros (Windows host only) for installed skills. Reads
+   * each distro via `wsl.exe -e` (NOT the unreliable `\\wsl$` UNC share),
+   * parsing the SKILL.md + lock-file dump. Returns one group per distro that
+   * has any skills.
    */
   private async scanWsl(activeAgents: KnownAgent[]): Promise<WslSkillGroup[]> {
     if (process.platform !== 'win32' || !this.isWslScanEnabled()) {
       return [];
     }
-    const roots = await getWslRoots();
+    const distros = await getRunningWslDistros();
+    const agentDirs = activeAgents.map(a => a.skillsDir);
+    const agentByDir = new Map(activeAgents.map(a => [a.skillsDir, a] as const));
     const groups: WslSkillGroup[] = [];
-    for (const root of roots) {
-      const lock = await this.readLockFile(path.join(root.base, '.agents', '.skill-lock.json'));
-      const entries: AgentScanEntry[] = [];
-      for (const agent of activeAgents) {
-        const dir = path.join(root.base, agent.skillsDir);
-        const skills = await this.scanDirectory(dir, 'global', lock);
-        for (const skill of skills) {
-          entries.push({
-            skill: { ...skill, origin: `wsl:${root.distro}` },
-            agentDisplayName: agent.displayName,
-            isCanonical: agent.isCanonical === true,
-          });
-        }
+
+    for (const distro of distros) {
+      const dump = await dumpWslSkills(distro, agentDirs);
+      if (!dump) { continue; }
+      const parsed = parseWslDump(dump);
+
+      let lock: SkillLockFile | null = null;
+      if (parsed.lockJson) {
+        try { lock = JSON.parse(parsed.lockJson) as SkillLockFile; } catch { lock = null; }
       }
+
+      const entries: AgentScanEntry[] = [];
+      for (const s of parsed.skills) {
+        const md = parseSkillMdContent(s.content);
+        if (!md) { continue; }
+        const agent = agentByDir.get(s.agentDir);
+        const lockEntry = findLockEntryByFolder(lock, s.folderName);
+        // Display path (informational): the WSL UNC path. Not always reachable.
+        const winPath = `\\\\wsl$\\${distro}${parsed.home.replace(/\//g, '\\')}\\`
+          + `${s.agentDir.replace(/\//g, '\\')}\\${s.folderName}`;
+        entries.push({
+          skill: {
+            name: md.name,
+            folderName: s.folderName,
+            description: md.description,
+            path: winPath,
+            scope: 'global',
+            metadata: md.metadata,
+            source: lockEntry?.source,
+            hash: lockEntry?.skillFolderHash,
+            skillPath: lockEntry?.skillPath,
+            isCustom: !lockEntry,
+            agents: [],
+            origin: `wsl:${distro}`,
+          },
+          agentDisplayName: agent?.displayName ?? s.agentDir,
+          isCanonical: agent?.isCanonical === true,
+        });
+      }
+
       const deduped = this.deduplicateAcrossAgents(entries);
       if (deduped.length > 0) {
-        groups.push({ distro: root.distro, skills: deduped });
+        groups.push({ distro, skills: deduped });
       }
     }
     return groups;

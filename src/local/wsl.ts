@@ -1,15 +1,5 @@
 import { execFile } from 'child_process';
-import * as fs from 'fs';
 import { getLog } from '../logger';
-
-/**
- * A WSL distro's home directory, reachable from the Windows host via a UNC path.
- * `base` is e.g. `\\wsl$\Ubuntu-20.04\home\abelm` — agent skill dirs hang off it.
- */
-export interface WslRoot {
-  distro: string;
-  base: string;
-}
 
 /** WSL's own internal distros — not real Linux homes a user installs skills into. */
 const SYSTEM_DISTROS = new Set(['docker-desktop', 'docker-desktop-data']);
@@ -17,60 +7,90 @@ const SYSTEM_DISTROS = new Set(['docker-desktop', 'docker-desktop-data']);
 /** NUL char, used to scrub UTF-16 decode artifacts without an inline escape. */
 const NUL = String.fromCharCode(0);
 
+const TAB = String.fromCharCode(9);
+
+export interface WslDumpSkill {
+  agentDir: string;   // relative agent skills dir, e.g. ".agents/skills"
+  folderName: string; // skill folder name
+  content: string;    // raw SKILL.md contents
+}
+
+export interface WslDump {
+  home: string;            // the distro's $HOME, e.g. "/home/abelm"
+  lockJson: string | null; // raw ~/.agents/.skill-lock.json contents, if present
+  skills: WslDumpSkill[];
+}
+
 /**
- * Detect running WSL distros and resolve each one's default-user home as a
- * Windows UNC path. Windows-only; returns [] on any other platform or on any
- * failure (e.g. wsl.exe not installed). Never throws.
+ * Names of running, non-system WSL distros (Windows only). Returns [] on any
+ * other platform or on any failure (e.g. wsl.exe not installed). Never throws.
  *
- * We scan only RUNNING distros on purpose: touching `\\wsl$\<distro>` for a
- * stopped distro auto-starts it, which is slow and a surprising side effect.
+ * We scan only RUNNING distros on purpose: starting a stopped distro just to
+ * read skills is slow and a surprising side effect.
  */
-export async function getWslRoots(): Promise<WslRoot[]> {
+export async function getRunningWslDistros(): Promise<string[]> {
   if (process.platform !== 'win32') {
     return [];
   }
   const log = getLog();
   try {
     const listing = await runWsl(['-l', '-v'], 'utf16le');
-    const distros = parseRunningDistros(listing);
-    const roots: WslRoot[] = [];
-    for (const distro of distros) {
-      try {
-        // `$HOME` is emitted by the Linux shell as raw UTF-8 (not wsl.exe's UTF-16).
-        const home = (await runWsl(['-d', distro, '-e', 'sh', '-lc', 'printf %s "$HOME"'], 'utf8')).trim();
-        if (!home.startsWith('/')) { continue; }
-        const base = resolveWslBase(distro, home);
-        if (base) {
-          roots.push({ distro, base });
-        }
-      } catch (e) {
-        log.warn(`[wsl] could not resolve home for distro ${distro}: ${(e as Error).message}`);
-      }
-    }
-    return roots;
+    return parseRunningDistros(listing);
   } catch (e) {
-    // wsl.exe missing or any other failure — degrade silently to "no WSL".
     log.info(`[wsl] WSL detection unavailable: ${(e as Error).message}`);
     return [];
   }
 }
 
 /**
- * Resolve a distro + Linux home (`/home/<user>`) to a reachable Windows UNC base.
- * Windows exposes WSL files under `\\wsl$\<distro>` (older) or `\\wsl.localhost\
- * <distro>` (Windows 22H2+); try both and return the first that exists, or null.
+ * Read installed skills from a distro by running a single shell script through
+ * `wsl.exe -e` (NOT the `\\wsl$` UNC share, which is unreliable / session-
+ * dependent on Windows). Returns the raw dump text, or null on failure.
  */
-function resolveWslBase(distro: string, home: string): string | null {
-  const tail = home.replace(/\//g, '\\');
-  for (const prefix of ['\\\\wsl$\\', '\\\\wsl.localhost\\']) {
-    const base = `${prefix}${distro}${tail}`;
-    try {
-      if (fs.existsSync(base)) { return base; }
-    } catch {
-      // UNC access can throw (provider unavailable) — treat as "not here".
-    }
+export async function dumpWslSkills(distro: string, agentDirs: string[]): Promise<string | null> {
+  const log = getLog();
+  const dirsLiteral = agentDirs.map(d => `'${d}'`).join(' ');
+  const script =
+    `for agentdir in ${dirsLiteral}; do ` +
+    `base="$HOME/$agentdir"; [ -d "$base" ] || continue; ` +
+    `for d in "$base"/*/; do ` +
+    `[ -f "$d/SKILL.md" ] || continue; ` +
+    `name=$(basename "$d"); ` +
+    `printf '===SKILL\\t%s\\t%s===\\n' "$agentdir" "$name"; ` +
+    `cat "$d/SKILL.md"; ` +
+    `printf '\\n===ENDSKILL===\\n'; ` +
+    `done; done; ` +
+    `printf '===HOME===%s===\\n' "$HOME"; ` +
+    `printf '===LOCK===\\n'; ` +
+    `cat "$HOME/.agents/.skill-lock.json" 2>/dev/null; ` +
+    `printf '\\n===ENDLOCK===\\n'`;
+  try {
+    return await runWsl(['-d', distro, '-e', 'sh', '-lc', script], 'utf8');
+  } catch (e) {
+    log.warn(`[wsl] could not read skills from distro ${distro}: ${(e as Error).message}`);
+    return null;
   }
-  return null;
+}
+
+/** Parse the delimited dump emitted by dumpWslSkills() into structured data. */
+export function parseWslDump(dump: string): WslDump {
+  const skills: WslDumpSkill[] = [];
+  const skillRe = new RegExp(
+    `===SKILL${TAB}([^${TAB}]+)${TAB}([^\\n]+?)===\\n([\\s\\S]*?)\\n===ENDSKILL===`,
+    'g',
+  );
+  let m: RegExpExecArray | null;
+  while ((m = skillRe.exec(dump)) !== null) {
+    skills.push({ agentDir: m[1], folderName: m[2], content: m[3] });
+  }
+
+  const homeMatch = dump.match(/===HOME===([\s\S]*?)===\n/);
+  const home = homeMatch ? homeMatch[1].trim() : '';
+
+  const lockMatch = dump.match(/===LOCK===\n([\s\S]*?)\n===ENDLOCK===/);
+  const lockRaw = lockMatch ? lockMatch[1].trim() : '';
+
+  return { home, lockJson: lockRaw || null, skills };
 }
 
 /**
@@ -104,7 +124,7 @@ function runWsl(args: string[], encoding: BufferEncoding): Promise<string> {
     execFile(
       'wsl.exe',
       args,
-      { encoding: 'buffer', windowsHide: true, timeout: 15000, maxBuffer: 1024 * 1024 },
+      { encoding: 'buffer', windowsHide: true, timeout: 15000, maxBuffer: 4 * 1024 * 1024 },
       (err, stdout) => {
         if (err) { reject(err); return; }
         resolve(Buffer.from(stdout as unknown as Buffer).toString(encoding));

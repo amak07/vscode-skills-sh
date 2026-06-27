@@ -1,12 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { execFile } from 'child_process';
 
-// fs is mocked so existsSync is configurable (UNC paths don't exist in CI).
-vi.mock('fs', async (importOriginal) => ({ ...(await importOriginal() as object) }));
 vi.mock('child_process');
 
-import * as fs from 'fs';
-import { getWslRoots, parseRunningDistros } from '../../../local/wsl';
+import { getRunningWslDistros, dumpWslSkills, parseWslDump, parseRunningDistros } from '../../../local/wsl';
 
 /** `wsl.exe -l -v` prints UTF-16LE. Build a Buffer matching that. */
 function utf16(text: string): Buffer {
@@ -36,71 +33,88 @@ describe('parseRunningDistros', () => {
   });
 });
 
-describe('getWslRoots', () => {
-  beforeEach(() => {
-    vi.mocked(execFile).mockReset();
+describe('parseWslDump', () => {
+  const TAB = String.fromCharCode(9);
+  const dump =
+    `===SKILL${TAB}.agents/skills${TAB}monorepo-management===\n` +
+    `---\nname: monorepo-management\ndescription: Master monorepos\n---\nBody.\n` +
+    `\n===ENDSKILL===\n` +
+    `===SKILL${TAB}.claude/skills${TAB}monorepo-management===\n` +
+    `---\nname: monorepo-management\ndescription: Master monorepos\n---\nBody.\n` +
+    `\n===ENDSKILL===\n` +
+    `===HOME===/home/abelm===\n` +
+    `===LOCK===\n{"version":3,"skills":{"monorepo-management":{"source":"wshobson/agents"}}}\n===ENDLOCK===\n`;
+
+  it('extracts skills, home, and the lock JSON', () => {
+    const parsed = parseWslDump(dump);
+    expect(parsed.home).toBe('/home/abelm');
+    expect(parsed.lockJson).toContain('wshobson/agents');
+    expect(parsed.skills).toHaveLength(2);
+    expect(parsed.skills[0]).toMatchObject({ agentDir: '.agents/skills', folderName: 'monorepo-management' });
+    expect(parsed.skills[0].content).toContain('name: monorepo-management');
   });
-  afterEach(() => {
-    setPlatform(originalPlatform);
+
+  it('handles an empty dump (no skills, no lock)', () => {
+    const parsed = parseWslDump('===HOME===/home/x===\n===LOCK===\n\n===ENDLOCK===\n');
+    expect(parsed.skills).toEqual([]);
+    expect(parsed.lockJson).toBeNull();
+    expect(parsed.home).toBe('/home/x');
   });
+});
+
+describe('getRunningWslDistros', () => {
+  beforeEach(() => { vi.mocked(execFile).mockReset(); });
+  afterEach(() => { setPlatform(originalPlatform); });
 
   it('returns [] on non-Windows without spawning wsl.exe', async () => {
     setPlatform('darwin');
-    const roots = await getWslRoots();
-    expect(roots).toEqual([]);
+    expect(await getRunningWslDistros()).toEqual([]);
     expect(execFile).not.toHaveBeenCalled();
   });
 
-  it('lists running distros and resolves each UNC home (win32)', async () => {
+  it('lists running distros on win32', async () => {
     setPlatform('win32');
-    // First call: `wsl -l -v` (UTF-16LE). Subsequent: `$HOME` per distro (UTF-8).
-    vi.mocked(execFile).mockImplementation(((cmd: string, args: string[], _opts: unknown, cb: (e: Error | null, out: Buffer) => void) => {
-      if (args.includes('-l')) { cb(null, utf16(WSL_LIST_OUTPUT)); }
-      else { cb(null, Buffer.from('/home/abelm', 'utf8')); }
+    vi.mocked(execFile).mockImplementation(((_cmd: string, _args: string[], _opts: unknown, cb: (e: Error | null, out: Buffer) => void) => {
+      cb(null, utf16(WSL_LIST_OUTPUT));
       return {} as never;
     }) as never);
-    vi.spyOn(fs, 'existsSync').mockReturnValue(true);
-
-    const roots = await getWslRoots();
-
-    expect(roots).toEqual([
-      { distro: 'Ubuntu-20.04', base: '\\\\wsl$\\Ubuntu-20.04\\home\\abelm' },
-    ]);
-  });
-
-  it('falls back to \\\\wsl.localhost when \\\\wsl$ is unavailable', async () => {
-    setPlatform('win32');
-    vi.mocked(execFile).mockImplementation(((cmd: string, args: string[], _opts: unknown, cb: (e: Error | null, out: Buffer) => void) => {
-      if (args.includes('-l')) { cb(null, utf16(WSL_LIST_OUTPUT)); }
-      else { cb(null, Buffer.from('/home/abelm', 'utf8')); }
-      return {} as never;
-    }) as never);
-    vi.spyOn(fs, 'existsSync').mockImplementation((p) => String(p).startsWith('\\\\wsl.localhost\\'));
-
-    expect(await getWslRoots()).toEqual([
-      { distro: 'Ubuntu-20.04', base: '\\\\wsl.localhost\\Ubuntu-20.04\\home\\abelm' },
-    ]);
-  });
-
-  it('skips a distro whose UNC home does not exist', async () => {
-    setPlatform('win32');
-    vi.mocked(execFile).mockImplementation(((cmd: string, args: string[], _opts: unknown, cb: (e: Error | null, out: Buffer) => void) => {
-      if (args.includes('-l')) { cb(null, utf16(WSL_LIST_OUTPUT)); }
-      else { cb(null, Buffer.from('/home/abelm', 'utf8')); }
-      return {} as never;
-    }) as never);
-    vi.spyOn(fs, 'existsSync').mockReturnValue(false);
-
-    expect(await getWslRoots()).toEqual([]);
+    expect(await getRunningWslDistros()).toEqual(['Ubuntu-20.04']);
   });
 
   it('returns [] (never throws) when wsl.exe is missing', async () => {
     setPlatform('win32');
-    vi.mocked(execFile).mockImplementation(((cmd: string, args: string[], _opts: unknown, cb: (e: Error | null, out: Buffer | null) => void) => {
+    vi.mocked(execFile).mockImplementation(((_cmd: string, _args: string[], _opts: unknown, cb: (e: Error | null, out: Buffer | null) => void) => {
       cb(Object.assign(new Error('spawn wsl.exe ENOENT'), { code: 'ENOENT' }), null);
       return {} as never;
     }) as never);
+    expect(await getRunningWslDistros()).toEqual([]);
+  });
+});
 
-    expect(await getWslRoots()).toEqual([]);
+describe('dumpWslSkills', () => {
+  beforeEach(() => { vi.mocked(execFile).mockReset(); });
+
+  it('runs a script in the distro via wsl -e and returns its stdout', async () => {
+    let capturedArgs: string[] = [];
+    vi.mocked(execFile).mockImplementation(((_cmd: string, args: string[], _opts: unknown, cb: (e: Error | null, out: Buffer) => void) => {
+      capturedArgs = args;
+      cb(null, Buffer.from('DUMP-OUTPUT', 'utf8'));
+      return {} as never;
+    }) as never);
+
+    const out = await dumpWslSkills('Ubuntu-20.04', ['.agents/skills', '.claude/skills']);
+
+    expect(out).toBe('DUMP-OUTPUT');
+    expect(capturedArgs.slice(0, 4)).toEqual(['-d', 'Ubuntu-20.04', '-e', 'sh']);
+    // The generated script references each agent dir.
+    expect(capturedArgs[capturedArgs.length - 1]).toContain(`'.agents/skills' '.claude/skills'`);
+  });
+
+  it('returns null (never throws) on failure', async () => {
+    vi.mocked(execFile).mockImplementation(((_cmd: string, _args: string[], _opts: unknown, cb: (e: Error | null, out: Buffer | null) => void) => {
+      cb(new Error('boom'), null);
+      return {} as never;
+    }) as never);
+    expect(await dumpWslSkills('Ubuntu-20.04', ['.agents/skills'])).toBeNull();
   });
 });
