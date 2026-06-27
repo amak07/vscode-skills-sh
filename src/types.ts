@@ -138,11 +138,19 @@ export interface InstalledSkill {
   skillPath?: string; // e.g. "skills/react-email/SKILL.md" — from lock file
   isCustom: boolean; // true = regular directory (user-created), false = symlink (marketplace)
   agents: string[]; // display names of agents that have this skill (e.g. ["Claude Code", "Cursor"])
+  origin?: string; // e.g. "wsl:Ubuntu-20.04" for skills found inside a WSL distro (Windows host)
+}
+
+export interface WslSkillGroup {
+  distro: string;
+  skills: InstalledSkill[];
 }
 
 export interface ScanResult {
   globalSkills: InstalledSkill[];
   projectSkills: InstalledSkill[];
+  /** Skills found inside running WSL distros (Windows host only). */
+  wslGroups?: WslSkillGroup[];
 }
 
 export interface SkillLockEntry {
