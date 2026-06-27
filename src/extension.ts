@@ -115,7 +115,15 @@ export function activate(context: vscode.ExtensionContext) {
   let previousSkillNames = new Set<string>();
   let previousSkillsList: InstalledSkill[] = [];
 
+  let skillChangesInFlight = false;
   async function handleSkillChanges(source: string): Promise<void> {
+    // Re-entrancy guard: the WSL poll and the file watcher can both call this,
+    // and two concurrent runs would diff against the same stale snapshot and
+    // double-fire toasts / rating prompts. A skipped call is harmless — the
+    // poll re-ticks and the watcher re-fires.
+    if (skillChangesInFlight) { return; }
+    skillChangesInFlight = true;
+    try {
     const log = getLog();
     const oldNames = previousSkillNames;
     const oldSkills = previousSkillsList;
@@ -234,6 +242,9 @@ export function activate(context: vscode.ExtensionContext) {
 
     previousSkillNames = newNames;
     previousSkillsList = newSkills;
+    } finally {
+      skillChangesInFlight = false;
+    }
   }
 
   watcher.onDidChange(() => {
@@ -266,6 +277,11 @@ export function activate(context: vscode.ExtensionContext) {
   // without needing window focus. Windows + skills-sh.scanWsl only.
   context.subscriptions.push(
     onOperationStarted((op) => {
+      // Only installs can produce a WSL skill (installed via the marketplace into
+      // a WSL terminal). Extension-initiated uninstall/update never target WSL
+      // skills (WSL tree items are read-only and excluded from update detection),
+      // so they're already covered by the file watcher — no poll needed.
+      if (op.kind !== 'install') { return; }
       const wslEnabled = vscode.workspace.getConfiguration('skills-sh').get<boolean>('scanWsl', true);
       if (process.platform !== 'win32' || !wslEnabled) { return; }
       activeWslPoll?.cancel();
@@ -275,12 +291,8 @@ export function activate(context: vscode.ExtensionContext) {
         budgetMs: 24000, // resolves before the installer's 30s timeout
         tick: () => handleSkillChanges('wsl-poll'),
         isResolved: () => {
-          // update = remove+add: the skill is present before and after, so
-          // presence can't signal completion — run to budget instead.
-          if (op.kind === 'update') { return false; }
           const names = treeProvider.getInstalledSkillNames();
-          const present = targets.filter(n => names.has(n)).length;
-          return op.kind === 'install' ? present === targets.length : present === 0;
+          return targets.every(n => names.has(n));
         },
       });
     }),

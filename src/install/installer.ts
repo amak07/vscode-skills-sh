@@ -389,6 +389,8 @@ export async function uninstallSkill(
       const msg = toErrorMessage(e);
       log.error(`[installer] uninstall: failed for "${skillName}": ${msg}`);
       vscode.window.showErrorMessage(`Failed to uninstall "${skillName}": ${msg}`);
+      // Still signal completion so listeners (e.g. rescan) run and any poll stops.
+      _onOperationCompleted.fire();
     }
     return;
   }

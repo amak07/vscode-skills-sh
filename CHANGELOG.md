@@ -8,7 +8,7 @@ All notable changes to the Skills.sh Agent Skills Manager extension will be docu
 
 - **WSL skill detection (Windows).** On a Windows host, the extension now also scans **running** WSL distros for installed skills (read via `wsl.exe`, not the unreliable `\\wsl$` share) and shows them in a collapsed `WSL: <distro>` group. Skills installed inside WSL (e.g. `npx skills add` run in a WSL terminal) live on a separate filesystem the Windows host couldn't previously see. When WSL skills are present, your host skills are grouped under a parallel `Windows` (or `macOS`/`Linux`) heading for symmetry; with no WSL present the view is unchanged. Controlled by the new `skills-sh.scanWsl` setting (default on).
 - **"Show more / Show less" on the detail page** — long SKILL.md content is collapsed with a gradient fade and expands on click, mirroring skills.sh. Short skills render fully with no button.
-- **WSL operations auto-refresh.** When you install/uninstall/update a skill from the extension on Windows, a bounded completion poll now re-scans (including WSL) until the change is seen — so the WSL group/badge update and the "Installing…" notification clears promptly, instead of waiting on window focus or the ~30s timeout. (A manual `npx skills` typed in a terminal still refreshes on focus/Refresh.)
+- **WSL installs auto-refresh.** When you install a skill from the extension on Windows (it runs in your WSL terminal), a bounded completion poll now re-scans (including WSL) until the new skill is seen — so the WSL group/badge update and the "Installing…" notification clears promptly, instead of waiting on window focus or the ~30s timeout. (A manual `npx skills` typed in a terminal still refreshes on focus/Refresh.)
 
 ### Fixed
 

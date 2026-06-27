@@ -53,6 +53,14 @@ describe('startOperationPoll', () => {
     expect(maxInFlight).toBe(1);
   });
 
+  it('never ticks when the budget is smaller than one interval', async () => {
+    const tick = vi.fn(async () => {});
+    startOperationPoll({ intervalMs: 5000, budgetMs: 2000, tick, isResolved: () => false });
+
+    await vi.advanceTimersByTimeAsync(60000);
+    expect(tick).not.toHaveBeenCalled();
+  });
+
   it('keeps polling when a tick throws (errors are swallowed)', async () => {
     const tick = vi.fn(async () => { throw new Error('scan failed'); });
     startOperationPoll({ intervalMs: 1000, budgetMs: 3000, tick, isResolved: () => false });

@@ -23,11 +23,16 @@ export interface OperationPollHandle {
  */
 export function startOperationPoll(opts: OperationPollOptions): OperationPollHandle {
   const { intervalMs, budgetMs, tick, isResolved } = opts;
-  const maxTicks = Math.max(1, Math.floor(budgetMs / intervalMs));
+  const maxTicks = Math.floor(budgetMs / intervalMs);
 
   let ticks = 0;
   let cancelled = false;
   let timer: ReturnType<typeof setTimeout> | undefined;
+
+  // Budget smaller than one interval → no ticks fit; don't poll at all.
+  if (maxTicks < 1) {
+    return { cancel(): void { /* nothing scheduled */ } };
+  }
 
   const schedule = (): void => {
     timer = setTimeout(async () => {

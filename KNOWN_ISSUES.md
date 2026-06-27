@@ -32,10 +32,11 @@ watcher. So a skill installed or removed **inside WSL** (e.g. `npx skills add` i
 a WSL terminal) may not appear/disappear in the `WSL: <distro>` group or update
 its marketplace "Installed" badge until the next scan.
 
-**Extension-initiated** install/uninstall/update (the Install/Uninstall/Update
-buttons) now auto-resolve: a bounded WSL completion poll re-scans until the change
-is observed, so the WSL group/badge refresh and the "Installing…" notification
-clears promptly (instead of waiting for the ~30s timeout).
+**Extension-initiated installs** (the marketplace Install button) now auto-resolve:
+a bounded WSL completion poll re-scans until the new skill is observed, so the WSL
+group/badge refresh and the "Installing…" notification clears promptly (instead of
+waiting for the ~30s timeout). Uninstall/update from the extension never target WSL
+skills (WSL tree items are read-only), so they don't need the poll.
 
 A **manual** `npx skills add/remove` typed directly in a terminal is not polled,
 so it still picks up via:
