@@ -491,6 +491,41 @@ describe('InstalledSkillsTreeProvider', () => {
       expect(wslGroup.children[0].tooltip).toContain('Location: WSL · Ubuntu-20.04');
     });
 
+    it('nests native groups under a host-OS group when WSL is also present', async () => {
+      const scanner = createMockScanner({
+        globalSkills: [makeSkill({ name: 'native', source: 'org/repo', hash: 'abc' })],
+        wslGroups: [{
+          distro: 'Ubuntu-20.04',
+          skills: [makeSkill({ name: 'w', origin: 'wsl:Ubuntu-20.04', isCustom: true })],
+        }],
+      });
+      const provider = new InstalledSkillsTreeProvider(scanner);
+
+      const children = await provider.getChildren();
+
+      const hostGroup = children.find((c: any) => c.groupType === 'host') as any;
+      expect(hostGroup).toBeDefined();
+      expect(['Windows', 'macOS', 'Linux']).toContain(hostGroup.label);
+      expect(hostGroup.collapsibleState).toBe(TreeItemCollapsibleState.Expanded);
+      // The native source group is nested under host, NOT at the top level.
+      expect(children.find((c: any) => c.groupType === 'source')).toBeUndefined();
+      expect((hostGroup.children as any[]).some(g => g.groupType === 'source')).toBe(true);
+      // The WSL group is a sibling at the top level.
+      expect(children.find((c: any) => c.groupType === 'wsl')).toBeDefined();
+    });
+
+    it('keeps native groups top-level (no host wrapper) when no WSL is present', async () => {
+      const scanner = createMockScanner({
+        globalSkills: [makeSkill({ name: 'native', source: 'org/repo', hash: 'abc' })],
+      });
+      const provider = new InstalledSkillsTreeProvider(scanner);
+
+      const children = await provider.getChildren();
+
+      expect(children.find((c: any) => c.groupType === 'host')).toBeUndefined();
+      expect(children.find((c: any) => c.groupType === 'source')).toBeDefined();
+    });
+
     it('does not show the "no skills" state when only WSL skills exist', async () => {
       const scanner = createMockScanner({
         wslGroups: [{
