@@ -54,10 +54,15 @@ function makeSkill(overrides: Partial<InstalledSkill> & { name: string }): Insta
   };
 }
 
-function createMockScanner(skills: { globalSkills?: InstalledSkill[]; projectSkills?: InstalledSkill[] }): SkillScanner {
+function createMockScanner(skills: {
+  globalSkills?: InstalledSkill[];
+  projectSkills?: InstalledSkill[];
+  wslGroups?: { distro: string; skills: InstalledSkill[] }[];
+}): SkillScanner {
   const result: ScanResult = {
     globalSkills: skills.globalSkills ?? [],
     projectSkills: skills.projectSkills ?? [],
+    wslGroups: skills.wslGroups,
   };
   return { scan: vi.fn(async () => result) } as unknown as SkillScanner;
 }
@@ -443,6 +448,64 @@ describe('InstalledSkillsTreeProvider', () => {
       const children = await provider.getChildren();
       const customGroup = children.find((c: any) => c.groupType === 'custom');
       expect(customGroup!.contextValue).toBe('group');
+    });
+  });
+
+  // --- WSL distro groups --------------------------------------------------
+
+  describe('WSL groups', () => {
+    it('renders a collapsed "WSL: <distro> (N)" group at the bottom', async () => {
+      const scanner = createMockScanner({
+        wslGroups: [{
+          distro: 'Ubuntu-20.04',
+          skills: [
+            makeSkill({ name: 'monorepo-management', origin: 'wsl:Ubuntu-20.04', isCustom: true }),
+            makeSkill({ name: 'vercel-react-best-practices', origin: 'wsl:Ubuntu-20.04', isCustom: true }),
+          ],
+        }],
+      });
+      const provider = new InstalledSkillsTreeProvider(scanner);
+
+      const children = await provider.getChildren();
+      const wslGroup = children.find((c: any) => c.groupType === 'wsl') as any;
+      expect(wslGroup).toBeDefined();
+      expect(wslGroup.label).toBe('WSL: Ubuntu-20.04 (2)');
+      expect(wslGroup.collapsibleState).toBe(TreeItemCollapsibleState.Collapsed);
+      expect(wslGroup.children).toHaveLength(2);
+      // WSL group sits after Quick Links (which is always first)
+      expect((children[0] as any).groupType).toBe('quick-links');
+      expect(children.indexOf(wslGroup)).toBeGreaterThan(0);
+    });
+
+    it('marks WSL skills as installed-context via origin in the tooltip', async () => {
+      const scanner = createMockScanner({
+        wslGroups: [{
+          distro: 'Ubuntu-20.04',
+          skills: [makeSkill({ name: 'monorepo-management', origin: 'wsl:Ubuntu-20.04', isCustom: true })],
+        }],
+      });
+      const provider = new InstalledSkillsTreeProvider(scanner);
+
+      const children = await provider.getChildren();
+      const wslGroup = children.find((c: any) => c.groupType === 'wsl') as any;
+      expect(wslGroup.children[0].tooltip).toContain('Location: WSL · Ubuntu-20.04');
+    });
+
+    it('does not show the "no skills" state when only WSL skills exist', async () => {
+      const scanner = createMockScanner({
+        wslGroups: [{
+          distro: 'Ubuntu-20.04',
+          skills: [makeSkill({ name: 'monorepo-management', origin: 'wsl:Ubuntu-20.04', isCustom: true })],
+        }],
+      });
+      const provider = new InstalledSkillsTreeProvider(scanner);
+
+      await provider.rescan();
+
+      const { commands } = await import('vscode');
+      expect(commands.executeCommand).toHaveBeenCalledWith(
+        'setContext', 'skills-sh.noSkillsFound', false,
+      );
     });
   });
 

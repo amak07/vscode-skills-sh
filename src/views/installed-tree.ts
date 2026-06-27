@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { InstalledSkill } from '../types';
+import { InstalledSkill, WslSkillGroup } from '../types';
 import { SkillScanner } from '../local/scanner';
 import { getLastUpdateResult } from '../api/updates';
 import { getManifestSkillNames } from '../manifest/manifest';
@@ -14,12 +14,13 @@ const GROUP_ICONS: Record<string, string> = {
   project: 'folder-library',
   updates: 'cloud-upload',
   'quick-links': 'link',
+  wsl: 'terminal-linux',
 };
 
 class GroupItem extends vscode.TreeItem {
   constructor(
     public readonly label: string,
-    public readonly groupType: 'source' | 'custom' | 'untracked' | 'project' | 'updates' | 'quick-links',
+    public readonly groupType: 'source' | 'custom' | 'untracked' | 'project' | 'updates' | 'quick-links' | 'wsl',
     public readonly children: TreeItem[],
     collapsibleState = vscode.TreeItemCollapsibleState.Collapsed,
   ) {
@@ -77,6 +78,9 @@ class SkillItem extends vscode.TreeItem {
     if (agentNames.length > 0) {
       tooltipLines.push(`\nAgents: ${agentNames.join(', ')}`);
     }
+    if (skill.origin?.startsWith('wsl:')) {
+      tooltipLines.push(`\nLocation: WSL · ${skill.origin.slice('wsl:'.length)}`);
+    }
     tooltipLines.push(`\nPath: ${skill.path}`);
     if (skill.source) {
       tooltipLines.push(`Source: ${skill.source}`);
@@ -130,6 +134,7 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
 
   private globalSkills: InstalledSkill[] = [];
   private projectSkills: InstalledSkill[] = [];
+  private wslGroups: WslSkillGroup[] = [];
   private hasInitiallyScanned = false;
   private auditMap = new Map<string, AuditMapEntry>();
 
@@ -145,13 +150,16 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
   }
 
   async rescan(): Promise<void> {
-    const { globalSkills, projectSkills } = await this.scanner.scan();
+    const { globalSkills, projectSkills, wslGroups } = await this.scanner.scan();
     this.globalSkills = globalSkills;
     this.projectSkills = projectSkills;
+    this.wslGroups = wslGroups ?? [];
     this.hasInitiallyScanned = true;
 
+    const wslSkillCount = this.wslGroups.reduce((n, g) => n + g.skills.length, 0);
     const noSkills = this.globalSkills.length === 0
-      && this.projectSkills.length === 0;
+      && this.projectSkills.length === 0
+      && wslSkillCount === 0;
     vscode.commands.executeCommand('setContext', 'skills-sh.noSkillsFound', noSkills);
     // Inverse of noSkillsFound — needed as a truthy context for walkthrough completion events
     vscode.commands.executeCommand('setContext', 'skills-sh.hasInstalledSkill', !noSkills);
@@ -275,6 +283,20 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
           `Project Skills (${this.projectSkills.length})`,
           'project',
           children,
+        ));
+      }
+
+      // --- WSL distro groups (Windows host; collapsed by default, at the bottom) ---
+      for (const group of this.wslGroups) {
+        const sorted = this.sortSkills(group.skills);
+        const children = sorted.map(s =>
+          new SkillItem(s, false, manifestNames.has(s.folderName), this.auditMap.get(s.folderName)?.score, this.auditMap.get(s.folderName)?.audits),
+        );
+        groups.push(new GroupItem(
+          `WSL: ${group.distro} (${group.skills.length})`,
+          'wsl',
+          children,
+          vscode.TreeItemCollapsibleState.Collapsed,
         ));
       }
 
