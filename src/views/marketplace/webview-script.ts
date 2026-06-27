@@ -471,7 +471,11 @@ export function renderDetailHtml(detail: DetailData): string {
         + '</div>'
       : '')
     + '<div class="detail-skillmd-header">' + _icons.file + ' <span>SKILL.md</span></div>'
-    + '<div class="prose">' + (detail.skillMdHtml || '') + '</div>'
+    + '<div class="readme-collapsible" id="readmeCollapsible">'
+    +   '<div class="prose readme-prose">' + (detail.skillMdHtml || '') + '</div>'
+    +   '<div class="readme-fade" aria-hidden="true"></div>'
+    + '</div>'
+    + '<button type="button" class="readme-toggle" id="readmeToggle" hidden>Show more</button>'
     + '</div><aside>'
     + actionsSection
     + '<div class="sidebar-section"><div class="sidebar-label">Weekly Installs</div>'
@@ -492,6 +496,31 @@ export function renderDetailHtml(detail: DetailData): string {
             }).join('') + '</div></div>';
       })()
     + '</aside></div></div>';
+}
+
+/**
+ * Wire the collapsible SKILL.md "Show more / Show less" behavior, mirroring
+ * skills.sh. Reveals the toggle and keeps the clamp only when the content
+ * overflows the collapsed height; otherwise expands fully and hides the toggle.
+ * Exported so the toggle logic can be unit-tested (overflow gating depends on
+ * real layout, which only the live webview provides).
+ */
+export function setupReadmeCollapsible(doc: Document = document): void {
+  const collapsible = doc.getElementById('readmeCollapsible');
+  const toggle = doc.getElementById('readmeToggle') as HTMLButtonElement | null;
+  if (!collapsible || !toggle) { return; }
+
+  // +8px rounding buffer: ignore sub-pixel/rounding overflow that isn't real.
+  if (collapsible.scrollHeight > collapsible.clientHeight + 8) {
+    toggle.hidden = false; // content overflows — offer Show more
+  } else {
+    collapsible.classList.add('expanded'); // fits — no clamp, no button
+  }
+
+  toggle.addEventListener('click', () => {
+    const expanded = collapsible.classList.toggle('expanded');
+    toggle.textContent = expanded ? 'Show less' : 'Show more';
+  });
 }
 
 export function renderAuditsView(data: AuditsData): string {
@@ -1808,6 +1837,9 @@ export function initializeWebview(api: VsCodeApi, config: WebviewConfig): void {
         handleActionButtons(e.target as HTMLElement);
       });
     }
+
+    // Collapsible SKILL.md: clamp + reveal the toggle only when content overflows.
+    setupReadmeCollapsible(document);
   }
 
   function attachAuditsListeners(): void {

@@ -1,3 +1,6 @@
 
 # Use bd merge for beads JSONL files
 .beads/issues.jsonl merge=beads
+
+# Test fixtures are byte-exact oracles — never convert line endings.
+src/test/fixtures/** -text
