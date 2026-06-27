@@ -40,10 +40,11 @@ function parseRenderedHtml(
   skillId: string
 ): SkillDetail | null {
   try {
-    // Weekly Installs: <span>Weekly Installs</span></div><div class="...">121.0K</div>
-    const weeklyInstalls = extractPattern(
+    // Installs: <span>Installs</span></div><div class="text-3xl ...">10.7K</div>
+    // (skills.sh renamed this sidebar stat from "Weekly Installs" to total "Installs".)
+    const installs = extractPattern(
       html,
-      /Weekly Installs<\/span><\/div><div[^>]*>([\d,.]+K?)<\/div>/
+      />Installs<\/span><\/div><div[^>]*>([\d,.]+[KM]?)<\/div>/
     ) || 'N/A';
 
     // First Seen: <span>First Seen</span></div><div class="...">Jan 16, 2026</div>
@@ -86,7 +87,7 @@ function parseRenderedHtml(
     return {
       name: skillId,
       source: `${owner}/${repo}`,
-      weeklyInstalls,
+      installs,
       firstSeen,
       repository: `${owner}/${repo}`,
       installCommand,

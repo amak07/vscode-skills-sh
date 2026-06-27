@@ -52,7 +52,7 @@ export interface InstalledSkillData {
 export interface DetailData {
   name: string;
   source?: string;
-  weeklyInstalls?: string;
+  installs?: string;
   repository?: string;
   installCommand: string;
   perAgent?: { agent: string; installs: number }[];
@@ -478,8 +478,8 @@ export function renderDetailHtml(detail: DetailData): string {
     + '<button type="button" class="readme-toggle" id="readmeToggle" hidden>Show more</button>'
     + '</div><aside>'
     + actionsSection
-    + '<div class="sidebar-section"><div class="sidebar-label">Weekly Installs</div>'
-    + '<div class="sidebar-value-large">' + (detail.weeklyInstalls || 'N/A') + '</div></div>'
+    + '<div class="sidebar-section"><div class="sidebar-label">Installs</div>'
+    + '<div class="sidebar-value-large">' + (detail.installs || 'N/A') + '</div></div>'
     + repoSection
     + starsSection
     + '<div class="sidebar-section"><div class="sidebar-label">First Seen</div>'

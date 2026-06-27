@@ -269,7 +269,7 @@ export class MarketplaceViewProvider implements vscode.WebviewViewProvider {
             detail = {
               name: skillId,
               source,
-              weeklyInstalls: 'N/A',
+              installs: 'N/A',
               firstSeen: 'N/A',
               repository: source,
               installCommand: `npx skills add https://github.com/${source} --skill ${skillId}`,

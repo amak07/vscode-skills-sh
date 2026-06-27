@@ -14,7 +14,7 @@ import { fetchSkillDetail, extractHiddenReadmeChunk } from '../../../api/detail-
 
 /** Minimal but complete detail page containing all extractable fields. */
 function buildDetailHtml(opts: {
-  weeklyInstalls?: string;
+  installs?: string;
   firstSeen?: string;
   githubStars?: string;
   installCommand?: string;
@@ -25,7 +25,7 @@ function buildDetailHtml(opts: {
   hiddenChunkBody?: string;
   securityAudits?: { partner: string; status: string; slug: string }[];
 } = {}): string {
-  const weeklyInstalls = opts.weeklyInstalls ?? '121.0K';
+  const installs = opts.installs ?? '121.0K';
   const firstSeen = opts.firstSeen ?? 'Jan 16, 2026';
   const githubStars = opts.githubStars ?? '6.8K';
   const installCommand = opts.installCommand ?? 'npx skills add https://github.com/acme/tools --skill my-skill';
@@ -71,7 +71,7 @@ function buildDetailHtml(opts: {
     : '';
 
   return `<html><body>
-<span>Weekly Installs</span></div><div class="stat-value">${weeklyInstalls}</div>
+<span>Installs</span></div><div class="stat-value">${installs}</div>
 <span>First Seen</span></div><div class="stat-value">${firstSeen}</div>
 <span>GitHub Stars</span></div><div class="sidebar-value"><svg class="icon"></svg><span>${githubStars}</span></div>
 <code>${installCommand}</code>
@@ -94,11 +94,11 @@ describe('fetchSkillDetail', () => {
 
   // --- Successful parsing -------------------------------------------------
 
-  it('extracts weekly installs from detail page', async () => {
-    mockFetch({ 'skills.sh/acme/tools/my-skill': htmlResponse(buildDetailHtml({ weeklyInstalls: '42.5K' })) });
+  it('extracts the installs count from detail page', async () => {
+    mockFetch({ 'skills.sh/acme/tools/my-skill': htmlResponse(buildDetailHtml({ installs: '42.5K' })) });
     const detail = await fetchSkillDetail('acme', 'tools', 'my-skill');
     expect(detail).not.toBeNull();
-    expect(detail!.weeklyInstalls).toBe('42.5K');
+    expect(detail!.installs).toBe('42.5K');
   });
 
   it('extracts first seen date', async () => {
@@ -167,6 +167,8 @@ describe('fetchSkillDetail', () => {
     expect(detail!.skillMdHtml).toContain('Why Monorepos?');   // above the fold (visible prose)
     expect(detail!.skillMdHtml).toContain('Common Pitfalls');  // below the fold (RSC chunk)
     expect(detail!.skillMdHtml).toContain('Best Practices');   // below the fold
+    // skills.sh's sidebar "Installs" stat (renamed from "Weekly Installs").
+    expect(detail!.installs).toBe('10.7K');
   });
 
   it('appends the hidden RSC chunk to the visible prose when truncated', async () => {
@@ -244,17 +246,17 @@ describe('fetchSkillDetail', () => {
 
   // --- Empty / missing fields --------------------------------------------
 
-  it('returns N/A for missing weekly installs', async () => {
+  it('returns N/A for missing installs count', async () => {
     const html = '<html><body><div class="prose prose-invert max-w-none">body</div></div></div><div class="col-span-3">side</div></body></html>';
     mockFetch({ 'skills.sh/a/b/na': htmlResponse(html) });
     const detail = await fetchSkillDetail('a', 'b', 'na');
     expect(detail).not.toBeNull();
-    expect(detail!.weeklyInstalls).toBe('N/A');
+    expect(detail!.installs).toBe('N/A');
     expect(detail!.firstSeen).toBe('N/A');
   });
 
   it('returns empty array for per-agent when Installed on section is missing', async () => {
-    const html = '<html><body><span>Weekly Installs</span></div><div class="v">10</div>' +
+    const html = '<html><body><span>Installs</span></div><div class="v">10</div>' +
       '<span>First Seen</span></div><div class="v">Jan 01, 2026</div>' +
       '<div class="prose prose-invert max-w-none">hi</div></div></div><div class="col-span-3">side</div>' +
       '</body></html>';
@@ -267,7 +269,7 @@ describe('fetchSkillDetail', () => {
   it('falls back to constructed install command when not found in HTML', async () => {
     // HTML with no npx skills add pattern
     const html = '<html><body>' +
-      '<span>Weekly Installs</span></div><div class="v">5</div>' +
+      '<span>Installs</span></div><div class="v">5</div>' +
       '<span>First Seen</span></div><div class="v">Jan 01, 2026</div>' +
       '<div class="prose prose-invert max-w-none">content</div></div></div><div class="col-span-3">side</div>' +
       '</body></html>';
