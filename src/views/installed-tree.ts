@@ -179,7 +179,8 @@ export class InstalledSkillsTreeProvider implements vscode.TreeDataProvider<Tree
 
   getInstalledSkillNames(): Set<string> {
     const names = new Set<string>();
-    for (const skill of [...this.globalSkills, ...this.projectSkills]) {
+    const wslSkills = this.wslGroups.flatMap(g => g.skills);
+    for (const skill of [...this.globalSkills, ...this.projectSkills, ...wslSkills]) {
       names.add(skill.name);
       names.add(skill.folderName);
     }

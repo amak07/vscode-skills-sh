@@ -374,6 +374,20 @@ describe('InstalledSkillsTreeProvider', () => {
       const names = provider.getInstalledSkillNames();
       expect(names.size).toBe(0);
     });
+
+    it('includes WSL skills so the marketplace shows them as installed', async () => {
+      const scanner = createMockScanner({
+        wslGroups: [{
+          distro: 'Ubuntu-20.04',
+          skills: [makeSkill({ name: 'vercel-react-best-practices', folderName: 'vercel-react-best-practices', origin: 'wsl:Ubuntu-20.04' })],
+        }],
+      });
+      const provider = new InstalledSkillsTreeProvider(scanner);
+      await provider.rescan();
+
+      const names = provider.getInstalledSkillNames();
+      expect(names.has('vercel-react-best-practices')).toBe(true);
+    });
   });
 
   describe('getAllInstalledSkills', () => {
