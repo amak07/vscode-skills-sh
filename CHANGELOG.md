@@ -12,6 +12,7 @@ All notable changes to the Skills.sh Agent Skills Manager extension will be docu
 
 ### Fixed
 
+- **Detail page install count showed "N/A".** skills.sh renamed the sidebar stat from "Weekly Installs" to a total **Installs** count and changed the markup; the scraper now reads the new value and the panel is relabeled "Installs".
 - **Detail page SKILL.md is complete again** — skills.sh's new detail layout truncates the SKILL.md behind a "Show more" control and ships the below-the-fold content in the page's RSC flight data, which left the extension's panel blank. The scraper now reconstructs the full document (above-the-fold prose + the flight-data remainder), including skills.sh's syntax highlighting.
 - **No more false "Install failed" from PromptScript.** Installing globally prints an upstream `✗ … PromptScript: does not support global skill installation` and a non-zero exit code, even though the skill installs everywhere else. The extension now treats a non-zero exit as a real failure only when the skill is genuinely missing afterward. See `KNOWN_ISSUES.md`.
 

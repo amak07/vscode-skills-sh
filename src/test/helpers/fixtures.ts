@@ -106,7 +106,7 @@ export const SAMPLE_MANIFEST = {
 
 export const SAMPLE_DETAIL_HTML = `<html><body>
 <div class="stat-value">121.0K</div>
-<span>Weekly Installs</span></div><div class="stat-value">121.0K</div>
+<span>Installs</span></div><div class="stat-value">121.0K</div>
 <span>First Seen</span></div><div class="stat-value">Jan 16, 2026</div>
 <span>GitHub Stars</span></div><div class="sidebar-value"><svg></svg><span>6.8K</span></div>
 <div class="prose prose-invert max-w-none">

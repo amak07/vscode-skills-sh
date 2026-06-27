@@ -534,17 +534,17 @@ describe('renderDetailHtml', () => {
     expect(html).toContain('<h2>Body</h2>'); // raw HTML preserved
   });
 
-  it('renders weekly installs', () => {
+  it('renders installs count', () => {
     const detail: DetailData = {
       name: 'test', source: 'a/b',
       installCommand: 'npx skills add a/b',
-      weeklyInstalls: '1,234',
+      installs: '1,234',
     };
     const html = renderDetailHtml(detail);
     expect(html).toContain('1,234');
   });
 
-  it('renders "N/A" when weeklyInstalls missing', () => {
+  it('renders "N/A" when installs missing', () => {
     const detail: DetailData = {
       name: 'test', source: 'a/b',
       installCommand: 'npx skills add a/b',

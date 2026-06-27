@@ -475,7 +475,7 @@ describe('MarketplaceViewProvider', () => {
       const detail = {
         name: 'my-skill',
         source: 'org/repo',
-        weeklyInstalls: '1.2K',
+        installs: '1.2K',
         firstSeen: 'Jan 10, 2026',
         repository: 'org/repo',
         installCommand: 'npx skills add https://github.com/org/repo --skill my-skill',
@@ -506,7 +506,7 @@ describe('MarketplaceViewProvider', () => {
       const detail = {
         name: 'my-skill',
         source: 'org/repo',
-        weeklyInstalls: '1K',
+        installs: '1K',
         firstSeen: 'Jan 2026',
         repository: 'org/repo',
         installCommand: 'npx skills add ...',
@@ -540,7 +540,7 @@ describe('MarketplaceViewProvider', () => {
       );
       const payload = (call![0] as any).payload;
       expect(payload.name).toBe('my-skill');
-      expect(payload.weeklyInstalls).toBe('N/A');
+      expect(payload.installs).toBe('N/A');
       expect(payload.firstSeen).toBe('N/A');
       expect(payload.skillMdHtml).toContain('# Fallback Content');
     });
@@ -563,7 +563,7 @@ describe('MarketplaceViewProvider', () => {
       const detail = {
         name: 'my-skill',
         source: 'org/repo',
-        weeklyInstalls: '1K',
+        installs: '1K',
         firstSeen: 'Jan 2026',
         repository: 'org/repo',
         installCommand: 'npx skills add ...',
@@ -587,7 +587,7 @@ describe('MarketplaceViewProvider', () => {
       const detail = {
         name: 'my-skill',
         source: 'org/repo',
-        weeklyInstalls: '1K',
+        installs: '1K',
         firstSeen: 'Jan 2026',
         repository: 'org/repo',
         installCommand: 'npx skills add ...',
@@ -609,7 +609,7 @@ describe('MarketplaceViewProvider', () => {
       const detail = {
         name: 'my-skill',
         source: 'org/repo',
-        weeklyInstalls: '1K',
+        installs: '1K',
         firstSeen: 'Jan 2026',
         repository: 'org/repo',
         installCommand: 'npx skills add ...',
@@ -1459,7 +1459,7 @@ describe('MarketplaceViewProvider', () => {
       mockFetchSkillDetail.mockResolvedValue({
         name: 'My Skill',
         source: 'owner/repo',
-        weeklyInstalls: '100',
+        installs: '100',
         firstSeen: '2025-01-01',
         repository: 'owner/repo',
         installCommand: 'npx skills add ...',
@@ -1480,7 +1480,7 @@ describe('MarketplaceViewProvider', () => {
       const p = (call![0] as any).payload;
       expect(p).toHaveProperty('name');
       expect(p).toHaveProperty('source');
-      expect(p).toHaveProperty('weeklyInstalls');
+      expect(p).toHaveProperty('installs');
       expect(p).toHaveProperty('repository');
       expect(p).toHaveProperty('installCommand');
       expect(p).toHaveProperty('perAgent');
@@ -1577,7 +1577,7 @@ describe('MarketplaceViewProvider', () => {
       // Second request resolves immediately
       const secondDetail = {
         name: 'Skill B', source: 'org/repo-b',
-        weeklyInstalls: '50', firstSeen: '2025-06-01',
+        installs: '50', firstSeen: '2025-06-01',
         repository: 'org/repo-b', installCommand: 'npx skills add ...',
         perAgent: [], skillMdHtml: '<p>B</p>',
       };
@@ -1594,7 +1594,7 @@ describe('MarketplaceViewProvider', () => {
       // Now resolve the first (stale) request
       resolveFirst({
         name: 'Skill A', source: 'org/repo-a',
-        weeklyInstalls: '100', firstSeen: '2025-01-01',
+        installs: '100', firstSeen: '2025-01-01',
         repository: 'org/repo-a', installCommand: 'npx skills add ...',
         perAgent: [], skillMdHtml: '<p>A</p>',
       });
@@ -1613,7 +1613,7 @@ describe('MarketplaceViewProvider', () => {
       const firstPromise = new Promise((_, reject) => { rejectFirst = reject; });
       mockFetchSkillDetail.mockReturnValueOnce(firstPromise);
       mockFetchSkillDetail.mockResolvedValueOnce({
-        name: 'Latest', source: 'o/r', weeklyInstalls: '0', firstSeen: '',
+        name: 'Latest', source: 'o/r', installs: '0', firstSeen: '',
         repository: 'o/r', installCommand: '', perAgent: [], skillMdHtml: '',
       });
 

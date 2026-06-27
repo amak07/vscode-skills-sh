@@ -54,7 +54,7 @@ export interface SkillSecurityAudit {
 export interface SkillDetail {
   name: string;
   source: string;
-  weeklyInstalls: string;
+  installs: string;
   firstSeen: string;
   repository: string;
   installCommand: string;
