@@ -7,6 +7,12 @@ import { KNOWN_AGENTS } from '../../../local/known-agents';
 import { createSandbox, Sandbox } from '../../helpers/fs-sandbox';
 import { SAMPLE_LOCK_FILE } from '../../helpers/fixtures';
 
+// Mock WSL detection so scanner tests never shell out to real wsl.exe (the dev
+// machine is Windows, where scan() would otherwise enumerate live distros).
+// Default: no WSL roots. WSL-specific tests override via vi.mocked(getWslRoots).
+vi.mock('../../../local/wsl', () => ({ getWslRoots: vi.fn(async () => []) }));
+import { getWslRoots } from '../../../local/wsl';
+
 let sandbox: Sandbox;
 let scanner: SkillScanner;
 let savedEnv: Record<string, string | undefined>;
@@ -438,5 +444,64 @@ describe('SkillScanner multi-agent awareness', () => {
     // Both canonical (via .agents/skills/ real dir) and Claude Code (via .claude/skills/ symlink)
     expect(skill!.agents).toContain('skills.sh');
     expect(skill!.agents).toContain('Claude Code');
+  });
+});
+
+// ─── WSL scanning (Windows host) ─────────────────────────
+
+describe('SkillScanner.scan() — WSL', () => {
+  const originalPlatform = process.platform;
+  function setPlatform(p: string): void {
+    Object.defineProperty(process, 'platform', { value: p, configurable: true });
+  }
+  afterEach(() => {
+    setPlatform(originalPlatform);
+    vi.mocked(getWslRoots).mockResolvedValue([]);
+  });
+
+  it('does not scan WSL on non-Windows and leaves native results intact', async () => {
+    setPlatform('darwin');
+    sandbox.createSkill(sandbox.globalSkillsDir, 'native-skill', {
+      frontmatter: { name: 'native-skill', description: 'x' },
+    });
+
+    const result = await scanner.scan();
+
+    expect(result.wslGroups).toBeUndefined();
+    expect(getWslRoots).not.toHaveBeenCalled();
+    expect(result.globalSkills.map(s => s.name)).toContain('native-skill');
+  });
+
+  it('adds a collapsed-ready WSL group on win32 when a running distro has skills', async () => {
+    setPlatform('win32');
+    const wslHome = createSandbox('wsl-root-');
+    try {
+      wslHome.createSkill(wslHome.agentsDir, 'monorepo-management', {
+        frontmatter: { name: 'monorepo-management', description: 'from WSL' },
+      });
+      vi.mocked(getWslRoots).mockResolvedValue([{ distro: 'Ubuntu-20.04', base: wslHome.home }]);
+
+      const result = await scanner.scan();
+
+      expect(result.wslGroups).toBeDefined();
+      expect(result.wslGroups).toHaveLength(1);
+      expect(result.wslGroups![0].distro).toBe('Ubuntu-20.04');
+      const names = result.wslGroups![0].skills.map(s => s.name);
+      expect(names).toContain('monorepo-management');
+      expect(result.wslGroups![0].skills[0].origin).toBe('wsl:Ubuntu-20.04');
+    } finally {
+      wslHome.cleanup();
+    }
+  });
+
+  it('skips WSL scanning when skills-sh.scanWsl is disabled', async () => {
+    setPlatform('win32');
+    (workspace as any).__setConfigValue('skills-sh.scanWsl', false);
+    vi.mocked(getWslRoots).mockResolvedValue([{ distro: 'Ubuntu-20.04', base: sandbox.home }]);
+
+    const result = await scanner.scan();
+
+    expect(result.wslGroups).toBeUndefined();
+    expect(getWslRoots).not.toHaveBeenCalled();
   });
 });

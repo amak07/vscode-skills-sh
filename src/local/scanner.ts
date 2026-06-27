@@ -2,12 +2,13 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import * as vscode from 'vscode';
-import { InstalledSkill, SkillScope, SkillLockFile, LocalLockFile, ScanResult } from '../types';
+import { InstalledSkill, SkillScope, SkillLockFile, LocalLockFile, ScanResult, WslSkillGroup } from '../types';
 import { parseSkillMd, parseSkillMdAsync } from './parser';
 import { getLog } from '../logger';
 import { findLockEntryByFolder } from '../utils/lock-file';
 import { getGlobalLockPath } from '../utils/constants';
 import { KNOWN_AGENTS, KnownAgent } from './known-agents';
+import { getWslRoots } from './wsl';
 
 export interface ScanDiagnostic {
   globalDirs: { path: string; exists: boolean; skillCount: number; agent?: string }[];
@@ -135,7 +136,10 @@ export class SkillScanner {
       projectSkills = this.deduplicateAcrossAgents(projectEntries);
     }
 
-    return { globalSkills, projectSkills };
+    // -- WSL skills (Windows host only): scan running distros' homes --
+    const wslGroups = await this.scanWsl(activeAgents);
+
+    return { globalSkills, projectSkills, wslGroups: wslGroups.length > 0 ? wslGroups : undefined };
   }
 
   /**
@@ -175,7 +179,11 @@ export class SkillScanner {
     }));
   }
 
-  private async scanDirectory(dir: string, scope: SkillScope): Promise<InstalledSkill[]> {
+  private async scanDirectory(
+    dir: string,
+    scope: SkillScope,
+    globalLock: SkillLockFile | null = this.lockFileData,
+  ): Promise<InstalledSkill[]> {
     const log = getLog();
     const skills: InstalledSkill[] = [];
 
@@ -205,7 +213,7 @@ export class SkillScanner {
         continue;
       }
 
-      const lockEntry = this.findLockEntry(entry.name);
+      const lockEntry = this.findLockEntry(entry.name, globalLock);
       const isSymlink = entry.isSymbolicLink();
       log.info(`[scanner]   ${entry.name}: name="${parsed.name}" symlink=${isSymlink} lock=${lockEntry ? `found (source=${lockEntry.source})` : 'NOT FOUND'}`);
 
@@ -264,17 +272,60 @@ export class SkillScanner {
   }
 
   private async loadLockFile(): Promise<void> {
+    this.lockFileData = await this.readLockFile(getGlobalLockPath());
+  }
+
+  /** Read and parse a `.skill-lock.json` at an arbitrary path (e.g. a WSL distro's). */
+  private async readLockFile(lockPath: string): Promise<SkillLockFile | null> {
     const log = getLog();
-    const lockPath = getGlobalLockPath();
     try {
       const content = await fs.promises.readFile(lockPath, 'utf-8');
-      this.lockFileData = JSON.parse(content) as SkillLockFile;
-      const keys = Object.keys(this.lockFileData?.skills ?? {});
-      log.info(`[scanner] Lock file loaded: ${keys.length} skills — [${keys.join(', ')}]`);
+      const data = JSON.parse(content) as SkillLockFile;
+      const keys = Object.keys(data?.skills ?? {});
+      log.info(`[scanner] Lock file loaded (${lockPath}): ${keys.length} skills`);
+      return data;
     } catch {
-      log.warn('[scanner] Lock file not found or unreadable');
-      this.lockFileData = null;
+      log.warn(`[scanner] Lock file not found or unreadable: ${lockPath}`);
+      return null;
     }
+  }
+
+  /** Whether WSL scanning is enabled (Windows-only feature; default on). */
+  private isWslScanEnabled(): boolean {
+    return vscode.workspace.getConfiguration('skills-sh').get<boolean>('scanWsl', true);
+  }
+
+  /**
+   * Scan running WSL distros (Windows host only) for installed skills. Each
+   * distro is scanned with its own `~/.agents/.skill-lock.json`, mirroring the
+   * native global scan. Returns one group per distro that has any skills.
+   */
+  private async scanWsl(activeAgents: KnownAgent[]): Promise<WslSkillGroup[]> {
+    if (process.platform !== 'win32' || !this.isWslScanEnabled()) {
+      return [];
+    }
+    const roots = await getWslRoots();
+    const groups: WslSkillGroup[] = [];
+    for (const root of roots) {
+      const lock = await this.readLockFile(path.join(root.base, '.agents', '.skill-lock.json'));
+      const entries: AgentScanEntry[] = [];
+      for (const agent of activeAgents) {
+        const dir = path.join(root.base, agent.skillsDir);
+        const skills = await this.scanDirectory(dir, 'global', lock);
+        for (const skill of skills) {
+          entries.push({
+            skill: { ...skill, origin: `wsl:${root.distro}` },
+            agentDisplayName: agent.displayName,
+            isCanonical: agent.isCanonical === true,
+          });
+        }
+      }
+      const deduped = this.deduplicateAcrossAgents(entries);
+      if (deduped.length > 0) {
+        groups.push({ distro: root.distro, skills: deduped });
+      }
+    }
+    return groups;
   }
 
   /** Load project-level skills-lock.json (created by npx skills add without -g) */
@@ -293,9 +344,9 @@ export class SkillScanner {
     }
   }
 
-  private findLockEntry(folderName: string) {
+  private findLockEntry(folderName: string, globalLock: SkillLockFile | null = this.lockFileData) {
     // Check global lock (~/.agents/.skill-lock.json) via shared utility
-    const globalEntry = findLockEntryByFolder(this.lockFileData, folderName);
+    const globalEntry = findLockEntryByFolder(globalLock, folderName);
     if (globalEntry) {
       return globalEntry;
     }
