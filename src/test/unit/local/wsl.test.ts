@@ -68,6 +68,20 @@ describe('getWslRoots', () => {
     ]);
   });
 
+  it('falls back to \\\\wsl.localhost when \\\\wsl$ is unavailable', async () => {
+    setPlatform('win32');
+    vi.mocked(execFile).mockImplementation(((cmd: string, args: string[], _opts: unknown, cb: (e: Error | null, out: Buffer) => void) => {
+      if (args.includes('-l')) { cb(null, utf16(WSL_LIST_OUTPUT)); }
+      else { cb(null, Buffer.from('/home/abelm', 'utf8')); }
+      return {} as never;
+    }) as never);
+    vi.spyOn(fs, 'existsSync').mockImplementation((p) => String(p).startsWith('\\\\wsl.localhost\\'));
+
+    expect(await getWslRoots()).toEqual([
+      { distro: 'Ubuntu-20.04', base: '\\\\wsl.localhost\\Ubuntu-20.04\\home\\abelm' },
+    ]);
+  });
+
   it('skips a distro whose UNC home does not exist', async () => {
     setPlatform('win32');
     vi.mocked(execFile).mockImplementation(((cmd: string, args: string[], _opts: unknown, cb: (e: Error | null, out: Buffer) => void) => {

@@ -39,8 +39,8 @@ export async function getWslRoots(): Promise<WslRoot[]> {
         // `$HOME` is emitted by the Linux shell as raw UTF-8 (not wsl.exe's UTF-16).
         const home = (await runWsl(['-d', distro, '-e', 'sh', '-lc', 'printf %s "$HOME"'], 'utf8')).trim();
         if (!home.startsWith('/')) { continue; }
-        const base = `\\\\wsl$\\${distro}${home.replace(/\//g, '\\')}`;
-        if (fs.existsSync(base)) {
+        const base = resolveWslBase(distro, home);
+        if (base) {
           roots.push({ distro, base });
         }
       } catch (e) {
@@ -53,6 +53,24 @@ export async function getWslRoots(): Promise<WslRoot[]> {
     log.info(`[wsl] WSL detection unavailable: ${(e as Error).message}`);
     return [];
   }
+}
+
+/**
+ * Resolve a distro + Linux home (`/home/<user>`) to a reachable Windows UNC base.
+ * Windows exposes WSL files under `\\wsl$\<distro>` (older) or `\\wsl.localhost\
+ * <distro>` (Windows 22H2+); try both and return the first that exists, or null.
+ */
+function resolveWslBase(distro: string, home: string): string | null {
+  const tail = home.replace(/\//g, '\\');
+  for (const prefix of ['\\\\wsl$\\', '\\\\wsl.localhost\\']) {
+    const base = `${prefix}${distro}${tail}`;
+    try {
+      if (fs.existsSync(base)) { return base; }
+    } catch {
+      // UNC access can throw (provider unavailable) — treat as "not here".
+    }
+  }
+  return null;
 }
 
 /**

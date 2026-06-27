@@ -4,6 +4,14 @@ All notable changes to the Skills.sh Agent Skills Manager extension will be docu
 
 ## [Unreleased]
 
+### Added
+
+- **WSL skill detection (Windows).** On a Windows host, the extension now also scans **running** WSL distros for installed skills and shows them in a collapsed `WSL: <distro>` group at the bottom of the Installed view. Skills installed inside WSL (e.g. `npx skills add` run in a WSL terminal) live on a separate filesystem the Windows host couldn't previously see. Controlled by the new `skills-sh.scanWsl` setting (default on). Native macOS/Linux scanning is unchanged.
+
+### Fixed
+
+- **No more false "Install failed" from PromptScript.** Installing globally prints an upstream `✗ … PromptScript: does not support global skill installation` and a non-zero exit code, even though the skill installs everywhere else. The extension now treats a non-zero exit as a real failure only when the skill is genuinely missing afterward. See `KNOWN_ISSUES.md`.
+
 ## [0.2.3] - 2026-03-26
 
 ### Added
