@@ -31,6 +31,8 @@ import {
   notifyInstallDetected,
   disposeTerminal,
   getUpdatingSkillNames,
+  isSkillInstalled,
+  shouldReportInstallFailure,
 } from '../../../install/installer';
 
 // ---------------------------------------------------------------------------
@@ -479,6 +481,58 @@ describe('getUpdatingSkillNames', () => {
     // Since the user declined, updatingSkillNames should remain empty
     const names = getUpdatingSkillNames();
     expect(names.size).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// PromptScript false-failure handling
+// ---------------------------------------------------------------------------
+
+describe('shouldReportInstallFailure', () => {
+  it('does not report when exit code is 0', () => {
+    expect(shouldReportInstallFailure(0, false)).toBe(false);
+  });
+
+  it('does not report when the skill is actually installed (cosmetic CLI exit)', () => {
+    // e.g. PromptScript "does not support global skill installation" → exit 1,
+    // but the skill installed everywhere else.
+    expect(shouldReportInstallFailure(1, true)).toBe(false);
+  });
+
+  it('reports a real failure when exit is non-zero and the skill is absent', () => {
+    expect(shouldReportInstallFailure(1, false)).toBe(true);
+  });
+
+  it('does not report when exit code is undefined (no shell integration)', () => {
+    expect(shouldReportInstallFailure(undefined, false)).toBe(false);
+  });
+});
+
+describe('isSkillInstalled', () => {
+  let sandbox: Sandbox;
+  let savedEnv: Record<string, string | undefined>;
+
+  beforeEach(() => {
+    sandbox = createSandbox('installer-isinstalled-');
+    savedEnv = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };
+    process.env.HOME = sandbox.home;
+    process.env.USERPROFILE = sandbox.home;
+  });
+
+  afterEach(() => {
+    sandbox.cleanup();
+    for (const [k, v] of Object.entries(savedEnv)) {
+      if (v !== undefined) { process.env[k] = v; } else { delete process.env[k]; }
+    }
+  });
+
+  it('returns true when the skill folder exists under ~/.agents/skills', () => {
+    fs.mkdirSync(path.join(sandbox.agentsDir, 'vercel-react-best-practices'), { recursive: true });
+    expect(isSkillInstalled('vercel-react-best-practices')).toBe(true);
+  });
+
+  it('returns false when the skill folder is absent', () => {
+    expect(isSkillInstalled('not-installed')).toBe(false);
   });
 });
 

@@ -14,6 +14,26 @@ export function getUpdatingSkillNames(): ReadonlySet<string> {
   return updatingSkillNames;
 }
 
+/** True when a skill folder is present in the canonical global skills dir. */
+export function isSkillInstalled(skill: string): boolean {
+  try {
+    return fs.existsSync(path.join(getAgentsSkillsDir(), skill));
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Whether a non-zero `npx skills add/remove` exit should be surfaced as a real
+ * failure. The upstream CLI exits non-zero when an agent without global support
+ * (e.g. PromptScript, Eve — their `globalSkillsDir` is undefined) is present,
+ * even though the skill installed successfully to every other agent. So a
+ * non-zero exit is only a genuine failure when the skill is NOT on disk.
+ */
+export function shouldReportInstallFailure(exitCode: number | undefined, installed: boolean): boolean {
+  return exitCode !== undefined && exitCode !== 0 && !installed;
+}
+
 let sharedTerminal: vscode.Terminal | undefined;
 
 function getTerminal(): vscode.Terminal {
@@ -134,7 +154,11 @@ export async function installSkill(
           vscode.window.onDidEndTerminalShellExecution((e) => {
             log.info(`[installer] install: onDidEndTerminalShellExecution fired (terminal match: ${e.terminal === terminal}, exit: ${e.exitCode})`);
             if (e.terminal === terminal) {
-              if (e.exitCode !== undefined && e.exitCode !== 0) {
+              // A non-zero exit is only a real failure if the skill didn't land
+              // on disk — the upstream CLI exits non-zero merely because agents
+              // like PromptScript don't support global installs (skill still
+              // installs everywhere else). Don't show a false failure.
+              if (shouldReportInstallFailure(e.exitCode, isSkillInstalled(skillName))) {
                 vscode.window.showErrorMessage(
                   `Install of "${skillName}" failed (exit code ${e.exitCode}). Check the terminal.`,
                 );
@@ -229,17 +253,25 @@ export async function updateSkills(
         // Each skill sends 2 commands (remove + add), so we expect 2N completions.
         const expectedCmds = updates.length * 2;
         let completedCmds = 0;
+        let sawNonZeroExit = false;
         disposables.push(
           vscode.window.onDidEndTerminalShellExecution((e) => {
             if (e.terminal === terminal) {
               completedCmds++;
               log.info(`[installer] update: shell execution ${completedCmds}/${expectedCmds} (exit: ${e.exitCode})`);
-              if (e.exitCode !== undefined && e.exitCode !== 0) {
-                vscode.window.showWarningMessage(
-                  `Some skill updates may have failed (exit code ${e.exitCode}). Check the terminal.`,
-                );
-              }
+              if (e.exitCode !== undefined && e.exitCode !== 0) { sawNonZeroExit = true; }
               if (completedCmds >= expectedCmds) {
+                // Only warn if a non-zero exit actually left a skill missing on
+                // disk — not for the cosmetic PromptScript/Eve "no global
+                // support" exit (the update otherwise succeeded everywhere).
+                if (sawNonZeroExit) {
+                  const missing = updates.filter(u => !isSkillInstalled(u.name));
+                  if (missing.length > 0) {
+                    vscode.window.showWarningMessage(
+                      `Some skill updates may have failed: ${missing.map(u => u.name).join(', ')}. Check the terminal.`,
+                    );
+                  }
+                }
                 cleanup('shell-integration');
               }
             }
