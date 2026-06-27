@@ -4,7 +4,8 @@ import { SkillWatcher } from './local/watcher';
 import { InstalledSkillsTreeProvider } from './views/installed-tree';
 import { MarketplaceViewProvider } from './views/marketplace/provider';
 import { WelcomeViewProvider } from './views/welcome/provider';
-import { updateSkills, uninstallSkill, disposeTerminal, notifyInstallDetected, onOperationCompleted, getUpdatingSkillNames } from './install/installer';
+import { updateSkills, uninstallSkill, disposeTerminal, notifyInstallDetected, onOperationCompleted, onOperationStarted, getUpdatingSkillNames } from './install/installer';
+import { startOperationPoll, type OperationPollHandle } from './local/operation-poll';
 import { checkUpdates, getLastUpdateResult, clearUpdateForSkill } from './api/updates';
 import { fetchAuditListing, buildAuditMap } from './api/audits-scraper';
 import { InstalledSkill, InstalledSkillCard } from './types';
@@ -244,10 +245,44 @@ export function activate(context: vscode.ExtensionContext) {
   // When a terminal install/uninstall command completes (via shell integration),
   // trigger a rescan so the tree view and marketplace update even if the
   // filesystem watcher didn't fire (common on Windows with symlinks).
+  // WSL-aware completion poll handle (see onOperationStarted wiring below).
+  let activeWslPoll: OperationPollHandle | undefined;
+
   context.subscriptions.push(
     onOperationCompleted(() => {
       getLog().info('[operation] Terminal command completed, rescanning...');
       handleSkillChanges('operation');
+      // The op finished via the normal detectors — the WSL poll is now redundant.
+      activeWslPoll?.cancel();
+      activeWslPoll = undefined;
+    }),
+  );
+
+  // WSL-aware completion poll: WSL skill dirs aren't file-watched, and WSL
+  // terminals often don't emit shell-integration completion events. So when an
+  // extension-initiated op begins, bounded-poll a rescan (which includes WSL)
+  // until the change is observed — this clears the "Installing…" notification
+  // (handleSkillChanges fires notifyInstallDetected) and refreshes the tree/badge
+  // without needing window focus. Windows + skills-sh.scanWsl only.
+  context.subscriptions.push(
+    onOperationStarted((op) => {
+      const wslEnabled = vscode.workspace.getConfiguration('skills-sh').get<boolean>('scanWsl', true);
+      if (process.platform !== 'win32' || !wslEnabled) { return; }
+      activeWslPoll?.cancel();
+      const targets = op.skillNames;
+      activeWslPoll = startOperationPoll({
+        intervalMs: 2000,
+        budgetMs: 24000, // resolves before the installer's 30s timeout
+        tick: () => handleSkillChanges('wsl-poll'),
+        isResolved: () => {
+          // update = remove+add: the skill is present before and after, so
+          // presence can't signal completion — run to budget instead.
+          if (op.kind === 'update') { return false; }
+          const names = treeProvider.getInstalledSkillNames();
+          const present = targets.filter(n => names.has(n)).length;
+          return op.kind === 'install' ? present === targets.length : present === 0;
+        },
+      });
     }),
   );
 
