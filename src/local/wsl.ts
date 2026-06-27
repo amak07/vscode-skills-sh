@@ -65,7 +65,9 @@ export async function dumpWslSkills(distro: string, agentDirs: string[]): Promis
     `cat "$HOME/.agents/.skill-lock.json" 2>/dev/null; ` +
     `printf '\\n===ENDLOCK===\\n'`;
   try {
-    return await runWsl(['-d', distro, '-e', 'sh', '-lc', script], 'utf8');
+    // `sh -c` (not `-lc`): a login shell could run a user's profile and pollute
+    // stdout before the first delimiter. The script needs only builtins + cat.
+    return await runWsl(['-d', distro, '-e', 'sh', '-c', script], 'utf8');
   } catch (e) {
     log.warn(`[wsl] could not read skills from distro ${distro}: ${(e as Error).message}`);
     return null;
@@ -84,10 +86,12 @@ export function parseWslDump(dump: string): WslDump {
     skills.push({ agentDir: m[1], folderName: m[2], content: m[3] });
   }
 
-  const homeMatch = dump.match(/===HOME===([\s\S]*?)===\n/);
+  // Anchor the HOME/LOCK markers to line starts (they're printed that way) so a
+  // SKILL.md body containing the literal marker text can't be mistaken for them.
+  const homeMatch = dump.match(/^===HOME===([\s\S]*?)===$/m);
   const home = homeMatch ? homeMatch[1].trim() : '';
 
-  const lockMatch = dump.match(/===LOCK===\n([\s\S]*?)\n===ENDLOCK===/);
+  const lockMatch = dump.match(/^===LOCK===\n([\s\S]*?)\n===ENDLOCK===$/m);
   const lockRaw = lockMatch ? lockMatch[1].trim() : '';
 
   return { home, lockJson: lockRaw || null, skills };

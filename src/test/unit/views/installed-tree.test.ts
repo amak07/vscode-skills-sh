@@ -491,6 +491,25 @@ describe('InstalledSkillsTreeProvider', () => {
       expect(children.indexOf(wslGroup)).toBeGreaterThan(0);
     });
 
+    it('renders WSL skill items read-only (excluded from the skill context menu)', async () => {
+      const scanner = createMockScanner({
+        wslGroups: [{
+          distro: 'Ubuntu-20.04',
+          skills: [makeSkill({ name: 'monorepo-management', origin: 'wsl:Ubuntu-20.04', isCustom: true })],
+        }],
+      });
+      const provider = new InstalledSkillsTreeProvider(scanner);
+
+      const children = await provider.getChildren();
+      const wslGroup = children.find((c: any) => c.groupType === 'wsl') as any;
+      const item = wslGroup.children[0];
+      // contextValue must NOT start with "skill" (the menus key on /^skill/),
+      // and there must be no click command (UNC preview is unreliable).
+      expect(item.contextValue).toBe('wslSkill');
+      expect(/^skill/.test(item.contextValue)).toBe(false);
+      expect(item.command).toBeUndefined();
+    });
+
     it('marks WSL skills as installed-context via origin in the tooltip', async () => {
       const scanner = createMockScanner({
         wslGroups: [{

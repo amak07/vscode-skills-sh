@@ -110,14 +110,23 @@ class SkillItem extends vscode.TreeItem {
     }
     this.tooltip = tooltipLines.join('\n');
 
-    // Context value scheme: skill / skill_manifest / skill_updatable / skill_updatable_manifest
-    const base = hasUpdate ? 'skill_updatable' : 'skill';
-    this.contextValue = inManifest ? `${base}_manifest` : base;
-    this.command = {
-      command: 'skills-sh.previewSkillFile',
-      title: 'Preview SKILL.md',
-      arguments: [skill],
-    };
+    if (skill.origin?.startsWith('wsl:')) {
+      // WSL skills are read-only/informational from the Windows host: uninstall,
+      // open, copy-path, etc. would target the Windows filesystem (wrong distro)
+      // and silently fail. A contextValue that does NOT start with "skill"
+      // excludes them from every `viewItem =~ /^skill/` context menu. No click
+      // command either — the UNC path to SKILL.md isn't reliably openable.
+      this.contextValue = 'wslSkill';
+    } else {
+      // Context value scheme: skill / skill_manifest / skill_updatable / skill_updatable_manifest
+      const base = hasUpdate ? 'skill_updatable' : 'skill';
+      this.contextValue = inManifest ? `${base}_manifest` : base;
+      this.command = {
+        command: 'skills-sh.previewSkillFile',
+        title: 'Preview SKILL.md',
+        arguments: [skill],
+      };
+    }
   }
 }
 

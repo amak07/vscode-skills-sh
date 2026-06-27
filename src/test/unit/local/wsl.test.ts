@@ -60,6 +60,20 @@ describe('parseWslDump', () => {
     expect(parsed.lockJson).toBeNull();
     expect(parsed.home).toBe('/home/x');
   });
+
+  it('degrades gracefully when a SKILL.md body contains the delimiter text', () => {
+    const evil =
+      `===SKILL${TAB}.agents/skills${TAB}weird===\n` +
+      `---\nname: weird\ndescription: d\n---\nfoo\n===ENDSKILL===\nbar\n` +  // body contains the terminator
+      `\n===ENDSKILL===\n` +
+      `===HOME===/home/abelm===\n` +
+      `===LOCK===\n\n===ENDLOCK===\n`;
+    // Must not throw; home/lock still parse; at least one skill captured.
+    const parsed = parseWslDump(evil);
+    expect(parsed.home).toBe('/home/abelm');
+    expect(parsed.skills.length).toBeGreaterThanOrEqual(1);
+    expect(parsed.skills[0].folderName).toBe('weird');
+  });
 });
 
 describe('getRunningWslDistros', () => {
